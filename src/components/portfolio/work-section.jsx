@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { projects } from '@/data/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
-export function WorkSection() {
+export function WorkSection({ isScrolling }) {
+  const [activeProject, setActiveProject] = useState(null)
+  const resolvedProject = activeProject
+
   return (
     <section id="projects" className="space-y-8">
       <SectionHeader
@@ -12,24 +16,31 @@ export function WorkSection() {
         description="These cards now reflect the projects and outcomes from your resume, with emphasis on secure configuration tooling, deployment reliability, and reusable UI work."
       />
       <div className="grid gap-4 lg:grid-cols-3">
-        {projects.map((project, index) => (
+        {projects.map((project, index) => {
+          const isFeatured = index === 0 && resolvedProject === null
+          const isActive = resolvedProject === index
+
+          return (
           <article
             key={project.title}
-            className={`rounded-[2rem] border border-border/60 p-6 backdrop-blur ${
-              index === 0 ? 'bg-primary text-primary-foreground' : 'bg-card/70'
+            className={`rounded-[2rem] border p-6 backdrop-blur ${
+              isActive || isFeatured
+                ? 'border-primary/70 bg-primary text-primary-foreground shadow-[0_30px_80px_-40px_rgba(225,98,54,0.9)]'
+                : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
             }`}
+            onMouseEnter={() => !isScrolling && setActiveProject(index)}
           >
             <div className="flex items-center justify-between gap-4">
               <p
                 className={`text-xs font-semibold uppercase tracking-[0.26em] ${
-                  index === 0 ? 'text-primary-foreground/70' : 'text-primary'
+                  isActive || isFeatured ? 'text-primary-foreground/70' : 'text-primary'
                 }`}
               >
                 {project.eyebrow}
               </p>
               <span
                 className={`rounded-full border px-3 py-1 text-xs uppercase tracking-[0.18em] ${
-                  index === 0
+                  isActive || isFeatured
                     ? 'border-primary-foreground/20 bg-primary-foreground/8 text-primary-foreground'
                     : 'border-border/60 bg-background/80 text-muted-foreground'
                 }`}
@@ -40,7 +51,7 @@ export function WorkSection() {
             <h3 className="mt-6 font-serif text-3xl">{project.title}</h3>
             <p
               className={`mt-4 text-sm leading-7 ${
-                index === 0 ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                isActive || isFeatured ? 'text-primary-foreground/80' : 'text-muted-foreground'
               }`}
             >
               {project.description}
@@ -50,7 +61,7 @@ export function WorkSection() {
                 <span
                   key={item}
                   className={`rounded-full px-3 py-1.5 text-xs uppercase tracking-[0.18em] ${
-                    index === 0
+                    isActive || isFeatured
                       ? 'bg-primary-foreground/10 text-primary-foreground'
                       : 'border border-border/60 bg-background/70 text-muted-foreground'
                   }`}
@@ -61,16 +72,17 @@ export function WorkSection() {
             </div>
             <div className="mt-8 flex items-center justify-between">
               <Button
-                variant={index === 0 ? 'secondary' : 'outline'}
+                variant={isActive || isFeatured ? 'secondary' : 'outline'}
                 className="rounded-full"
               >
                 Explore
                 <ChevronRight className="size-4" />
               </Button>
-              <ArrowUpRight className={index === 0 ? 'text-primary-foreground/80' : 'text-primary'} />
+              <ArrowUpRight className={isActive || isFeatured ? 'text-primary-foreground/80' : 'text-primary'} />
             </div>
           </article>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

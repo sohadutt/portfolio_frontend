@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { contactMethods, personalInfo } from '@/data/portfolio'
 import { Button } from '@/components/ui/button'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
-export function ContactSection() {
+export function ContactSection({ isScrolling }) {
+  const [activeMethod, setActiveMethod] = useState(null)
+  const resolvedMethod = activeMethod
+
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
       <div className="rounded-[2rem] border border-border/60 bg-primary p-8 text-primary-foreground shadow-[0_30px_80px_-40px_rgba(225,98,54,0.9)]">
@@ -14,12 +18,18 @@ export function ContactSection() {
         <div className="mt-8 space-y-3">
           {contactMethods.map(({ label, value, href, icon }) => {
             const Icon = icon
+            const isActive = resolvedMethod === label
 
             return (
               <a
                 key={label}
                 href={href}
-                className="flex items-center justify-between rounded-[1.4rem] border border-primary-foreground/15 bg-primary-foreground/8 px-5 py-4 transition-colors hover:bg-primary-foreground/12"
+                className={`flex items-center justify-between rounded-[1.4rem] border px-5 py-4 ${
+                  isActive
+                    ? 'border-primary-foreground/35 bg-primary-foreground/18 shadow-[0_18px_55px_-35px_rgba(255,255,255,0.55)]'
+                    : `border-primary-foreground/15 bg-primary-foreground/8 ${isScrolling ? '' : 'hover:-translate-y-0.5 hover:bg-primary-foreground/12'}`
+                }`}
+                onMouseEnter={() => !isScrolling && setActiveMethod(label)}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-2xl bg-primary-foreground/12">
@@ -35,7 +45,7 @@ export function ContactSection() {
           })}
         </div>
       </div>
-      <div className="rounded-[2rem] border border-border/60 bg-card/75 p-8 backdrop-blur">
+      <div className={`rounded-[2rem] border border-border/60 bg-card/75 p-8 backdrop-blur ${isScrolling ? '' : 'hover:border-primary/35 hover:bg-primary/5'}`}>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-medium">Name</span>
@@ -68,7 +78,7 @@ export function ContactSection() {
             />
           </label>
         </div>
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-border/60 bg-background/70 px-4 py-4">
+        <div className={`mt-6 flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-border/60 bg-background/70 px-4 py-4 ${isScrolling ? '' : 'hover:border-primary/35 hover:bg-primary/6'}`}>
           <label className="flex items-center gap-3 text-sm text-muted-foreground">
             <span className="relative inline-flex h-7 w-12 items-center rounded-full bg-muted p-1">
               <span className="size-5 rounded-full bg-primary transition-transform duration-300" />

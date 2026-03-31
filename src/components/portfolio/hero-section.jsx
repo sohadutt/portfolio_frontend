@@ -1,23 +1,35 @@
 import { ArrowRight, ChartColumnIncreasing, CircleCheckBig, Sparkles } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { heroContent, heroMetrics, personalInfo, statusPills } from '@/data/portfolio'
 
-export function HeroSection() {
+export function HeroSection({ isScrolling }) {
+  const [activeMetric, setActiveMetric] = useState(null)
+  const [activeCapability, setActiveCapability] = useState(null)
+  const resolvedMetric = activeMetric
+  const resolvedCapability = activeCapability
+
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
       <div className="rounded-[2rem] border border-border/60 bg-card/80 p-8 shadow-[0_30px_80px_-45px_rgba(15,23,42,0.9)] backdrop-blur">
         <div className="mb-8 flex flex-wrap gap-3">
-          {statusPills.map(({ label, icon }) => {
+          {statusPills.map(({ label, icon }, index) => {
             const Icon = icon
+            const isActive = resolvedMetric === `pill-${index}`
 
             return (
-            <div
-              key={label}
-              className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-            >
-              <Icon className="size-3.5 text-primary" />
-              {label}
-            </div>
+              <div
+                key={label}
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
+                  isActive
+                    ? 'border-primary/50 bg-primary text-primary-foreground shadow-[0_20px_55px_-35px_rgba(225,98,54,0.95)]'
+                    : `border-border/70 bg-background/80 text-muted-foreground ${isScrolling ? '' : 'hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/8'}`
+                }`}
+                onMouseEnter={() => !isScrolling && setActiveMetric(`pill-${index}`)}
+              >
+                <Icon className={`size-3.5 ${isActive ? 'text-primary-foreground' : 'text-primary'}`} />
+                {label}
+              </div>
             )
           })}
         </div>
@@ -68,15 +80,26 @@ export function HeroSection() {
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
-          {heroMetrics.map((metric) => (
+          {heroMetrics.map((metric, index) => {
+            const isActive = resolvedMetric === index
+
+            return (
             <article
               key={metric.label}
-              className="rounded-[1.75rem] border border-border/60 bg-card/75 p-5 backdrop-blur"
+              className={`rounded-[1.75rem] border p-5 backdrop-blur ${
+                isActive
+                  ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_rgba(225,98,54,0.9)]'
+                  : `border-border/60 bg-card/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
+              }`}
+              onMouseEnter={() => !isScrolling && setActiveMetric(index)}
             >
               <p className="font-serif text-3xl">{metric.value}</p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{metric.label}</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {metric.label}
+              </p>
             </article>
-          ))}
+            )
+          })}
         </div>
         <div className="rounded-[2rem] border border-border/60 bg-card/75 p-6 backdrop-blur">
           <div className="mb-4 flex items-center gap-3">
@@ -96,7 +119,14 @@ export function HeroSection() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-border/60 bg-background/75 p-4">
+            <div
+              className={`rounded-2xl border p-4 ${
+                resolvedCapability === 'backend'
+                  ? 'border-primary/60 bg-primary/10 shadow-[0_24px_70px_-42px_rgba(225,98,54,0.9)]'
+                  : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/35 hover:bg-primary/6'}`
+              }`}
+              onMouseEnter={() => !isScrolling && setActiveCapability('backend')}
+            >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                 <CircleCheckBig className="size-4 text-primary" />
                 Backend systems
@@ -105,7 +135,14 @@ export function HeroSection() {
                 Django management commands, safe database operations, and API-based automation.
               </p>
             </div>
-            <div className="rounded-2xl border border-border/60 bg-background/75 p-4">
+            <div
+              className={`rounded-2xl border p-4 ${
+                resolvedCapability === 'frontend'
+                  ? 'border-primary/60 bg-primary/10 shadow-[0_24px_70px_-42px_rgba(225,98,54,0.9)]'
+                  : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/35 hover:bg-primary/6'}`
+              }`}
+              onMouseEnter={() => !isScrolling && setActiveCapability('frontend')}
+            >
               <div className="mb-2 flex items-center gap-2 text-sm font-medium">
                 <ChartColumnIncreasing className="size-4 text-primary" />
                 Frontend delivery

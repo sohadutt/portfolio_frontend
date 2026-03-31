@@ -102,22 +102,43 @@ export const experience = [
     period: '2024 - Present',
     title: 'Associate - Backend & Config Automation',
     company: 'Imagine.io | Delhi, India',
+    relation: 'automation',
     summary:
       'Designed Django management commands for controlled database updates, automated product configurator workflows through Python scripts and REST APIs, and validated PostgreSQL-backed configuration integrity across deployments.',
+    highlights: [
+      'Controlled config changes through safe Django command flows instead of direct production edits.',
+      'Connected REST automation, PostgreSQL validation, and deployment checks into one repeatable path.',
+      'Reduced manual operational risk while keeping product teams moving faster.',
+    ],
+    relatedComponents: ['Command', 'Alert Dialog', 'Data Table', 'Toast'],
   },
   {
     period: '2025 - Present',
     title: 'Frontend Developer',
     company: 'Board & Benchers | Delhi, India',
+    relation: 'frontend',
     summary:
       'Built reusable UI components with React and Tailwind CSS, integrated backend APIs with reliable error handling, and delivered responsive performance-optimized interfaces.',
+    highlights: [
+      'Created reusable interface pieces that scale across pages instead of one-off screens.',
+      'Focused on responsive behavior, API feedback states, and smoother user flows on multiple devices.',
+      'Turned backend capability into UI that feels polished and dependable.',
+    ],
+    relatedComponents: ['Drawer', 'Tabs', 'Tooltip', 'Toast'],
   },
   {
     period: '2023 - 2024',
     title: 'VFX Artist',
     company: 'Whizzy Entertainment Studios | Gujarat, India',
+    relation: 'workflow',
     summary:
       'Created reusable production pipelines and templates, collaborating across teams to improve delivery speed and maintain technical quality standards.',
+    highlights: [
+      'Brought a pipeline mindset that values repeatability, naming consistency, and handoff clarity.',
+      'Worked across teams where timing and technical quality both mattered for delivery.',
+      'That production discipline now carries into engineering workflows and QA.',
+    ],
+    relatedComponents: ['Progress', 'Calendar', 'Table', 'Badge'],
   },
 ]
 
@@ -125,6 +146,9 @@ export const showcaseCategories = [
   {
     title: 'Display & Feedback',
     icon: Sparkles,
+    relation: 'workflow',
+    preview:
+      'Feedback-heavy components help workflow-driven systems communicate status, QA progress, and delivery confidence.',
     items: [
       'Alert',
       'Badge',
@@ -143,6 +167,9 @@ export const showcaseCategories = [
   {
     title: 'Navigation & Layout',
     icon: LayoutPanelTop,
+    relation: 'frontend',
+    preview:
+      'Layout and navigation patterns support the frontend track, especially when interfaces need to expand without feeling crowded.',
     items: [
       'Accordion',
       'Aspect Ratio',
@@ -169,6 +196,9 @@ export const showcaseCategories = [
   {
     title: 'Data & Forms',
     icon: Workflow,
+    relation: 'automation',
+    preview:
+      'Forms and data controls connect directly to the automation work, where safe input, validation, and review matter most.',
     items: [
       'Calendar',
       'Checkbox',
@@ -204,22 +234,34 @@ export const featuredModules = [
   {
     title: 'Config automation',
     icon: Database,
+    relation: 'automation',
     body: 'Highlights your backend work around Django management commands, data safety, and automation of production configuration flows.',
+    details:
+      'When this card is active, the system emphasizes data-heavy components and safer review patterns that match your backend automation story.',
   },
   {
     title: 'Frontend delivery',
     icon: FolderGit2,
+    relation: 'frontend',
     body: 'Shows your React and Tailwind work in a more polished interface while still fitting the portfolio into a single clean page.',
+    details:
+      'This state pulls navigation and layout patterns forward so the portfolio visibly reflects your UI delivery strengths.',
   },
   {
     title: 'Cross-functional workflow',
     icon: MessageSquareQuote,
+    relation: 'workflow',
     body: 'Connects backend, frontend, QA, and production experience into one narrative instead of splitting them into isolated roles.',
+    details:
+      'The expanded view leans into status, coordination, and delivery cues that show how you work across disciplines.',
   },
   {
     title: 'Scalable portfolio system',
     icon: Blocks,
+    relation: 'portfolio-system',
     body: 'Keeps room for the larger component system you asked for, while the visible content now reflects your resume and links.',
+    details:
+      'This stays as its own focused module so the linked hover system only expands one related card at a time.',
   },
 ]
 

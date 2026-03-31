@@ -2,9 +2,17 @@ import { Button } from '@/components/ui/button'
 import { navigationLinks, personalInfo } from '@/data/portfolio'
 import { ThemeToggle } from '@/components/portfolio/theme-toggle'
 
-export function NavBar({ theme, onToggleTheme }) {
+export function NavBar({ theme, onToggleTheme, isVisible, onShow, onHide }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-40">
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
+        isVisible
+          ? 'translate-y-0 opacity-100'
+          : 'pointer-events-none -translate-y-[calc(100%-1rem)] opacity-0'
+      }`}
+      onMouseEnter={onShow}
+      onMouseLeave={onHide}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-4 sm:px-6 lg:px-8">
         <div className="flex w-full items-center justify-between rounded-full border border-border/60 bg-background/80 px-3 py-2 shadow-[0_18px_60px_-32px_rgba(15,23,42,0.8)] backdrop-blur-xl">
           <a href="#" className="flex items-center gap-3 rounded-full px-3 py-2 transition-colors hover:bg-muted/70">
@@ -21,7 +29,7 @@ export function NavBar({ theme, onToggleTheme }) {
               <a
                 key={link.href}
                 href={link.href}
-                className="rounded-full px-4 py-2 text-sm text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-foreground"
+                className="rounded-full px-4 py-2 text-sm text-muted-foreground transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
               >
                 {link.label}
               </a>
