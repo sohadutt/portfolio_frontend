@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { aboutContent, skillGroups } from '@/data/portfolio'
+import { aboutContent, skillGroups } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
 export function AboutSection({ isScrolling }) {

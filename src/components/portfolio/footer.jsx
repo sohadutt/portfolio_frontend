@@ -1,4 +1,4 @@
-import { footerLinks, personalInfo } from '@/data/portfolio'
+import { footerLinks, personalInfo } from '@/helper/portfolio'
 
 export function Footer({ isScrolling }) {
   return (

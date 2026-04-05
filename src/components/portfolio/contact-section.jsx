@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { contactMethods, personalInfo } from '@/data/portfolio'
+import { contactMethods, personalInfo } from '@/helper/portfolio'
 import { Button } from '@/components/ui/button'
 import { SectionHeader } from '@/components/portfolio/section-header'
 

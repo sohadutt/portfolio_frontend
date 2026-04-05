@@ -1,7 +1,7 @@
 import { ArrowRight, ChartColumnIncreasing, CircleCheckBig, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { heroContent, heroMetrics, personalInfo, statusPills } from '@/data/portfolio'
+import { heroContent, heroMetrics, personalInfo, statusPills } from '@/helper/portfolio'
 
 export function HeroSection({ isScrolling }) {
   const [activeMetric, setActiveMetric] = useState(null)

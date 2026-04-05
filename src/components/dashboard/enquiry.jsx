@@ -1,4 +1,4 @@
-import { getData } from "@/data/functions"
+import { getData } from "@/helper/functions"
 
 export function enquirys({ isScrolling }) {
     submissions = getData()

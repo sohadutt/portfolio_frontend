@@ -1,4 +1,4 @@
-import { showcaseCategories } from '@/data/portfolio'
+import { showcaseCategories } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
 export function ComponentShowcase({ activeHover, onRelationChange, isScrolling }) {

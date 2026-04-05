@@ -1,4 +1,4 @@
-import { experience, featuredModules } from '@/data/portfolio'
+import { experience, featuredModules } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
 function getCardClasses(isActive, isScrolling) {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { projects } from '@/data/portfolio'
+import { projects } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 
 export function WorkSection({ isScrolling }) {

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { navigationLinks, personalInfo } from '@/data/portfolio'
+import { navigationLinks, personalInfo } from '@/helper/portfolio'
 import { ThemeToggle } from '@/components/portfolio/theme-toggle'
 
 export function NavBar({ theme, onToggleTheme, isVisible, onShow, onHide }) {
