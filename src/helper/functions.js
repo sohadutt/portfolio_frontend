@@ -16,6 +16,7 @@ const api = axios.create({
     withCredentials: true,
 });
 
+// --- INTERCEPTORS ---
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
@@ -35,9 +36,11 @@ api.interceptors.response.use(
                 try {
                     const response = await axios.post(URLS.REFRESH_TOKEN, { refresh: refreshToken });
                     const newAccess = response.data.access;
+                    
                     localStorage.setItem('access_token', newAccess);
                     api.defaults.headers.common['Authorization'] = `Bearer ${newAccess}`;
                     originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
+                    
                     return api(originalRequest);
                 } catch (refreshError) {
                     localStorage.clear();
@@ -49,56 +52,67 @@ api.interceptors.response.use(
     }
 );
 
+// --- ERROR EXTRACTOR ---
+// Ensures Django JSON errors are converted to readable strings for toast notifications
+const extractError = (error) => {
+    if (error.response?.data) {
+        const data = error.response.data;
+        // Check for common Django error keys
+        if (data.detail) return data.detail;
+        if (data.message) return data.message;
+        if (data.error) return data.error;
+        
+        // If it's a form validation error object, grab the first error message
+        if (typeof data === 'object') {
+            const firstKey = Object.keys(data)[0];
+            if (Array.isArray(data[firstKey])) {
+                return `${firstKey}: ${data[firstKey][0]}`;
+            }
+        }
+        return typeof data === 'string' ? data : "An unexpected error occurred.";
+    }
+    return error.message || "Network error. Please try again.";
+};
+
+// --- BASE REQUEST HELPERS ---
 export const getRequest = async (url, params = {}) => {
     try {
         const response = await api.get(url, { params });
         return response.data;
     } catch (error) {
-        throw error.response?.data || error.message;
+        throw new Error(extractError(error));
     }
 };
 
-export const postRequest = async (url, data) => {
+export const postRequest = async (url, data, isMultipart = false) => {
     try {
-        const response = await api.post(url, data);
+        const config = isMultipart ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+        const response = await api.post(url, data, config);
         return response.data;
     } catch (error) {
-        throw error.response?.data || error.message;
+        throw new Error(extractError(error));
     }
 };
 
 export const patchRequest = async (url, data, isMultipart = false) => {
     try {
-        const config = {
-            headers: isMultipart ? {} : { 'Content-Type': 'application/json' }
-        };
-
-        if (isMultipart) {
-            delete config.headers['Content-Type'];
-        }
-
+        const config = isMultipart ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
         const response = await api.patch(url, data, config);
         return response.data;
     } catch (error) {
-        throw error.response?.data || error.message;
+        throw new Error(extractError(error));
     }
 };
 
+// --- SPECIFIC API CALLS ---
 export const initializeCSRF = async () => getRequest(URLS.CSRF);
+
 export const registerUser = async (data) => postRequest(URLS.REGISTER, data);
 
 export const loginUser = async (credentials) => {
     const data = await postRequest(URLS.LOGIN, credentials);
-    let accessToken = null;
-    let refreshToken = null;
-
-    if (data?.tokens) {
-        accessToken = data.tokens.access;
-        refreshToken = data.tokens.refresh;
-    } else if (data?.access) {
-        accessToken = data.access;
-        refreshToken = data.refresh;
-    }
+    let accessToken = data?.tokens?.access || data?.access;
+    let refreshToken = data?.tokens?.refresh || data?.refresh;
 
     if (accessToken) {
         localStorage.setItem('access_token', accessToken);
@@ -110,8 +124,8 @@ export const loginUser = async (credentials) => {
 
 export const verifyOTP = async (email, otp) => {
     const data = await postRequest(URLS.VERIFY_OTP, { email, otp });
-    let accessToken = data?.access || data?.tokens?.access;
-    let refreshToken = data?.refresh || data?.tokens?.refresh;
+    let accessToken = data?.tokens?.access || data?.access;
+    let refreshToken = data?.tokens?.refresh || data?.refresh;
 
     if (accessToken) {
         localStorage.setItem('access_token', accessToken);
@@ -131,21 +145,23 @@ export const logoutUser = async () => {
     }
 };
 
+// User Profile
 export const get_user_profile = () => getRequest(URLS.USER_PROFILE);
 export const update_user_profile = (formData, isMultipart = false) => patchRequest(URLS.UPDATE_PROFILE, formData, isMultipart);
 export const status_share_token = () => postRequest(URLS.SHARE_TOGGLE);
-export const update_portfolio = (data) => postRequest(URLS.PORTFOLIO_SAVE, data);
 
+// Portfolio Data
+export const update_portfolio = (data) => postRequest(URLS.PORTFOLIO_SAVE, data);
 export const fetchPublicPortfolio = (token = null) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token) : URLS.PORTFOLIO_DEFAULT;
     return getRequest(url);
 };
 
+// Forms & Dashboard
 export const submitContactForm = (data, token = null) => {
     const url = token ? URLS.SUBMIT_ENQUIRY_SHARED(token) : URLS.SUBMIT_FORM_DEFAULT;
     return postRequest(url, data);
 };
-
 export const fetchSubmissions = (page = 1) => getRequest(URLS.DASHBOARD_SUBMISSIONS, { page });
 export const updateSubmission = (id, data) => patchRequest(URLS.UPDATE_SUBMISSION(id), data);
 export const reorderSubmissions = (order) => postRequest(URLS.REORDER_SUBMISSIONS, { order });
