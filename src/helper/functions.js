@@ -53,16 +53,13 @@ api.interceptors.response.use(
 );
 
 // --- ERROR EXTRACTOR ---
-// Ensures Django JSON errors are converted to readable strings for toast notifications
 const extractError = (error) => {
     if (error.response?.data) {
         const data = error.response.data;
-        // Check for common Django error keys
         if (data.detail) return data.detail;
         if (data.message) return data.message;
         if (data.error) return data.error;
         
-        // If it's a form validation error object, grab the first error message
         if (typeof data === 'object') {
             const firstKey = Object.keys(data)[0];
             if (Array.isArray(data[firstKey])) {
@@ -111,8 +108,8 @@ export const registerUser = async (data) => postRequest(URLS.REGISTER, data);
 
 export const loginUser = async (credentials) => {
     const data = await postRequest(URLS.LOGIN, credentials);
-    let accessToken = data?.tokens?.access || data?.access;
-    let refreshToken = data?.tokens?.refresh || data?.refresh;
+    const accessToken = data?.tokens?.access || data?.access;
+    const refreshToken = data?.tokens?.refresh || data?.refresh;
 
     if (accessToken) {
         localStorage.setItem('access_token', accessToken);
@@ -124,8 +121,8 @@ export const loginUser = async (credentials) => {
 
 export const verifyOTP = async (email, otp) => {
     const data = await postRequest(URLS.VERIFY_OTP, { email, otp });
-    let accessToken = data?.tokens?.access || data?.access;
-    let refreshToken = data?.tokens?.refresh || data?.refresh;
+    const accessToken = data?.tokens?.access || data?.access;
+    const refreshToken = data?.tokens?.refresh || data?.refresh;
 
     if (accessToken) {
         localStorage.setItem('access_token', accessToken);
@@ -146,22 +143,30 @@ export const logoutUser = async () => {
 };
 
 // User Profile
-export const get_user_profile = () => getRequest(URLS.USER_PROFILE);
-export const update_user_profile = (formData, isMultipart = false) => patchRequest(URLS.UPDATE_PROFILE, formData, isMultipart);
-export const status_share_token = () => postRequest(URLS.SHARE_TOGGLE);
+export const getUserProfile = () => getRequest(URLS.USER_PROFILE);
+export const updateUserProfile = (formData) => patchRequest(URLS.UPDATE_PROFILE, formData, true);
+export const toggleShareStatus = () => postRequest(URLS.SHARE_TOGGLE);
 
-// Portfolio Data
-export const update_portfolio = (data) => postRequest(URLS.PORTFOLIO_SAVE, data);
-export const fetchPublicPortfolio = (token = null) => {
-    const url = token ? URLS.PORTFOLIO_SHARED(token) : URLS.PORTFOLIO_DEFAULT;
+// Portfolio Management (Authenticated)
+export const submitPortfolio = (data, index = 1) => postRequest(URLS.PORTFOLIO_SUBMIT(index), data);
+export const updatePortfolio = (data, index = 1) => postRequest(URLS.PORTFOLIO_UPDATE(index), data);
+
+// Portfolio Data (Public)
+export const fetchPublicPortfolio = (token = null, index = 1) => {
+    const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);
     return getRequest(url);
 };
 
-// Forms & Dashboard
-export const submitContactForm = (data, token = null) => {
-    const url = token ? URLS.SUBMIT_ENQUIRY_SHARED(token) : URLS.SUBMIT_FORM_DEFAULT;
+// Dashboard Controls
+export const fetchDashboardPortfolios = () => getRequest(URLS.DASHBOARD_PORTFOLIOS);
+export const togglePortfolioVisibility = (index) => patchRequest(URLS.TOGGLE_PORTFOLIO(index));
+
+// Forms & Submissions
+export const submitContactForm = (data, token = null, index = 1) => {
+    const url = token ? URLS.SUBMIT_ENQUIRY_SHARED(token, index) : URLS.SUBMIT_FORM_DEFAULT(index);
     return postRequest(url, data);
 };
+
 export const fetchSubmissions = (page = 1) => getRequest(URLS.DASHBOARD_SUBMISSIONS, { page });
 export const updateSubmission = (id, data) => patchRequest(URLS.UPDATE_SUBMISSION(id), data);
 export const reorderSubmissions = (order) => postRequest(URLS.REORDER_SUBMISSIONS, { order });

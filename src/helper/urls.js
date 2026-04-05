@@ -17,21 +17,42 @@ export const URLS = {
     GET_PUBLIC_TOKEN: `${BASE_URL}/api/profile/get-token/`,
 
     // ---- Portfolio Viewing (Public) ----
-    PORTFOLIO_DEFAULT: `${BASE_URL}/api/portfolio/default/`,
-    // Usage: URLS.PORTFOLIO_SHARED('some-token')
-    PORTFOLIO_SHARED: (token) => `${BASE_URL}/api/portfolio/shared/${token}/`,
+    // Use for primary: URLS.PORTFOLIO_DEFAULT() 
+    // Use for indexed: URLS.PORTFOLIO_DEFAULT(2)
+    PORTFOLIO_DEFAULT: (idx = 1) => idx === 1 
+        ? `${BASE_URL}/api/portfolio/default/` 
+        : `${BASE_URL}/api/portfolio/default/${idx}/`,
+
+    // Use for primary: URLS.PORTFOLIO_SHARED('my-token')
+    // Use for indexed: URLS.PORTFOLIO_SHARED('my-token', 2)
+    PORTFOLIO_SHARED: (token, idx = 1) => idx === 1 
+        ? `${BASE_URL}/api/portfolio/shared/${token}/` 
+        : `${BASE_URL}/api/portfolio/shared/${token}/${idx}/`,
 
     // ---- Portfolio Management (Authenticated) ----
-    PORTFOLIO_SAVE: `${BASE_URL}/api/portfolio/save/`,
+    PORTFOLIO_SUBMIT: (idx = 1) => idx === 1 
+        ? `${BASE_URL}/api/portfolio/submit/` 
+        : `${BASE_URL}/api/portfolio/submit/${idx}/`,
+
+    PORTFOLIO_UPDATE: (idx = 1) => idx === 1 
+        ? `${BASE_URL}/api/portfolio/update/` 
+        : `${BASE_URL}/api/portfolio/update/${idx}/`,
 
     // ---- Contact Form Submissions (Public) ----
-    SUBMIT_FORM_DEFAULT: `${BASE_URL}/api/forms/submit/default/`,
-    // Usage: URLS.SUBMIT_ENQUIRY_SHARED('some-token')
-    SUBMIT_ENQUIRY_SHARED: (token) => `${BASE_URL}/api/forms/submit/shared/${token}/`,
+    // Note: Default submit now requires an index in your Django URLs
+    SUBMIT_FORM_DEFAULT: (idx = 1) => `${BASE_URL}/api/forms/submit/default/${idx}/`,
+
+    SUBMIT_ENQUIRY_SHARED: (token, idx = 1) => idx === 1 
+        ? `${BASE_URL}/api/forms/submit/shared/${token}/` 
+        : `${BASE_URL}/api/forms/submit/shared/${token}/${idx}/`,
 
     // ---- Dashboard Management (Authenticated) ----
+    // Submissions
     DASHBOARD_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/`,
-    // Usage: URLS.UPDATE_SUBMISSION(123)
     UPDATE_SUBMISSION: (formId) => `${BASE_URL}/api/dashboard/submissions/${formId}/`,
     REORDER_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/reorder/`,
+
+    // Portfolios
+    DASHBOARD_PORTFOLIOS: `${BASE_URL}/api/dashboard/portfolios/`,
+    TOGGLE_PORTFOLIO: (idx) => `${BASE_URL}/api/dashboard/portfolios/${idx}/toggle/`,
 };
