@@ -18,7 +18,7 @@ import { ContactSection } from '@/components/portfolio/contact-section'
 import { Footer } from '@/components/portfolio/footer'
 
 // Helpers & Hooks
-import { get_user_profile, fetchPublicPortfolio, THEME_MAP } from "@/helper/functions"
+import { getUserProfile, fetchPublicPortfolio, THEME_MAP } from "@/helper/functions"
 import { useTheme } from '@/hooks/use-theme'
 import 'lenis/dist/lenis.css'
 
@@ -170,7 +170,7 @@ function DashboardView() {
 
   // Fetch Private User Profile
   useEffect(() => {
-    get_user_profile()
+    getUserProfile()
       .then((res) => {
         setData(res)
         setLoading(false)

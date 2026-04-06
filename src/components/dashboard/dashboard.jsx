@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SideProfile } from "@/components/user/SideProfile"
-import { get_user_profile } from "@/helper/functions"
+import { getUserProfile } from "@/helper/functions"
+import { Spinner } from "@/components/ui/spinner"
 import { Toaster } from "@/components/ui/sonner"
 import { LayoutDashboard, User, Briefcase, Settings } from "lucide-react"
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty"
 
 export default function Dashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    get_user_profile()
+    getUserProfile()
       .then((res) => {
         setData(res)
         setLoading(false)
@@ -23,12 +30,14 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground font-medium">Loading Dashboard...</p>
-        </div>
-      </div>
+    <Empty className="size-8">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Spinner />
+        </EmptyMedia>
+        <EmptyTitle>Loading Dashboard</EmptyTitle>
+      </EmptyHeader>
+    </Empty>
     )
   }
 

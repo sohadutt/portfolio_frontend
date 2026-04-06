@@ -30,26 +30,19 @@ export const URLS = {
         : `${BASE_URL}/api/portfolio/shared/${token}/${idx}/`,
 
     // ---- Portfolio Management (Authenticated) ----
-    PORTFOLIO_SUBMIT: (idx = 1) => idx === 1 
-        ? `${BASE_URL}/api/portfolio/submit/` 
-        : `${BASE_URL}/api/portfolio/submit/${idx}/`,
-
-    PORTFOLIO_UPDATE: (idx = 1) => idx === 1 
-        ? `${BASE_URL}/api/portfolio/update/` 
-        : `${BASE_URL}/api/portfolio/update/${idx}/`,
+    // Backend now strictly requires the index in the URL
+    PORTFOLIO_SUBMIT: (idx = 1) => `${BASE_URL}/api/portfolio/submit/${idx}/`,
+    PORTFOLIO_UPDATE: (idx = 1) => `${BASE_URL}/api/portfolio/update/${idx}/`,
 
     // ---- Contact Form Submissions (Public) ----
-    // Note: Default submit now requires an index in your Django URLs
     SUBMIT_FORM_DEFAULT: (idx = 1) => `${BASE_URL}/api/forms/submit/default/${idx}/`,
-
-    SUBMIT_ENQUIRY_SHARED: (token, idx = 1) => idx === 1 
-        ? `${BASE_URL}/api/forms/submit/shared/${token}/` 
-        : `${BASE_URL}/api/forms/submit/shared/${token}/${idx}/`,
+    // Backend strictly takes the token and applies order_index=1 via kwargs
+    SUBMIT_ENQUIRY_SHARED: (token) => `${BASE_URL}/api/forms/submit/shared/${token}/`,
 
     // ---- Dashboard Management (Authenticated) ----
     // Submissions
-    DASHBOARD_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/`,
-    UPDATE_SUBMISSION: (formId) => `${BASE_URL}/api/dashboard/submissions/${formId}/`,
+    DASHBOARD_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/view/`,
+    UPDATE_SUBMISSION: (formId) => `${BASE_URL}/api/dashboard/submissions/update/${formId}/`,
     REORDER_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/reorder/`,
 
     // Portfolios

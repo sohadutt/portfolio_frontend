@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarImage, AvatarFallback, AvatarBadge } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import { update_user_profile, status_share_token, THEME_MAP } from "@/helper/functions" 
+import { getUserProfile, toggleShareStatus, THEME_MAP } from "@/helper/functions" 
 import { Save, User, Check, Copy, Camera } from "lucide-react"
 
 // Cropper Imports
@@ -59,7 +59,7 @@ export function SideProfile({ profileData }) {
   // --- SHARE & VISIBILITY LOGIC ---
   const handleShareToggle = async () => {
     try {
-      const res = await status_share_token()
+      const res = await toggleShareStatus()
       setFormData(prev => ({ 
         ...prev, 
         enable_share_token: res.enable_share_token,
@@ -160,7 +160,7 @@ export function SideProfile({ profileData }) {
         isMultipart = true
       }
 
-      await update_user_profile(dataToSend, isMultipart)
+      await getUserProfile(dataToSend, isMultipart)
       toast.success("Profile saved")
       setNewImageFile(null) 
     } catch (error) {

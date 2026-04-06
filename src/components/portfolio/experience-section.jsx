@@ -1,9 +1,10 @@
 import { experience, featuredModules } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
+import { Badge } from '@/components/ui/badge'
 
 function getCardClasses(isActive, isScrolling) {
   return isActive
-    ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_rgba(225,98,54,0.9)]'
+    ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
     : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
 }
 
@@ -27,24 +28,32 @@ export function ExperienceSection({ activeHover, onRelationChange, isScrolling }
             return (
               <article
                 key={item.title}
-                className={`rounded-[1.6rem] border p-5 ${getCardClasses(isHighlighted, isScrolling)}`}
+                className={`rounded-[1.6rem] border p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
                 onMouseEnter={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
                 onFocus={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">{item.period}</p>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs uppercase tracking-[0.16em] ${
-                      isHighlighted
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
+                  
+                  {/* shadcn Component: Badge for the company */}
+                  <Badge
+                    variant={isHighlighted ? "default" : "secondary"}
+                    className="px-3 py-1 uppercase tracking-[0.16em]"
                   >
                     {item.company}
-                  </span>
+                  </Badge>
                 </div>
-                <h3 className="mt-4 font-serif text-2xl">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.summary}</p>
+                
+                {/* shadcn Typography: H3 */}
+                <h3 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+                  {item.title}
+                </h3>
+                
+                {/* shadcn Typography: Muted */}
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  {item.summary}
+                </p>
+                
                 <div
                   className={`grid transition-all duration-500 ${
                     isExpanded ? 'mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-70'
@@ -55,19 +64,24 @@ export function ExperienceSection({ activeHover, onRelationChange, isScrolling }
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
                         Expanded focus
                       </p>
+                      
+                      {/* shadcn Typography: Muted List */}
                       <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
                         {item.highlights.map((highlight) => (
                           <li key={highlight}>{highlight}</li>
                         ))}
                       </ul>
+                      
                       <div className="mt-4 flex flex-wrap gap-2">
                         {item.relatedComponents.map((component) => (
-                          <span
+                          /* shadcn Component: Badge for related skills/components */
+                          <Badge
                             key={component}
-                            className="rounded-full border border-primary/25 bg-primary/12 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-primary"
+                            variant="outline"
+                            className="border-primary/25 bg-primary/12 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-primary hover:bg-primary/20"
                           >
                             {component}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </div>
@@ -78,6 +92,7 @@ export function ExperienceSection({ activeHover, onRelationChange, isScrolling }
           })}
         </div>
       </div>
+      
       <div className="grid gap-4 sm:grid-cols-2">
         {featuredModules.map(({ title, body, icon, relation, details }) => {
           const Icon = icon
@@ -87,19 +102,28 @@ export function ExperienceSection({ activeHover, onRelationChange, isScrolling }
           return (
             <article
               key={title}
-              className={`rounded-[1.75rem] border bg-card/70 p-6 backdrop-blur ${getCardClasses(isHighlighted, isScrolling)}`}
+              className={`rounded-[1.75rem] border bg-card/70 p-6 backdrop-blur transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onFocus={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
             >
               <div
-                className={`flex size-12 items-center justify-center rounded-2xl ${
+                className={`flex size-12 items-center justify-center rounded-2xl transition-colors duration-300 ${
                   isHighlighted ? 'bg-primary text-primary-foreground' : 'bg-primary/12 text-primary'
                 }`}
               >
                 <Icon className="size-5" />
               </div>
-              <h3 className="mt-6 font-serif text-2xl">{title}</h3>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">{body}</p>
+              
+              {/* shadcn Typography: H3 */}
+              <h3 className="mt-6 scroll-m-20 text-2xl font-semibold tracking-tight">
+                {title}
+              </h3>
+              
+              {/* shadcn Typography: Muted */}
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                {body}
+              </p>
+              
               <div
                 className={`grid transition-all duration-500 ${
                   isExpanded ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'

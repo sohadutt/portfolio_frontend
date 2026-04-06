@@ -151,6 +151,12 @@ export const toggleShareStatus = () => postRequest(URLS.SHARE_TOGGLE);
 export const submitPortfolio = (data, index = 1) => postRequest(URLS.PORTFOLIO_SUBMIT(index), data);
 export const updatePortfolio = (data, index = 1) => postRequest(URLS.PORTFOLIO_UPDATE(index), data);
 
+// NEW: Automatically calculate the next available index for a new portfolio
+export const createNewPortfolio = (data, currentPortfolioCount) => {
+    const nextIndex = (currentPortfolioCount || 0) + 1;
+    return postRequest(URLS.PORTFOLIO_SUBMIT(nextIndex), data);
+};
+
 // Portfolio Data (Public)
 export const fetchPublicPortfolio = (token = null, index = 1) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);

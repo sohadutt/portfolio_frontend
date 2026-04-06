@@ -26,7 +26,7 @@ export function ComponentShowcase({ activeHover, onRelationChange, isScrolling }
               key={title}
               className={`rounded-[1.75rem] border p-5 ${
                 isHighlighted
-                  ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_rgba(225,98,54,0.9)]'
+                  ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
                   : `border-border/60 bg-background/80 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
               }`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'showcase' })}

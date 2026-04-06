@@ -22,7 +22,6 @@ import {
   FieldGroup,
   FieldLabel,
   FieldError,
-  FieldDescription,
   FieldContent,
 } from '@/components/ui/field'
 import { Loader2 } from 'lucide-react'
@@ -39,9 +38,9 @@ export function ContactSection({ isScrolling }) {
     name: "",
     email: "",
     phone: "",
-    priority: "0", // Default to Priority.LOW (0) as per Django model
+    priority: "0", 
     message: "",
-    for_work: false, // Default to false as per Django model
+    for_work: false, 
   })
 
   const handleChange = (e) => {
@@ -65,7 +64,6 @@ export function ContactSection({ isScrolling }) {
     setErrors({})
 
     try {
-      // Ensure priority is sent as an integer
       const payload = {
         ...formData,
         priority: parseInt(formData.priority, 10)
@@ -97,7 +95,7 @@ export function ContactSection({ isScrolling }) {
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
       {/* Left Column: Contact Methods */}
-      <div className="rounded-[2rem] border border-border/60 bg-primary p-8 text-primary-foreground shadow-[0_30px_80px_-40px_rgba(225,98,54,0.9)]">
+      <div className="rounded-[2rem] border border-border/60 bg-primary p-8 text-primary-foreground shadow-[0_24px_70px_-42px_var(--color-primary)">
         <SectionHeader
           eyebrow="Contact"
           title="Open to roles and collaborations where backend reliability meets strong product thinking."
@@ -124,8 +122,13 @@ export function ContactSection({ isScrolling }) {
                     <Icon className="size-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70">{label}</p>
-                    <p className="text-sm">{value}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70">
+                      {label}
+                    </p>
+                    {/* shadcn Typography: Small */}
+                    <p className="mt-1.5 text-sm font-medium leading-none">
+                      {value}
+                    </p>
                   </div>
                 </div>
               </a>
@@ -136,7 +139,7 @@ export function ContactSection({ isScrolling }) {
 
       {/* Right Column: Contact Form */}
       <div className={`rounded-[2rem] border border-border/60 bg-card/75 p-8 backdrop-blur transition-colors duration-300 ${isScrolling ? '' : 'hover:border-primary/35 hover:bg-primary/5'}`}>
-        <form onSubmit={handleSubmit} className="flex flex-col h-full justify-between">
+        <form onSubmit={handleSubmit} className="flex h-full flex-col justify-between">
           <FieldGroup className="grid gap-5 sm:grid-cols-2">
             
             <Field data-invalid={!!errors.name}>
@@ -185,7 +188,7 @@ export function ContactSection({ isScrolling }) {
             <Field data-invalid={!!errors.priority}>
               <FieldLabel htmlFor="priority">Urgency</FieldLabel>
               <Select value={formData.priority} onValueChange={handleSelectChange}>
-                <SelectTrigger id="priority" className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20 h-[42px]">
+                <SelectTrigger id="priority" className="h-[42px] rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -206,21 +209,25 @@ export function ContactSection({ isScrolling }) {
                 rows="5"
                 value={formData.message}
                 onChange={handleChange}
-                className="rounded-[1.5rem] border-border bg-background px-4 py-3 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
+                className="resize-none rounded-[1.5rem] border-border bg-background px-4 py-3 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
                 placeholder="Share the details of your project or inquiry."
                 required
               />
               {errors.message && <FieldError>{errors.message}</FieldError>}
             </Field>
 
-            <Field orientation="horizontal" className="sm:col-span-2 mt-2">
+            <Field orientation="horizontal" className="mt-2 sm:col-span-2">
               <Checkbox 
                 id="for_work" 
                 checked={formData.for_work} 
                 onCheckedChange={handleCheckboxChange} 
               />
               <FieldContent>
-                <FieldLabel htmlFor="for_work" className="font-normal cursor-pointer">
+                {/* shadcn Typography: Small/Muted alignment for form descriptions */}
+                <FieldLabel 
+                  htmlFor="for_work" 
+                  className="cursor-pointer text-sm font-medium leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   This inquiry is regarding a paid project, role, or collaboration.
                 </FieldLabel>
               </FieldContent>
@@ -229,29 +236,20 @@ export function ContactSection({ isScrolling }) {
           </FieldGroup>
 
           {/* Footer / Submit Area */}
-          <div className={`mt-8 flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] border border-border/60 bg-background/70 px-4 py-4 transition-colors duration-300 ${isScrolling ? '' : 'hover:border-primary/35 hover:bg-primary/6'}`}>
-            <label className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="relative inline-flex h-7 w-12 items-center rounded-full bg-muted p-1">
-                <span className="size-5 rounded-full bg-primary transition-transform duration-300" />
-              </span>
-              Available for backend and frontend work
-            </label>
-            
             <Button 
               type="submit" 
               disabled={loading}
-              className="rounded-full px-8 font-semibold shadow-lg transition-all"
+              className="rounded-half px-15 font-semibold shadow-lg transition-all"
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 size-4 animate-spin" />
                   Sending...
                 </>
               ) : (
                 "Send Message"
               )}
             </Button>
-          </div>
         </form>
       </div>
     </section>
