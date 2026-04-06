@@ -6,45 +6,52 @@ import { heroContent, heroMetrics, personalInfo, statusPills } from '@/helper/po
 export function HeroSection({ isScrolling }) {
   const [activeMetric, setActiveMetric] = useState(null)
   const [activeCapability, setActiveCapability] = useState(null)
-  const resolvedMetric = activeMetric
-  const resolvedCapability = activeCapability
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      {/* Updated the base neutral shadow to use standard black/foreground opacity so it looks good in light/dark mode */}
-      <div className="rounded-[2rem] border border-border/60 bg-card/80 p-8 shadow-[0_30px_80px_-45px_rgba(0,0,0,0.5)] backdrop-blur dark:shadow-[0_30px_80px_-45px_rgba(0,0,0,0.9)]">
+
+      {/* LEFT MAIN */}
+      <div className="rounded-[2rem] border border-border/60 bg-card/80 p-8 backdrop-blur">
+
+        {/* STATUS PILLS */}
         <div className="mb-8 flex flex-wrap gap-3">
           {statusPills.map(({ label, icon }, index) => {
             const Icon = icon
-            const isActive = resolvedMetric === `pill-${index}`
+            const isActive = activeMetric === `pill-${index}`
 
             return (
               <div
                 key={label}
-                // SWAPPED ORANGE FOR var(--color-primary)
-                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition-all ${
                   isActive
-                    ? 'border-primary/50 bg-primary text-primary-foreground shadow-[0_20px_55px_-35px_var(--color-primary)]'
-                    : `border-border/70 bg-background/80 text-muted-foreground ${isScrolling ? '' : 'hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/8'}`
+                    ? 'border-primary/50 bg-primary text-primary-foreground'
+                    : `border-border/70 bg-background/80 text-muted-foreground ${
+                        isScrolling ? '' : 'hover:border-primary/40 hover:bg-primary/5'
+                      }`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(`pill-${index}`)}
               >
-                <Icon className={`size-3.5 ${isActive ? 'text-primary-foreground' : 'text-primary'}`} />
+                <Icon className={`size-4 ${isActive ? '' : 'text-primary'}`} />
                 {label}
               </div>
             )
           })}
         </div>
+
+        {/* TEXT CONTENT */}
         <div className="space-y-6">
-          <p className="text-sm font-bold uppercase tracking-[0.32em] text-primary">
+          <p className="text-xs font-bold uppercase tracking-[0.32em] text-primary">
             {heroContent.eyebrow}
           </p>
-          <h1 className="scroll-m-20 text-balance text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
+
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.02]">
             {heroContent.title}
           </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
+
+          <p className="max-w-xl text-lg text-muted-foreground leading-relaxed">
             {heroContent.description}
           </p>
+
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild size="lg" className="rounded-full px-6 font-semibold">
               <a href="#projects">
@@ -52,6 +59,7 @@ export function HeroSection({ isScrolling }) {
                 <ArrowRight className="ml-2 size-4" />
               </a>
             </Button>
+
             <Button asChild variant="outline" size="lg" className="rounded-full px-6 font-semibold">
               <a href={personalInfo.github} target="_blank" rel="noreferrer">
                 GitHub
@@ -61,53 +69,61 @@ export function HeroSection({ isScrolling }) {
         </div>
       </div>
 
+      {/* RIGHT SIDE */}
       <div className="grid gap-4">
-        <div className="rounded-[2rem] border border-border/60 bg-card/75 p-6 backdrop-blur">
+
+        {/* FOCUS CARD */}
+        <div className="rounded-[2rem] border border-border/60 bg-card/80 p-6 backdrop-blur">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium leading-none text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Current focus
               </p>
-              <h3 className="mt-3 scroll-m-20 text-2xl font-semibold tracking-tight">
+              <h3 className="mt-2 text-2xl font-semibold tracking-tight">
                 Automation + product delivery
               </h3>
             </div>
-            <div className="rounded-2xl bg-primary/12 p-3 text-primary">
-              <Sparkles className="size-5" />
+
+            <div className="rounded-xl bg-primary/10 p-3">
+              <Sparkles className="size-6 text-primary" />
             </div>
           </div>
+
+          {/* PROGRESS */}
           <div className="mt-6 space-y-3">
-            <div className="h-3 overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-[78%] rounded-full bg-primary transition-all duration-700" />
+            <div className="h-2 rounded-full bg-muted">
+              <div className="h-full w-[78%] rounded-full bg-primary" />
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-[92%] rounded-full bg-foreground/75 transition-all duration-700" />
+            <div className="h-2 rounded-full bg-muted">
+              <div className="h-full w-[92%] rounded-full bg-foreground/70" />
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-[64%] rounded-full bg-chart-2 transition-all duration-700" />
+            <div className="h-2 rounded-full bg-muted">
+              <div className="h-full w-[64%] rounded-full bg-chart-2" />
             </div>
           </div>
         </div>
 
+        {/* METRICS */}
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
           {heroMetrics.map((metric, index) => {
-            const isActive = resolvedMetric === index
+            const isActive = activeMetric === index
 
             return (
               <article
                 key={metric.label}
-                // SWAPPED ORANGE FOR var(--color-primary)
-                className={`rounded-[1.75rem] border p-5 backdrop-blur transition-all duration-300 ${
+                className={`rounded-[1.5rem] border p-5 transition-all ${
                   isActive
-                    ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
-                    : `border-border/60 bg-card/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
+                    ? 'border-primary/60 bg-primary/10'
+                    : `border-border/60 bg-card/80 ${
+                        isScrolling ? '' : 'hover:border-primary/40 hover:bg-primary/5'
+                      }`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(index)}
               >
-                <p className="scroll-m-20 text-3xl font-semibold tracking-tight">
+                <p className="text-3xl font-semibold tracking-tight">
                   {metric.value}
                 </p>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {metric.label}
                 </p>
               </article>
@@ -115,8 +131,11 @@ export function HeroSection({ isScrolling }) {
           })}
         </div>
 
-        <div className="rounded-[2rem] border border-border/60 bg-card/75 p-6 backdrop-blur">
-          <div className="mb-4 flex items-center gap-3">
+        {/* PROFILE + CAPABILITIES */}
+        <div className="rounded-[2rem] border border-border/60 bg-card/80 p-6">
+
+          {/* PROFILE */}
+          <div className="mb-5 flex items-center gap-3">
             <div className="flex -space-x-3">
               {['S', 'D', 'U'].map((letter) => (
                 <div
@@ -127,48 +146,57 @@ export function HeroSection({ isScrolling }) {
                 </div>
               ))}
             </div>
+
             <div>
-              <p className="text-sm font-semibold leading-none">{personalInfo.subtitle}</p>
-              <p className="mt-1.5 text-sm text-muted-foreground">{personalInfo.location}</p>
+              <p className="text-sm font-semibold">{personalInfo.subtitle}</p>
+              <p className="text-sm text-muted-foreground">{personalInfo.location}</p>
             </div>
           </div>
+
+          {/* CAPABILITIES */}
           <div className="grid gap-3 sm:grid-cols-2">
+
             <div
-              // SWAPPED ORANGE FOR var(--color-primary)
-              className={`rounded-2xl border p-4 transition-all duration-300 ${
-                resolvedCapability === 'backend'
-                  ? 'border-primary/60 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
-                  : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/35 hover:bg-primary/6'}`
+              className={`rounded-xl border p-4 transition-all ${
+                activeCapability === 'backend'
+                  ? 'border-primary/60 bg-primary/10'
+                  : `border-border/60 bg-background/80 ${
+                      isScrolling ? '' : 'hover:border-primary/40 hover:bg-primary/5'
+                    }`
               }`}
               onMouseEnter={() => !isScrolling && setActiveCapability('backend')}
             >
-              <div className="mb-2 flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <CircleCheckBig className="size-4 text-primary" />
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <CircleCheckBig className="size-5 text-primary" />
                 Backend systems
               </div>
-              <p className="text-sm leading-6 text-muted-foreground">
-                Django management commands, safe database operations, and API-based automation.
+              <p className="text-sm text-muted-foreground">
+                Django, APIs, automation workflows and scalable backend logic.
               </p>
             </div>
+
             <div
-              // SWAPPED ORANGE FOR var(--color-primary)
-              className={`rounded-2xl border p-4 transition-all duration-300 ${
-                resolvedCapability === 'frontend'
-                  ? 'border-primary/60 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
-                  : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/35 hover:bg-primary/6'}`
+              className={`rounded-xl border p-4 transition-all ${
+                activeCapability === 'frontend'
+                  ? 'border-primary/60 bg-primary/10'
+                  : `border-border/60 bg-background/80 ${
+                      isScrolling ? '' : 'hover:border-primary/40 hover:bg-primary/5'
+                    }`
               }`}
               onMouseEnter={() => !isScrolling && setActiveCapability('frontend')}
             >
-              <div className="mb-2 flex items-center gap-2 text-sm font-semibold tracking-tight">
-                <ChartColumnIncreasing className="size-4 text-primary" />
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <ChartColumnIncreasing className="size-5 text-primary" />
                 Frontend delivery
               </div>
-              <p className="text-sm leading-6 text-muted-foreground">
-                React and Tailwind components integrated with backend APIs and responsive UX.
+              <p className="text-sm text-muted-foreground">
+                React, Tailwind and modern UI systems integrated with APIs.
               </p>
             </div>
+
           </div>
         </div>
+
       </div>
     </section>
   )

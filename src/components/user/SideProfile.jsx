@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarImage, AvatarFallback, AvatarBadge } from "@/components/ui/avatar"
 import { toast } from "sonner"
-import { getUserProfile, toggleShareStatus, THEME_MAP } from "@/helper/functions" 
-import { Save, User, Check, Copy, Camera } from "lucide-react"
+
+// Make sure logoutUser and updateUserProfile are exported from your helper
+import { updateUserProfile, toggleShareStatus, logoutUser, THEME_MAP } from "@/helper/functions" 
+import { Save, User, Check, Copy, Camera, LogOut } from "lucide-react"
 
 // Cropper Imports
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
@@ -37,13 +40,12 @@ export function SideProfile({ profileData }) {
     if (profileData) setFormData(profileData)
   }, [profileData])
 
-  // Mark as dirty if form changed OR if a new image is selected
   const isDirty = useMemo(() => {
     return JSON.stringify(formData) !== JSON.stringify(profileData) || newImageFile !== null
   }, [formData, profileData, newImageFile])
 
   const initials = useMemo(() => {
-    if (!formData?.username) return <User size={16} />
+    if (!formData?.username) return <User className="size-4" />
     return formData.username.slice(0, 2).toUpperCase()
   }, [formData?.username])
 
@@ -149,18 +151,16 @@ export function SideProfile({ profileData }) {
     setLoading(true)
     try {
       let dataToSend = formData
-      let isMultipart = false
-
+      
       if (newImageFile) {
         dataToSend = new FormData()
         Object.keys(formData).forEach(key => {
           if (key !== 'profile_picture') dataToSend.append(key, formData[key])
         })
         dataToSend.append('profile_picture', newImageFile)
-        isMultipart = true
       }
 
-      await getUserProfile(dataToSend, isMultipart)
+      await updateUserProfile(dataToSend)
       toast.success("Profile saved")
       setNewImageFile(null) 
     } catch (error) {
@@ -170,29 +170,40 @@ export function SideProfile({ profileData }) {
     }
   }
 
+  // --- AUTH LOGIC ---
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+      toast.success("Logged out successfully")
+      // Redirect to login page
+      window.location.href = "/login"
+    } catch (error) {
+      toast.error("Failed to log out")
+    }
+  }
+
   return (
     <>
       <Sidebar>
-        <SidebarHeader className="p-4 border-b">
+        <SidebarHeader className="border-b p-4">
           <div className="flex items-center gap-3">
-            {/* Clickable Avatar Group */}
             <div 
-              className="relative group cursor-pointer" 
+              className="group relative cursor-pointer" 
               onClick={() => fileInputRef.current?.click()}
             >
-              <Avatar size="lg" className="border shadow-sm group-hover:opacity-75 transition-opacity">
+              <Avatar className="h-12 w-12 border shadow-sm transition-opacity group-hover:opacity-75">
                 <AvatarImage src={previewImage || formData?.profile_picture} alt={formData?.username} className="object-cover" />
-                <AvatarFallback className="bg-muted text-muted-foreground font-medium">
+                <AvatarFallback className="bg-muted font-medium text-muted-foreground">
                   {initials}
                 </AvatarFallback>
                 {formData?.is_verified && (
-                  <AvatarBadge className="bg-blue-500 border-2 border-background flex items-center justify-center p-0.5">
-                    <Check className="text-white w-2.5 h-2.5" strokeWidth={4} />
+                  <AvatarBadge className="flex h-4 w-4 items-center justify-center border-2 border-background bg-blue-500 p-0">
+                    <Check className="h-2.5 w-2.5 text-white" strokeWidth={4} />
                   </AvatarBadge>
                 )}
               </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="text-white w-4 h-4" />
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                <Camera className="h-4 w-4 text-white" />
               </div>
               <input 
                 type="file" 
@@ -203,73 +214,77 @@ export function SideProfile({ profileData }) {
               />
             </div>
 
-            <div className="flex flex-col min-w-0">
-              <span className="font-bold text-sm truncate">{formData?.username || "Guest"}</span>
-              <span className="text-xs text-muted-foreground truncate">{formData?.email}</span>
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-semibold leading-none">
+                  {formData?.username || "Guest"}
+                </span>
+                <Badge variant="secondary" className="h-4 px-1.5 py-0 text-[10px] uppercase tracking-wider">
+                  {formData?.tier || "Premium"}
+                </Badge>
+              </div>
+              <span className="truncate text-xs leading-none text-muted-foreground">
+                {formData?.email}
+              </span>
             </div>
           </div>
         </SidebarHeader>
 
         <SidebarContent className="gap-0">
           <SidebarGroup>
-            <SidebarGroupLabel className="px-3">Personal Info</SidebarGroupLabel>
-            <SidebarGroupContent className="space-y-3 p-3">
-              <div className="grid gap-1.5">
-                <label className="text-[10px] uppercase font-bold text-muted-foreground ml-1">First Name</label>
-                <Input name="first_name" value={formData?.first_name || ""} onChange={handleChange} className="h-8 text-sm" />
+            <SidebarGroupLabel>Personal Info</SidebarGroupLabel>
+            <SidebarGroupContent className="p-2 space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="first_name">First Name</Label>
+                <Input id="first_name" name="first_name" value={formData?.first_name || ""} onChange={handleChange} />
               </div>
-              <div className="grid gap-1.5">
-                <label className="text-[10px] uppercase font-bold text-muted-foreground ml-1">Last Name</label>
-                <Input name="last_name" value={formData?.last_name || ""} onChange={handleChange} className="h-8 text-sm" />
+              <div className="space-y-1.5">
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input id="last_name" name="last_name" value={formData?.last_name || ""} onChange={handleChange} />
               </div>
             </SidebarGroupContent>
           </SidebarGroup>
 
           <SidebarGroup>
-            <SidebarGroupLabel className="px-3">Visibility & Sharing</SidebarGroupLabel>
-            <SidebarGroupContent className="p-3 space-y-4">
+            <SidebarGroupLabel>Visibility & Sharing</SidebarGroupLabel>
+            <SidebarGroupContent className="p-2 space-y-4">
               
-              {/* Restored Share Switch Card */}
-              <div className="flex items-center justify-between space-x-2 rounded-lg border p-3 shadow-sm bg-card/50">
-                <div className="flex flex-col gap-0.5">
-                  <Label htmlFor="share-toggle" className="text-xs font-bold cursor-pointer">
-                    Public Access
-                  </Label>
-                  <span className="text-[10px] text-muted-foreground">
-                    {formData?.enable_share_token ? "Live" : "Private"}
-                  </span>
+              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-card">
+                <div className="space-y-0.5">
+                  <Label htmlFor="share-toggle">Public Access</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {formData?.enable_share_token ? "Portfolio is live" : "Portfolio is private"}
+                  </p>
                 </div>
                 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   {formData?.enable_share_token && (
-                     <Button 
-                      variant="outline" 
+                    <Button 
+                      variant="ghost" 
                       size="icon" 
-                      className="h-7 w-7 animate-in zoom-in duration-200" 
+                      className="h-8 w-8" 
                       onClick={copyShareLink}
                     >
-                      <Copy className="h-3 w-3" />
+                      <Copy className="h-4 w-4" />
                     </Button>
                   )}
                   <Switch 
                     id="share-toggle" 
                     checked={formData?.enable_share_token || false} 
                     onCheckedChange={handleShareToggle}
-                    size="sm"
                   />
                 </div>
               </div>
 
-              {/* Theme Selector */}
-              <div className="grid gap-1.5 px-1">
-                <label className="text-[10px] uppercase font-bold text-muted-foreground ml-1">Active Theme</label>
+              <div className="space-y-1.5">
+                <Label htmlFor="theme_select">Active Theme</Label>
                 <Select value={String(formData?.theme_mode ?? 0)} onValueChange={handleThemeChange}>
-                  <SelectTrigger className="h-8 text-xs bg-background">
+                  <SelectTrigger id="theme_select">
                     <SelectValue placeholder="Select a theme" />
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(THEME_MAP).map(([key, value]) => (
-                      <SelectItem key={key} value={key} className="text-xs capitalize">
+                      <SelectItem key={key} value={key} className="capitalize">
                         {value.replace('theme-', '')}
                       </SelectItem>
                     ))}
@@ -280,10 +295,10 @@ export function SideProfile({ profileData }) {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-4 border-t h-20 flex items-center">
+        <SidebarFooter className="border-t p-4 space-y-2">
           {isDirty && (
             <Button 
-              className="w-full animate-in fade-in slide-in-from-bottom-3 duration-300 shadow-xl" 
+              className="w-full shadow-sm" 
               onClick={handleSave}
               disabled={loading}
             >
@@ -291,6 +306,14 @@ export function SideProfile({ profileData }) {
               {loading ? "Saving..." : "Save Changes"}
             </Button>
           )}
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-muted-foreground hover:text-foreground" 
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Log out
+          </Button>
         </SidebarFooter>
       </Sidebar>
 
@@ -300,14 +323,14 @@ export function SideProfile({ profileData }) {
           <DialogHeader>
             <DialogTitle>Crop Profile Picture</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center p-4 bg-muted/30 rounded-md">
+          <div className="flex items-center justify-center rounded-md bg-muted/30 p-4">
             {imgSrc && (
               <ReactCrop
                 crop={crop}
                 onChange={(_, percentCrop) => setCrop(percentCrop)}
                 onComplete={(c) => setCompletedCrop(c)}
-                aspect={1} // Locks aspect ratio to a square
-                circularCrop // Visual circle guide
+                aspect={1}
+                circularCrop
               >
                 <img ref={imgRef} src={imgSrc} alt="Upload" onLoad={onImageLoad} className="max-h-[50vh] object-contain" />
               </ReactCrop>

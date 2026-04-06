@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { ReactLenis } from 'lenis/react'
+import { Loader2 } from 'lucide-react'
 
 // UI Components
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SideProfile } from "@/components/user/SideProfile"
 import { Toaster } from "@/components/ui/sonner"
 
-// Portfolio Sections
+// Pages & Sections
+import LoginPage from '@/components/user/LoginPage'
 import { NavBar } from '@/components/portfolio/nav-bar'
 import { HeroSection } from '@/components/portfolio/hero-section'
 import { AboutSection } from '@/components/portfolio/about-section'
@@ -22,47 +24,37 @@ import { getUserProfile, fetchPublicPortfolio, THEME_MAP } from "@/helper/functi
 import { useTheme } from '@/hooks/use-theme'
 import 'lenis/dist/lenis.css'
 
-/**
- * 1. Protected Route Component
- * Redirects to /login if no access token is found in localStorage
- */
+/* ---------------- PROTECTED ROUTE ---------------- */
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('access_token')
   if (!token) return <Navigate to="/login" replace />
   return children
 }
 
-/**
- * 2. Login Placeholder
- */
-const LoginPage = () => (
-  <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
-    <div className="text-center space-y-4">
-      <h1 className="text-4xl font-black uppercase tracking-tighter">Login</h1>
-      <p className="text-muted-foreground">Login functionality coming soon...</p>
-      <div className="p-4 border border-dashed rounded-lg text-xs font-mono">
-        Manually set 'access_token' in LocalStorage to access /dashboard.
-      </div>
-    </div>
-  </div>
-)
+/* ---------------- THEME HELPER ---------------- */
+const applyTheme = (themeMode) => {
+  if (themeMode === undefined) return
 
-/**
- * 3. Public Portfolio View (For visitors)
- * Displays the portfolio without the editing sidebar.
- * Handles both '/' (default) and '/portfolio/:token' (shared links).
- */
+  const root = document.documentElement
+  const themeClass = THEME_MAP[themeMode] || 'theme-ocean'
+
+  Object.values(THEME_MAP).forEach(t => root.classList.remove(t))
+  root.classList.add(themeClass)
+}
+
+/* ---------------- PUBLIC VIEW ---------------- */
 function PublicPortfolioView() {
   const { token } = useParams()
   const { theme, toggleTheme, mounted } = useTheme()
+
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-  
+
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
   const [isScrolling, setIsScrolling] = useState(false)
 
-  // Fetch Public Portfolio Data
+  /* Fetch Data */
   useEffect(() => {
     setLoading(true)
     fetchPublicPortfolio(token)
@@ -76,50 +68,49 @@ function PublicPortfolioView() {
       })
   }, [token])
 
-  // Apply Theme Dynamically based on backend data
+  /* Apply Theme */
   useEffect(() => {
-    if (data?.theme_mode !== undefined) {
-      const themeClass = THEME_MAP[data.theme_mode] || 'theme-ocean'
-      const root = document.documentElement
-      
-      // Clear old themes and apply the new one
-      Object.values(THEME_MAP).forEach(t => root.classList.remove(t))
-      root.classList.add(themeClass)
-    }
+    applyTheme(data?.theme_mode)
   }, [data?.theme_mode])
 
-  // Navigation and Scroll Logic
+  /* Nav Behavior */
   useEffect(() => {
+    let scrollTimeout
+
     function handlePointerMove(event) {
       setNavVisible(event.clientY <= 96 || window.scrollY < 24)
     }
-    let scrollTimeout
+
     function handleScroll() {
       setIsScrolling(true)
       if (window.scrollY < 24) setNavVisible(true)
-      window.clearTimeout(scrollTimeout)
-      scrollTimeout = window.setTimeout(() => setIsScrolling(false), 140)
+
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(() => setIsScrolling(false), 140)
     }
+
     window.addEventListener('pointermove', handlePointerMove)
     window.addEventListener('scroll', handleScroll, { passive: true })
+
     return () => {
-      window.clearTimeout(scrollTimeout)
+      clearTimeout(scrollTimeout)
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
-  if (!mounted || loading) return (
-    <div className="h-screen w-full flex items-center justify-center bg-background">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-    </div>
-  )
+  if (!mounted || loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
-    <ReactLenis root options={{ duration: 1.1, smoothWheel: true, wheelMultiplier: 0.9 }}>
-      <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background text-foreground">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(225,98,54,0.18),_transparent_32%),radial-gradient(circle_at_top_right,_rgba(33,119,116,0.12),_transparent_28%)]" />
-        
+    <ReactLenis root options={{ duration: 1.1, smoothWheel: true }}>
+      <div className="relative flex min-h-screen flex-col bg-background text-foreground">
+
         <NavBar
           theme={theme}
           onToggleTheme={toggleTheme}
@@ -128,8 +119,7 @@ function PublicPortfolioView() {
           onHide={() => { if (window.scrollY >= 24) setNavVisible(false) }}
         />
 
-        <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-16 pt-24 sm:px-6 lg:px-8">
-          {/* Passed data down to sections so they can use live API values */}
+        <main className="mx-auto w-full max-w-7xl flex flex-col gap-10 px-4 pt-24 pb-16 sm:px-6 lg:px-8">
           <HeroSection data={data} isScrolling={isScrolling} />
           <AboutSection data={data} isScrolling={isScrolling} />
           <WorkSection data={data} isScrolling={isScrolling} />
@@ -149,26 +139,23 @@ function PublicPortfolioView() {
         </main>
 
         <Footer data={data} isScrolling={isScrolling} />
+        <Toaster position="bottom-right" />
       </div>
-      <Toaster position="bottom-right" />
     </ReactLenis>
   )
 }
 
-/**
- * 4. Main Dashboard View (For You)
- * Contains the Sidebar AND the Portfolio sections
- */
+/* ---------------- DASHBOARD VIEW ---------------- */
 function DashboardView() {
   const { theme, toggleTheme, mounted } = useTheme()
+
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-  
+
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
   const [isScrolling, setIsScrolling] = useState(false)
 
-  // Fetch Private User Profile
   useEffect(() => {
     getUserProfile()
       .then((res) => {
@@ -181,56 +168,51 @@ function DashboardView() {
       })
   }, [])
 
-  // Apply Theme Dynamically based on backend data
   useEffect(() => {
-    if (data?.theme_mode !== undefined) {
-      const themeClass = THEME_MAP[data.theme_mode] || 'theme-ocean'
-      const root = document.documentElement
-      
-      // Clear old themes and apply the new one
-      Object.values(THEME_MAP).forEach(t => root.classList.remove(t))
-      root.classList.add(themeClass)
-    }
+    applyTheme(data?.theme_mode)
   }, [data?.theme_mode])
 
-  // Navigation and Scroll Logic
   useEffect(() => {
+    let scrollTimeout
+
     function handlePointerMove(event) {
       setNavVisible(event.clientY <= 96 || window.scrollY < 24)
     }
-    let scrollTimeout
+
     function handleScroll() {
       setIsScrolling(true)
       if (window.scrollY < 24) setNavVisible(true)
-      window.clearTimeout(scrollTimeout)
-      scrollTimeout = window.setTimeout(() => setIsScrolling(false), 140)
+
+      clearTimeout(scrollTimeout)
+      scrollTimeout = setTimeout(() => setIsScrolling(false), 140)
     }
+
     window.addEventListener('pointermove', handlePointerMove)
     window.addEventListener('scroll', handleScroll, { passive: true })
+
     return () => {
-      window.clearTimeout(scrollTimeout)
+      clearTimeout(scrollTimeout)
       window.removeEventListener('pointermove', handlePointerMove)
       window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
-  if (!mounted || loading) return (
-    <div className="h-screen w-full flex items-center justify-center bg-background">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-    </div>
-  )
+  if (!mounted || loading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
-    <ReactLenis root options={{ duration: 1.1, smoothWheel: true, wheelMultiplier: 0.9 }}>
+    <ReactLenis root options={{ duration: 1.1, smoothWheel: true }}>
       <SidebarProvider>
-        <div className="flex min-h-screen w-full bg-background text-foreground">
-          
-          {/* Editable Sidebar */}
+        <div className="flex min-h-screen bg-background text-foreground">
+
           <SideProfile profileData={data} />
 
-          <div className="relative flex-1 overflow-x-hidden">
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(225,98,54,0.18),_transparent_32%),radial-gradient(circle_at_top_right,_rgba(33,119,116,0.12),_transparent_28%)]" />
-            
+          <div className="relative flex-1">
             <NavBar
               theme={theme}
               onToggleTheme={toggleTheme}
@@ -243,7 +225,7 @@ function DashboardView() {
               <SidebarTrigger />
             </div>
 
-            <main className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+            <main className="mx-auto w-full max-w-7xl flex flex-col gap-10 px-4 pt-24 pb-16 sm:px-6 lg:px-8">
               <HeroSection data={data} isScrolling={isScrolling} />
               <AboutSection data={data} isScrolling={isScrolling} />
               <WorkSection data={data} isScrolling={isScrolling} />
@@ -265,33 +247,29 @@ function DashboardView() {
             <Footer data={data} isScrolling={isScrolling} />
           </div>
         </div>
+
         <Toaster position="bottom-right" />
       </SidebarProvider>
     </ReactLenis>
   )
 }
 
-/**
- * 5. Root App Component (Router)
- */
+/* ---------------- APP ROOT ---------------- */
 export default function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<PublicPortfolioView />} />
         <Route path="/portfolio/:token" element={<PublicPortfolioView />} />
-        
         <Route path="/login" element={<LoginPage />} />
-
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardView />
             </ProtectedRoute>
-          } 
+          }
         />
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
