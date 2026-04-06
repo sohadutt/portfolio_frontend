@@ -7,8 +7,8 @@ import {
 } from "lucide-react"
 
 import { Separator } from "@/components/ui/separator"
-import LoginForm from "@/components/user/Loginfrom"
-import SignupForm from "@/components/user/SignupForm"
+import { LoginForm } from "@/components/user/LoginFrom"
+import { SignupForm } from "@/components/user/SignupForm"
 import { THEME_MAP } from "@/helper/functions"
 
 export default function LoginPage() {
@@ -25,14 +25,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-
-      {/* LEFT SIDE */}
       <div className="hidden md:flex flex-col justify-between w-2/3 border-r border-border/50 p-10 lg:p-16">
-
-        {/* TOP */}
         <div className="space-y-12 max-w-2xl">
-
-          {/* LOGO */}
           <div className="flex items-center gap-4">
             <div className="flex size-14 items-center justify-center rounded-xl border bg-muted">
               <BriefcaseBusiness className="size-7" />
@@ -49,7 +43,7 @@ export default function LoginPage() {
               <br />
               manage and showcase
               <br />
-              your portfolio
+              your Portfolio.
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
@@ -62,9 +56,7 @@ export default function LoginPage() {
         {/* FEATURES */}
         <div className="space-y-6">
           <Separator />
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-
             <div className="flex items-start gap-3">
               <Layers className="size-6 mt-1 text-primary" />
               <div>
@@ -94,54 +86,42 @@ export default function LoginPage() {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </div>
-
-      {/* RIGHT SIDE */}
       <div className="flex w-full md:w-1/3 items-center justify-center px-6">
-
         <div className="w-full max-w-sm space-y-6">
-
           {/* HEADER */}
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold tracking-tight">
               {view === "login" ? "Welcome back" : "Create account"}
             </h2>
-
             <p className="text-sm text-muted-foreground">
               {view === "login"
                 ? "Enter your email and password to continue."
                 : "Create your account to get started."}
             </p>
           </div>
-
           <Separator />
-
           {/* FORM */}
           <div className="space-y-4">
             {view === "login" ? <LoginForm /> : <SignupForm />}
           </div>
-
           <Separator />
-
           {/* TOGGLE */}
           <p className="text-sm text-muted-foreground text-center">
             {view === "login"
-              ? "Don't have an account? "
-              : "Already have an account? "}
+              ? "Don't have an account? Sign-up here "
+              : "Already have an account? Login here "}
 
             <button
               onClick={() =>
                 setView(view === "login" ? "signup" : "login")
               }
-              className="font-medium text-foreground hover:underline underline-offset-4"
-            >
+              className="font-medium text-foreground hover:underline underline-offset-4">
               {view === "login" ? "Sign up" : "Log in"}
             </button>
           </p>
-
         </div>
       </div>
     </div>
