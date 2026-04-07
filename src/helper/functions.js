@@ -137,7 +137,9 @@ export const logoutUser = async () => {
     try {
         if (refresh) await postRequest(URLS.LOGOUT, { refresh });
     } finally {
-        localStorage.clear();
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_info');
         delete api.defaults.headers.common['Authorization'];
     }
 };
