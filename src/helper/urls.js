@@ -44,7 +44,4 @@ export const URLS = {
     
     // Fetch all portfolios for the manager table
     PORTFOLIOS_ALL: `${BASE_URL}/api/dashboard/portfolios/all/`, 
-    
-    // Fetch preview data for a specific portfolio 
-    PORTFOLIO_PREVIEW: (idx = 1) => `${BASE_URL}/api/dashboard/portfolios/preview/${idx}/`,
 };

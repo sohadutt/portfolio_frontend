@@ -174,9 +174,7 @@ export const fetchPortfolio = (token = null, index = 1) => {
 };
 
 // --- DASHBOARD CONTROLS ---
-// Mapped to the new /all/ endpoint to prevent 404s, keeping the function name the same for your React component
 export const fetchDashboardPortfolios = () => getRequest(URLS.PORTFOLIOS_ALL);
-export const fetchPortfolioPreview = (index = 1) => getRequest(URLS.PORTFOLIO_PREVIEW(index));
 export const togglePortfolioVisibility = (index) => patchRequest(URLS.TOGGLE_PORTFOLIO(index));
 
 // --- FORMS & SUBMISSIONS ---

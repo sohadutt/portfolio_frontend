@@ -35,7 +35,7 @@ export default function Dashboard() {
         <EmptyMedia variant="icon">
           <Spinner />
         </EmptyMedia>
-        <EmptyTitle>Loading Dashboard</EmptyTitle>
+        <EmptyTitle>Loading...</EmptyTitle>
       </EmptyHeader>
     </Empty>
     )
