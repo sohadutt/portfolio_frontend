@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react"
-import lucideData from "@/helper/tags.json"
 import {
   flexRender,
   getCoreRowModel,
@@ -25,20 +24,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-// Pagination Components
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
-// Helpers
-import { fetchDashboardPortfolios, togglePortfolioVisibility, THEME_MAP } from "@/helper/functions"
+// Helpers (Ensure these are exported correctly from your functions.js)
+import { fetchDashboardPortfolios, togglePortfolioVisibility } from "@/helper/functions"
 
 export default function ManagerPortfolio() {
   const [data, setData] = useState([])
@@ -49,8 +45,6 @@ export default function ManagerPortfolio() {
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
 
-  const iconNames = Object.keys(lucideData)
-
   // Fetch Portfolios on mount
   useEffect(() => {
     loadPortfolios()
@@ -60,7 +54,8 @@ export default function ManagerPortfolio() {
     setLoading(true)
     try {
       const res = await fetchDashboardPortfolios()
-      setData(res || []) 
+      // Your backend returns { owner: "...", portfolios: [...] }
+      setData(res?.portfolios || []) 
     } catch (error) {
       toast.error(error.message || "Failed to load portfolios")
     } finally {
@@ -68,16 +63,20 @@ export default function ManagerPortfolio() {
     }
   }
 
-  const handleToggleVisibility = async (index, currentStatus) => {
+  const handleToggleVisibility = async (orderIndex, currentStatus) => {
+    // 1. Optimistic UI Update: Flip the switch immediately for a snappy feel
+    setData(prevData => prevData.map(item => 
+      item.order_index === orderIndex ? { ...item, is_enabled: !currentStatus } : item
+    ))
+    
     try {
-      setData(prevData => prevData.map(item => 
-        item.index === index ? { ...item, is_visible: !currentStatus } : item
-      ))
-      await togglePortfolioVisibility(index)
-      toast.success("Visibility updated")
+      // 2. Send the PATCH request to the backend
+      await togglePortfolioVisibility(orderIndex)
+      toast.success(`Portfolio ${orderIndex} status updated`)
     } catch (error) {
+      // 3. Revert the switch if the backend rejects it (e.g., Free Tier limits)
       setData(prevData => prevData.map(item => 
-        item.index === index ? { ...item, is_visible: currentStatus } : item
+        item.order_index === orderIndex ? { ...item, is_enabled: currentStatus } : item
       ))
       toast.error(error.message || "Failed to update visibility")
     }
@@ -85,41 +84,43 @@ export default function ManagerPortfolio() {
 
   const columns = useMemo(() => [
     {
-      accessorKey: "hero_title",
-      header: "Title",
+      // Changed from hero_title to title to match Django payload
+      accessorKey: "title", 
+      header: "Portfolio Title",
       cell: ({ row }) => (
         <div className="font-medium">
-          {row.getValue("hero_title") || `Portfolio #${row.original.index}`}
+          {row.getValue("title") || row.original.name || `Portfolio #${row.original.order_index}`}
         </div>
       ),
     },
     {
-      accessorKey: "theme_mode",
-      header: "Theme",
+      // Replaced theme with tier since that's what the list view returns
+      accessorKey: "tier",
+      header: "Tier",
       cell: ({ row }) => {
-        const themeValue = row.getValue("theme_mode")
-        const themeName = THEME_MAP[themeValue] || "Ocean"
+        const tierValue = row.getValue("tier") || "FREE"
         return (
-          <Badge variant="secondary" className="capitalize">
-            {themeName.replace("theme-", "")}
+          <Badge variant={tierValue === "PREMIUM" ? "default" : "secondary"} className="text-[10px] uppercase tracking-wider">
+            {tierValue}
           </Badge>
         )
       },
     },
     {
-      accessorKey: "is_visible",
-      header: "Visibility",
+      // Match the backend property 'is_enabled'
+      accessorKey: "is_enabled",
+      header: "Public Status",
       cell: ({ row }) => {
-        const isVisible = row.getValue("is_visible")
-        const index = row.original.index
+        const isEnabled = row.getValue("is_enabled")
+        const orderIndex = row.original.order_index
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Switch
-              checked={isVisible}
-              onCheckedChange={() => handleToggleVisibility(index, isVisible)}
+              checked={isEnabled}
+              onCheckedChange={() => handleToggleVisibility(orderIndex, isEnabled)}
             />
             <span className="text-xs text-muted-foreground w-12">
-              {isVisible ? "Public" : "Hidden"}
+              {isEnabled ? "Visible" : "Hidden"}
             </span>
           </div>
         )
@@ -140,10 +141,10 @@ export default function ManagerPortfolio() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => window.open(`/portfolio/${portfolio.token || portfolio.index}`, '_blank')}>
+              <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, '_blank')}>
                 <Eye className="mr-2 h-4 w-4" /> View Live
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => console.log("Edit", portfolio.index)}>
+              <DropdownMenuItem onClick={() => console.log("Navigate to editor for index:", portfolio.order_index)}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit Content
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -168,7 +169,6 @@ export default function ManagerPortfolio() {
       columnFilters,
       columnVisibility,
     },
-    // Optional: Define how many rows you want per page (default is usually 10)
     initialState: {
       pagination: {
         pageSize: 5, 
@@ -178,9 +178,9 @@ export default function ManagerPortfolio() {
 
   if (loading) {
     return (
-      <div className="flex h-[400px] w-full flex-col items-center justify-center space-y-4 rounded-xl border border-dashed">
+      <div className="flex h-[400px] w-full flex-col items-center justify-center space-y-4 rounded-xl border border-dashed bg-card/50">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">Loading portfolios...</p>
+        <p className="text-sm text-muted-foreground">Loading workspace...</p>
       </div>
     )
   }
@@ -191,9 +191,9 @@ export default function ManagerPortfolio() {
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <Input
           placeholder="Filter by title..."
-          value={(table.getColumn("hero_title")?.getFilterValue()) ?? ""}
-          onChange={(event) => table.getColumn("hero_title")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
+          value={(table.getColumn("title")?.getFilterValue()) ?? ""}
+          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
+          className="max-w-sm bg-background"
         />
         <div className="flex items-center gap-2">
           <DropdownMenu>
@@ -223,9 +223,9 @@ export default function ManagerPortfolio() {
       </div>
 
       {/* Data Table */}
-      <div className="rounded-md border bg-card">
+      <div className="rounded-md border bg-card overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -253,8 +253,8 @@ export default function ManagerPortfolio() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No portfolios found. Create your first one!
+                <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
+                  No portfolios found. Create your first one to get started!
                 </TableCell>
               </TableRow>
             )}
@@ -263,8 +263,8 @@ export default function ManagerPortfolio() {
       </div>
       
       {/* Pagination Controls */}
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between py-4">
+        <div className="text-sm text-muted-foreground">
            Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
            {Math.min(
              (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -273,7 +273,7 @@ export default function ManagerPortfolio() {
            of {table.getFilteredRowModel().rows.length} entries
         </div>
         
-        <Pagination className="justify-end w-auto mx-0">
+        <Pagination className="w-auto mx-0">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious 
@@ -286,7 +286,6 @@ export default function ManagerPortfolio() {
               />
             </PaginationItem>
             
-            {/* Generate numbered page links */}
             {Array.from({ length: table.getPageCount() }).map((_, i) => (
               <PaginationItem key={i}>
                 <PaginationLink 

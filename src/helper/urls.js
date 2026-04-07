@@ -17,26 +17,20 @@ export const URLS = {
     GET_PUBLIC_TOKEN: `${BASE_URL}/api/profile/get-token/`,
 
     // ---- Portfolio Viewing (Public) ----
-    // Use for primary: URLS.PORTFOLIO_DEFAULT() 
-    // Use for indexed: URLS.PORTFOLIO_DEFAULT(2)
     PORTFOLIO_DEFAULT: (idx = 1) => idx === 1 
         ? `${BASE_URL}/api/portfolio/default/` 
         : `${BASE_URL}/api/portfolio/default/${idx}/`,
 
-    // Use for primary: URLS.PORTFOLIO_SHARED('my-token')
-    // Use for indexed: URLS.PORTFOLIO_SHARED('my-token', 2)
     PORTFOLIO_SHARED: (token, idx = 1) => idx === 1 
         ? `${BASE_URL}/api/portfolio/shared/${token}/` 
         : `${BASE_URL}/api/portfolio/shared/${token}/${idx}/`,
 
     // ---- Portfolio Management (Authenticated) ----
-    // Backend now strictly requires the index in the URL
     PORTFOLIO_SUBMIT: (idx = 1) => `${BASE_URL}/api/portfolio/submit/${idx}/`,
     PORTFOLIO_UPDATE: (idx = 1) => `${BASE_URL}/api/portfolio/update/${idx}/`,
 
     // ---- Contact Form Submissions (Public) ----
     SUBMIT_FORM_DEFAULT: (idx = 1) => `${BASE_URL}/api/forms/submit/default/${idx}/`,
-    // Backend strictly takes the token and applies order_index=1 via kwargs
     SUBMIT_ENQUIRY_SHARED: (token) => `${BASE_URL}/api/forms/submit/shared/${token}/`,
 
     // ---- Dashboard Management (Authenticated) ----
@@ -46,6 +40,11 @@ export const URLS = {
     REORDER_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/reorder/`,
 
     // Portfolios
-    DASHBOARD_PORTFOLIOS: `${BASE_URL}/api/dashboard/portfolios/`,
     TOGGLE_PORTFOLIO: (idx) => `${BASE_URL}/api/dashboard/portfolios/${idx}/toggle/`,
+    
+    // Fetch all portfolios for the manager table
+    PORTFOLIOS_ALL: `${BASE_URL}/api/dashboard/portfolios/all/`, 
+    
+    // Fetch preview data for a specific portfolio 
+    PORTFOLIO_PREVIEW: (idx = 1) => `${BASE_URL}/api/dashboard/portfolios/preview/${idx}/`,
 };

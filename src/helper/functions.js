@@ -83,7 +83,12 @@ export const getRequest = async (url, params = {}) => {
 
 export const postRequest = async (url, data, isMultipart = false) => {
     try {
-        const config = isMultipart ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+        const config = {
+            headers: isMultipart ? {} : { 'Content-Type': 'application/json' }
+        };
+        if (isMultipart) {
+            config.transformRequest = [(data) => data];
+        }
         const response = await api.post(url, data, config);
         return response.data;
     } catch (error) {
@@ -93,7 +98,12 @@ export const postRequest = async (url, data, isMultipart = false) => {
 
 export const patchRequest = async (url, data, isMultipart = false) => {
     try {
-        const config = isMultipart ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+        const config = {
+            headers: isMultipart ? {} : { 'Content-Type': 'application/json' }
+        };
+        if (isMultipart) {
+            config.transformRequest = [(data) => data];
+        }
         const response = await api.patch(url, data, config);
         return response.data;
     } catch (error) {
@@ -144,29 +154,32 @@ export const logoutUser = async () => {
     }
 };
 
-// User Profile
+// --- USER PROFILE ---
 export const getUserProfile = () => getRequest(URLS.USER_PROFILE);
 export const updateUserProfile = (formData) => patchRequest(URLS.UPDATE_PROFILE, formData, true);
-export const toggleShareStatus = () => postRequest(URLS.SHARE_TOGGLE);
+export const toggleShareStatus = (data = {}) => patchRequest(URLS.SHARE_TOGGLE, data);
 
-// Portfolio Management (Authenticated)
-export const updatePortfolio = (data, index = 1) => postRequest(URLS.PORTFOLIO_UPDATE(index), data);
+// --- PORTFOLIO MANAGEMENT (AUTHENTICATED) ---
+export const updatePortfolio = (data, index = 1) => patchRequest(URLS.PORTFOLIO_UPDATE(index), data);
+
 export const createNewPortfolio = (data, currentPortfolioCount) => {
     const nextIndex = (currentPortfolioCount || 0) + 1;
     return postRequest(URLS.PORTFOLIO_SUBMIT(nextIndex), data);
 };
 
-// Portfolio Data (Public)
+// --- PORTFOLIO DATA (PUBLIC) ---
 export const fetchPortfolio = (token = null, index = 1) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);
     return getRequest(url);
 };
 
-// Dashboard Controls
-export const fetchDashboardPortfolios = () => getRequest(URLS.DASHBOARD_PORTFOLIOS);
+// --- DASHBOARD CONTROLS ---
+// Mapped to the new /all/ endpoint to prevent 404s, keeping the function name the same for your React component
+export const fetchDashboardPortfolios = () => getRequest(URLS.PORTFOLIOS_ALL);
+export const fetchPortfolioPreview = (index = 1) => getRequest(URLS.PORTFOLIO_PREVIEW(index));
 export const togglePortfolioVisibility = (index) => patchRequest(URLS.TOGGLE_PORTFOLIO(index));
 
-// Forms & Submissions
+// --- FORMS & SUBMISSIONS ---
 export const submitContactForm = (data, token = null, index = 1) => {
     const url = token ? URLS.SUBMIT_ENQUIRY_SHARED(token, index) : URLS.SUBMIT_FORM_DEFAULT(index);
     return postRequest(url, data);
