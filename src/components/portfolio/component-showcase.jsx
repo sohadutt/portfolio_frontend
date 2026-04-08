@@ -1,9 +1,10 @@
-import { showcaseCategories } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
+import { getShowcaseCategories } from '@/helper/portfolio-data'
 
-export function ComponentShowcase({ activeHover, onRelationChange, isScrolling }) {
+export function ComponentShowcase({ data, activeHover, onRelationChange, isScrolling }) {
   const resolvedRelation = activeHover?.relation ?? null
   const activeSource = activeHover?.source ?? null
+  const showcaseCategories = getShowcaseCategories(data)
 
   return (
     <section

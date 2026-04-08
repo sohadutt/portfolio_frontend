@@ -7,8 +7,8 @@ import {
 } from "lucide-react"
 
 import { Separator } from "@/components/ui/separator"
-import { LoginForm } from "@/components/user/LoginFrom"
-import { SignupForm } from "@/components/user/SignupForm"
+import LoginForm from "@/components/user/LoginForm"
+import SignupForm from "@/components/user/SignupForm"
 import { THEME_MAP } from "@/helper/functions"
 
 export default function LoginPage() {

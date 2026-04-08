@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge' // Make sure this path is correct
-import { projects } from '@/helper/portfolio'
+import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/portfolio/section-header'
+import { getProjects } from '@/helper/portfolio-data'
 
-export function WorkSection({ isScrolling }) {
+export function WorkSection({ data, isScrolling }) {
   const [activeProject, setActiveProject] = useState(null)
   const resolvedProject = activeProject
+  const projects = getProjects(data)
 
   return (
     <section id="projects" className="space-y-8">

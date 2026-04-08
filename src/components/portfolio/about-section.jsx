@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { aboutContent, skillGroups } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
-import { Badge } from '@/components/ui/badge' // Make sure this path matches your setup
+import { Badge } from '@/components/ui/badge'
+import { getAboutContent, getSkillGroups } from '@/helper/portfolio-data'
 
-export function AboutSection({ isScrolling }) {
+export function AboutSection({ data, isScrolling }) {
   const [activeGroup, setActiveGroup] = useState(null)
   const resolvedGroup = activeGroup
+  const aboutContent = getAboutContent(data)
+  const skillGroups = getSkillGroups(data)
 
   return (
     <section id="about" className="grid gap-8 rounded-[2rem] border border-border/60 bg-card/65 p-8 backdrop-blur lg:grid-cols-[0.9fr_1.1fr]">

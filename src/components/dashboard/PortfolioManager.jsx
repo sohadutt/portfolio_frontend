@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   flexRender,
   getCoreRowModel,
@@ -7,7 +8,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { Loader2, Plus, MoreHorizontal, Eye, Pencil } from "lucide-react"
+import { Eye, Loader2, MoreHorizontal, Pencil, Plus } from "lucide-react"
 import { toast } from "sonner"
 
 // Shadcn UI Components
@@ -36,7 +37,8 @@ import {
 // Helpers (Ensure these are exported correctly from your functions.js)
 import { fetchDashboardPortfolios, togglePortfolioVisibility } from "@/helper/functions"
 
-export default function ManagerPortfolio() {
+export default function PortfolioManager() {
+  const navigate = useNavigate()
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
   
@@ -54,8 +56,7 @@ export default function ManagerPortfolio() {
     setLoading(true)
     try {
       const res = await fetchDashboardPortfolios()
-      // Your backend returns { owner: "...", portfolios: [...] }
-      setData(res?.portfolios || []) 
+      setData(res?.portfolios || [])
     } catch (error) {
       toast.error(error.message || "Failed to load portfolios")
     } finally {
@@ -64,17 +65,14 @@ export default function ManagerPortfolio() {
   }
 
   const handleToggleVisibility = async (orderIndex, currentStatus) => {
-    // 1. Optimistic UI Update: Flip the switch immediately for a snappy feel
     setData(prevData => prevData.map(item => 
       item.order_index === orderIndex ? { ...item, is_enabled: !currentStatus } : item
     ))
     
     try {
-      // 2. Send the PATCH request to the backend
       await togglePortfolioVisibility(orderIndex)
       toast.success(`Portfolio ${orderIndex} status updated`)
     } catch (error) {
-      // 3. Revert the switch if the backend rejects it (e.g., Free Tier limits)
       setData(prevData => prevData.map(item => 
         item.order_index === orderIndex ? { ...item, is_enabled: currentStatus } : item
       ))
@@ -84,7 +82,6 @@ export default function ManagerPortfolio() {
 
   const columns = useMemo(() => [
     {
-      // Changed from hero_title to title to match Django payload
       accessorKey: "title", 
       header: "Portfolio Title",
       cell: ({ row }) => (
@@ -94,20 +91,17 @@ export default function ManagerPortfolio() {
       ),
     },
     {
-      // Replaced theme with tier since that's what the list view returns
-      accessorKey: "tier",
-      header: "Tier",
+      accessorKey: "order_index",
+      header: "Index",
       cell: ({ row }) => {
-        const tierValue = row.getValue("tier") || "FREE"
         return (
-          <Badge variant={tierValue === "PREMIUM" ? "default" : "secondary"} className="text-[10px] uppercase tracking-wider">
-            {tierValue}
+          <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
+            #{row.getValue("order_index")}
           </Badge>
         )
       },
     },
     {
-      // Match the backend property 'is_enabled'
       accessorKey: "is_enabled",
       header: "Public Status",
       cell: ({ row }) => {
@@ -141,10 +135,10 @@ export default function ManagerPortfolio() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, '_blank')}>
+              <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}>
                 <Eye className="mr-2 h-4 w-4" /> View Live
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => console.log("Navigate to editor for index:", portfolio.order_index)}>
+              <DropdownMenuItem onClick={() => navigate(`/dashboard/portfolios/${portfolio.order_index}/edit`)}>
                 <Pencil className="mr-2 h-4 w-4" /> Edit Content
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -152,7 +146,7 @@ export default function ManagerPortfolio() {
         )
       },
     },
-  ], [data])
+  ], [navigate])
 
   const table = useReactTable({
     data,
@@ -187,7 +181,6 @@ export default function ManagerPortfolio() {
 
   return (
     <div className="space-y-4">
-      {/* Header Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
         <Input
           placeholder="Filter by title..."
@@ -216,16 +209,15 @@ export default function ManagerPortfolio() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button onClick={() => console.log("Create new")}>
+          <Button onClick={() => navigate(`/dashboard/portfolios/${(data?.length || 0) + 1}/edit`)}>
             <Plus className="mr-2 h-4 w-4" /> New Portfolio
           </Button>
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="rounded-md border bg-card overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/90 shadow-sm">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader className="bg-muted/35">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -262,7 +254,6 @@ export default function ManagerPortfolio() {
         </Table>
       </div>
       
-      {/* Pagination Controls */}
       <div className="flex items-center justify-between py-4">
         <div className="text-sm text-muted-foreground">
            Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}

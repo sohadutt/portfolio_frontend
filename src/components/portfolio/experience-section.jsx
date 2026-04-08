@@ -1,6 +1,6 @@
-import { experience, featuredModules } from '@/helper/portfolio'
 import { SectionHeader } from '@/components/portfolio/section-header'
 import { Badge } from '@/components/ui/badge'
+import { getExperience, getFeaturedModules } from '@/helper/portfolio-data'
 
 function getCardClasses(isActive, isScrolling) {
   return isActive
@@ -8,9 +8,11 @@ function getCardClasses(isActive, isScrolling) {
     : `border-border/60 bg-background/75 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
 }
 
-export function ExperienceSection({ activeHover, onRelationChange, isScrolling }) {
+export function ExperienceSection({ data, activeHover, onRelationChange, isScrolling }) {
   const resolvedRelation = activeHover?.relation ?? null
   const activeSource = activeHover?.source ?? null
+  const experience = getExperience(data)
+  const featuredModules = getFeaturedModules(data)
 
   return (
     <section id="experience" className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">

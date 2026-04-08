@@ -1,11 +1,20 @@
 import { ArrowRight, ChartColumnIncreasing, CircleCheckBig, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { heroContent, heroMetrics, personalInfo, statusPills } from '@/helper/portfolio'
+import {
+  getHeroContent,
+  getHeroMetrics,
+  getPortfolioPersonalInfo,
+  getStatusPills,
+} from '@/helper/portfolio-data'
 
-export function HeroSection({ isScrolling }) {
+export function HeroSection({ data, isScrolling }) {
   const [activeMetric, setActiveMetric] = useState(null)
   const [activeCapability, setActiveCapability] = useState(null)
+  const heroContent = getHeroContent(data)
+  const heroMetrics = getHeroMetrics(data)
+  const personalInfo = getPortfolioPersonalInfo(data)
+  const statusPills = getStatusPills(data)
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">

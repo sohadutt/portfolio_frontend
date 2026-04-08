@@ -93,7 +93,7 @@ export function SideProfile({ profileData }) {
           const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg" })
           file = new File([convertedBlob], "converted.jpg", { type: "image/jpeg" })
           toast.success("Converted successfully!", { id: "heic-convert" })
-        } catch (error) {
+        } catch {
           toast.error("Failed to process HEIC image.", { id: "heic-convert" })
           return
         }
@@ -177,7 +177,7 @@ export function SideProfile({ profileData }) {
       toast.success("Logged out successfully")
       // Redirect to login page
       window.location.href = "/login"
-    } catch (error) {
+    } catch {
       toast.error("Failed to log out")
     }
   }

@@ -42,7 +42,7 @@ api.interceptors.response.use(
                     originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
                     
                     return api(originalRequest);
-                } catch (refreshError) {
+                } catch {
                     localStorage.clear();
                     window.location.href = '/login';
                 }
@@ -71,13 +71,19 @@ const extractError = (error) => {
     return error.message || "Network error. Please try again.";
 };
 
+const createRequestError = (error) => {
+    const normalizedError = new Error(extractError(error));
+    normalizedError.details = error.response?.data;
+    return normalizedError;
+};
+
 // --- BASE REQUEST HELPERS ---
 export const getRequest = async (url, params = {}) => {
     try {
         const response = await api.get(url, { params });
         return response.data;
     } catch (error) {
-        throw new Error(extractError(error));
+        throw createRequestError(error);
     }
 };
 
@@ -92,7 +98,7 @@ export const postRequest = async (url, data, isMultipart = false) => {
         const response = await api.post(url, data, config);
         return response.data;
     } catch (error) {
-        throw new Error(extractError(error));
+        throw createRequestError(error);
     }
 };
 
@@ -107,7 +113,7 @@ export const patchRequest = async (url, data, isMultipart = false) => {
         const response = await api.patch(url, data, config);
         return response.data;
     } catch (error) {
-        throw new Error(extractError(error));
+        throw createRequestError(error);
     }
 };
 
@@ -115,6 +121,7 @@ export const patchRequest = async (url, data, isMultipart = false) => {
 export const initializeCSRF = async () => getRequest(URLS.CSRF);
 
 export const registerUser = async (data) => postRequest(URLS.REGISTER, data);
+export const requestOTP = async (email) => postRequest(URLS.REQUEST_OTP, { email });
 
 export const loginUser = async (credentials) => {
     const data = await postRequest(URLS.LOGIN, credentials);
@@ -172,6 +179,7 @@ export const fetchPortfolio = (token = null, index = 1) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);
     return getRequest(url);
 };
+export const fetchPublicPortfolio = (token = null, index = 1) => fetchPortfolio(token, index);
 
 // --- DASHBOARD CONTROLS ---
 export const fetchDashboardPortfolios = () => getRequest(URLS.PORTFOLIOS_ALL);

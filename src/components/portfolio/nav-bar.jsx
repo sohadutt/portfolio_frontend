@@ -1,8 +1,11 @@
 import { Button } from '@/components/ui/button'
-import { navigationLinks, personalInfo } from '@/helper/portfolio'
 import { ThemeToggle } from '@/components/portfolio/theme-toggle'
+import { getNavigationLinks, getPortfolioPersonalInfo } from '@/helper/portfolio-data'
 
-export function NavBar({ theme, onToggleTheme, isVisible, onShow, onHide }) {
+export function NavBar({ data, theme, onToggleTheme, isVisible, onShow, onHide }) {
+  const personalInfo = getPortfolioPersonalInfo(data)
+  const navigationLinks = getNavigationLinks(data)
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
@@ -37,8 +40,8 @@ export function NavBar({ theme, onToggleTheme, isVisible, onShow, onHide }) {
           <nav className="hidden items-center gap-1 lg:flex">
             {navigationLinks.map((link) => (
               <a
-                key={link.href}
-                href={link.href}
+                key={`${link.label}-${link.href}`}
+                href={link.href || '#'}
                 className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-primary hover:text-primary-foreground"
               >
                 {link.label}

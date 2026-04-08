@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { contactMethods, personalInfo } from '@/helper/portfolio'
 import { submitContactForm } from '@/helper/functions'
 import { toast } from 'sonner'
+import { getContactMethods, getPortfolioPersonalInfo } from '@/helper/portfolio-data'
 
 // UI Components
 import { Button } from '@/components/ui/button'
@@ -26,10 +26,12 @@ import {
 } from '@/components/ui/field'
 import { Loader2 } from 'lucide-react'
 
-export function ContactSection({ isScrolling }) {
+export function ContactSection({ data, isScrolling }) {
   const { token } = useParams() 
   const [activeMethod, setActiveMethod] = useState(null)
   const resolvedMethod = activeMethod
+  const contactMethods = getContactMethods(data)
+  const personalInfo = getPortfolioPersonalInfo(data)
   
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
@@ -81,8 +83,8 @@ export function ContactSection({ isScrolling }) {
         for_work: false,
       })
     } catch (err) {
-      if (typeof err === 'object' && err !== null) {
-        setErrors(err)
+      if (err?.details && typeof err.details === 'object') {
+        setErrors(err.details)
         toast.error("Please fix the errors in the form.")
       } else {
         toast.error(err.message || err || "Failed to send message.")
@@ -109,7 +111,7 @@ export function ContactSection({ isScrolling }) {
             return (
               <a
                 key={label}
-                href={href}
+                href={href || '#contact'}
                 className={`flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
                   isActive
                     ? 'border-primary-foreground/35 bg-primary-foreground/18 shadow-[0_18px_55px_-35px_rgba(255,255,255,0.55)]'
