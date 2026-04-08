@@ -5,10 +5,23 @@ import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/portfolio/section-header'
 import { getProjects } from '@/helper/portfolio-data'
 
-export function WorkSection({ data, isScrolling }) {
+const portfolioBuilderProject = {
+  title: 'Portfolio Builder',
+  eyebrow: 'Launch your own',
+  description:
+    'This portfolio is powered by the builder behind it, with a dashboard for editing projects, experience, links, themes, and public portfolio variations.',
+  stack: ['React', 'Vite', 'Dashboard CMS'],
+  stat: 'Live builder',
+  href: '/login?mode=signup&source=portfolio-builder',
+  ctaLabel: 'Make yours now',
+}
+
+export function WorkSection({ data, isScrolling, isDefaultPortfolio = false }) {
   const [activeProject, setActiveProject] = useState(null)
   const resolvedProject = activeProject
-  const projects = getProjects(data)
+  const projects = isDefaultPortfolio
+    ? [...getProjects(data), portfolioBuilderProject]
+    : getProjects(data)
 
   return (
     <section id="projects" className="space-y-8">
@@ -25,79 +38,80 @@ export function WorkSection({ data, isScrolling }) {
           return (
             <article
               key={project.title}
-              className={`group rounded-[2rem] border p-6 backdrop-blur transition-all duration-300 ${
+              className={`group rounded-[2rem] border p-6 transition-all duration-300 ${
                 isActive || isFeatured
-                  ? 'border-primary/70 bg-primary text-primary-foreground shadow-[0_30px_80px_-42px_var(--color-primary)'
-                  : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
+                  ? 'border-primary/30 bg-primary/6 shadow-sm'
+                  : `border-border/60 bg-background/95 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveProject(index)}
             >
               <div className="flex items-center justify-between gap-4">
                 <p
-                  className={`text-xs font-semibold uppercase tracking-[0.26em] transition-colors duration-300 ${
-                    isActive || isFeatured ? 'text-primary-foreground/80' : 'text-primary'
+                  className={`text-xs font-medium uppercase tracking-[0.2em] transition-colors duration-300 ${
+                    isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
                   {project.eyebrow}
                 </p>
-                
-                {/* shadcn Component: Badge for the Stat */}
+
                 <Badge
-                  variant="outline"
-                  className={`px-3 py-1 uppercase tracking-[0.18em] transition-colors duration-300 ${
+                  variant="secondary"
+                  className={`rounded-full px-3 py-1 font-medium transition-colors duration-300 ${
                     isActive || isFeatured
-                      ? 'border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
-                      : 'border-border/60 bg-background/80 text-muted-foreground'
+                      ? 'bg-primary/10 text-primary hover:bg-primary/15'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   {project.stat}
                 </Badge>
               </div>
-              
-              {/* shadcn Typography: H3 style (Removed font-serif) */}
-              <h3 className="mt-6 scroll-m-20 text-3xl font-semibold tracking-tight">
+
+              <h3 className="mt-6 scroll-m-20 text-2xl font-semibold tracking-tight">
                 {project.title}
               </h3>
-              
-              {/* shadcn Typography: standard paragraph leading */}
+
               <p
                 className={`mt-4 text-sm leading-7 transition-colors duration-300 ${
-                  isActive || isFeatured ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                  isActive || isFeatured ? 'text-foreground/85' : 'text-muted-foreground'
                 }`}
               >
                 {project.description}
               </p>
-              
+
               <div className="mt-6 flex flex-wrap gap-2">
                 {project.stack.map((item) => (
-                  /* shadcn Component: Badge for the Tech Stack */
                   <Badge
                     key={item}
                     variant="outline"
-                    className={`px-3 py-1 uppercase tracking-[0.18em] transition-colors duration-300 ${
+                    className={`rounded-full px-3 py-1 font-medium transition-colors duration-300 ${
                       isActive || isFeatured
-                        ? 'border-transparent bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/25'
-                        : 'border-border/60 bg-background/70 text-muted-foreground hover:bg-background/90'
+                        ? 'border-primary/20 bg-background text-foreground'
+                        : 'border-border/60 bg-background text-muted-foreground'
                     }`}
                   >
                     {item}
                   </Badge>
                 ))}
               </div>
-              
+
               <div className="mt-8 flex items-center justify-between">
                 <Button
+                  asChild
                   variant={isActive || isFeatured ? 'secondary' : 'outline'}
-                  className="rounded-full font-semibold transition-all duration-300"
+                  className="rounded-full font-medium shadow-none transition-all duration-300"
                 >
-                  Explore
-                  <ChevronRight className="ml-1 size-4" />
+                  <a href={project.href || '#contact'}>
+                    {project.ctaLabel || 'Explore'}
+                    <ChevronRight className="ml-1 size-4" />
+                  </a>
                 </Button>
-                <ArrowUpRight 
-                  className={`transition-all duration-300 ${
-                    isActive || isFeatured ? 'text-primary-foreground' : 'text-primary'
-                  }`} 
-                />
+                <a href={project.href || '#contact'} aria-label={`Open ${project.title}`}>
+                  <ArrowUpRight 
+                    className={`transition-all duration-300 ${
+                      isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
+                    }`} 
+                  />
+                </a>
               </div>
             </article>
           )

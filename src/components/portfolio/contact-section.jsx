@@ -96,8 +96,7 @@ export function ContactSection({ data, isScrolling }) {
 
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      {/* Left Column: Contact Methods */}
-      <div className="rounded-[2rem] border border-border/60 bg-primary p-8 text-primary-foreground shadow-[0_24px_70px_-42px_var(--color-primary)">
+      <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
         <SectionHeader
           eyebrow="Contact"
           title="Open to roles and collaborations where backend reliability meets strong product thinking."
@@ -114,21 +113,20 @@ export function ContactSection({ data, isScrolling }) {
                 href={href || '#contact'}
                 className={`flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
                   isActive
-                    ? 'border-primary-foreground/35 bg-primary-foreground/18 shadow-[0_18px_55px_-35px_rgba(255,255,255,0.55)]'
-                    : `border-primary-foreground/15 bg-primary-foreground/8 ${isScrolling ? '' : 'hover:-translate-y-0.5 hover:bg-primary-foreground/12'}`
+                    ? 'border-primary/30 bg-primary/6'
+                    : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMethod(label)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-2xl bg-primary-foreground/12">
+                  <div className="flex size-10 items-center justify-center rounded-2xl bg-muted text-primary">
                     <Icon className="size-4" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70">
+                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                       {label}
                     </p>
-                    {/* shadcn Typography: Small */}
-                    <p className="mt-1.5 text-sm font-medium leading-none">
+                    <p className="mt-1.5 text-sm font-medium leading-none text-foreground">
                       {value}
                     </p>
                   </div>
@@ -139,11 +137,9 @@ export function ContactSection({ data, isScrolling }) {
         </div>
       </div>
 
-      {/* Right Column: Contact Form */}
-      <div className={`rounded-[2rem] border border-border/60 bg-card/75 p-8 backdrop-blur transition-colors duration-300 ${isScrolling ? '' : 'hover:border-primary/35 hover:bg-primary/5'}`}>
+      <div className={`rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm transition-colors duration-300 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/30'}`}>
         <form onSubmit={handleSubmit} className="flex h-full flex-col justify-between">
           <FieldGroup className="grid gap-5 sm:grid-cols-2">
-            
             <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="name">Name</FieldLabel>
               <Input
@@ -151,7 +147,7 @@ export function ContactSection({ data, isScrolling }) {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
                 placeholder={personalInfo.name || "Your name"}
                 required
               />
@@ -166,7 +162,7 @@ export function ContactSection({ data, isScrolling }) {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
                 placeholder={personalInfo.email || "hello@example.com"}
                 required
               />
@@ -181,7 +177,7 @@ export function ContactSection({ data, isScrolling }) {
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
                 placeholder="+1 (555) 000-0000"
               />
               {errors.phone && <FieldError>{errors.phone}</FieldError>}
@@ -190,7 +186,7 @@ export function ContactSection({ data, isScrolling }) {
             <Field data-invalid={!!errors.priority}>
               <FieldLabel htmlFor="priority">Urgency</FieldLabel>
               <Select value={formData.priority} onValueChange={handleSelectChange}>
-                <SelectTrigger id="priority" className="h-[42px] rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20">
+                <SelectTrigger id="priority" className="h-[42px] rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,7 +207,7 @@ export function ContactSection({ data, isScrolling }) {
                 rows="5"
                 value={formData.message}
                 onChange={handleChange}
-                className="resize-none rounded-[1.5rem] border-border bg-background px-4 py-3 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="resize-none rounded-[1.5rem] border-border bg-background px-4 py-3 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
                 placeholder="Share the details of your project or inquiry."
                 required
               />
@@ -225,7 +221,6 @@ export function ContactSection({ data, isScrolling }) {
                 onCheckedChange={handleCheckboxChange} 
               />
               <FieldContent>
-                {/* shadcn Typography: Small/Muted alignment for form descriptions */}
                 <FieldLabel 
                   htmlFor="for_work" 
                   className="cursor-pointer text-sm font-medium leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -234,24 +229,22 @@ export function ContactSection({ data, isScrolling }) {
                 </FieldLabel>
               </FieldContent>
             </Field>
-
           </FieldGroup>
 
-          {/* Footer / Submit Area */}
-            <Button 
-              type="submit" 
-              disabled={loading}
-              className="rounded-half px-15 font-semibold shadow-lg transition-all"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Sending...
-                </>
-              ) : (
-                "Send Message"
-              )}
-            </Button>
+          <Button 
+            type="submit" 
+            disabled={loading}
+            className="mt-8 w-full rounded-full px-6 font-medium shadow-none sm:w-auto"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Send Message"
+            )}
+          </Button>
         </form>
       </div>
     </section>

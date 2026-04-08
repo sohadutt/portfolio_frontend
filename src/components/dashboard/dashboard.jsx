@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SideProfile } from "@/components/user/SideProfile"
-import { getUserProfile } from "@/helper/functions"
+import { getUserProfile, TIER_MAP } from "@/helper/functions"
 import { Spinner } from "@/components/ui/spinner"
 import { Toaster } from "@/components/ui/sonner"
 import { LayoutDashboard, User, Briefcase, Settings } from "lucide-react"
@@ -65,7 +65,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-4">
                {/* Placeholders for future top-nav items like notifications or logout */}
                <div className="text-[10px] bg-muted px-2 py-1 rounded font-mono uppercase tracking-tighter">
-                  Tier: {data?.tier === 2 ? 'Pro' : 'Basic'}
+                  Tier: {TIER_MAP[data?.tier] || 'Premium'}
                </div>
             </div>
           </header>

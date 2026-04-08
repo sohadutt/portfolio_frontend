@@ -14,8 +14,9 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { fetchPortfolio, updatePortfolio } from "@/helper/functions"
+import { createNewPortfolio, fetchDashboardPortfolios, fetchPortfolio, updatePortfolio } from "@/helper/functions"
 import { resolveIcon } from "@/helper/portfolio-data"
+import { defaultPortfolioDocument } from "@/helper/portfolio"
 import { LucideIconPicker } from "@/components/dashboard/LucideIconPicker"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,32 +28,29 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 
-const initialFormState = (portfolioIndex) => ({
-  isEnabled: true,
-  orderIndex: portfolioIndex,
-  personalInfo: {
-    name: "",
-    shortName: "",
-    title: "",
-    subtitle: "",
-    location: "",
-    email: "",
-    github: "",
-    linkedin: "",
-  },
-  heroContent: { eyebrow: "", title: "", description: "" },
-  aboutContent: { title: "", description: "" },
-  navigationLinks: [],
-  heroMetrics: [],
-  skillGroups: [],
-  projects: [],
-  experience: [],
-  showcaseCategories: [],
-  featuredModules: [],
-  contactMethods: [],
-  footerLinks: [],
-  statusPills: [],
-})
+const cloneDocument = (value) => JSON.parse(JSON.stringify(value))
+
+const initialFormState = (portfolioIndex) => {
+  const template = cloneDocument(defaultPortfolioDocument)
+
+  return {
+    isEnabled: template.is_enabled ?? true,
+    orderIndex: portfolioIndex,
+    personalInfo: template.personalInfo || {},
+    heroContent: template.heroContent || { eyebrow: "", title: "", description: "" },
+    aboutContent: template.aboutContent || { title: "", description: "" },
+    navigationLinks: template.navigationLinks || [],
+    heroMetrics: template.heroMetrics || [],
+    skillGroups: template.skillGroups || [],
+    projects: template.projects || [],
+    experience: template.experience || [],
+    showcaseCategories: template.showcaseCategories || [],
+    featuredModules: template.featuredModules || [],
+    contactMethods: template.contactMethods || [],
+    footerLinks: template.footerLinks || [],
+    statusPills: template.statusPills || [],
+  }
+}
 
 const templates = {
   navigationLinks: { label: "", href: "" },
@@ -83,13 +81,17 @@ function parseList(value = "") {
   return value.split(",").map((item) => item.trim()).filter(Boolean)
 }
 
+function ensureArray(value) {
+  return Array.isArray(value) ? value : []
+}
+
 function EditorSection({ title, description, action, children }) {
   return (
-    <Card className="border-border/70 bg-card/90 shadow-sm">
-      <CardHeader className="border-b border-border/60">
+    <Card className="border-border/60 bg-background shadow-sm mb-6 last:mb-0">
+      <CardHeader className="border-b border-border/50 pb-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1">
-            <CardTitle>{title}</CardTitle>
+            <CardTitle className="text-lg tracking-tight">{title}</CardTitle>
             {description ? <CardDescription>{description}</CardDescription> : null}
           </div>
           {action}
@@ -102,18 +104,18 @@ function EditorSection({ title, description, action, children }) {
 
 function ItemFrame({ title, subtitle, iconName, onRemove, children }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-background/70 p-4">
+    <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 mb-4 last:mb-0">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-primary">
             {createElement(resolveIcon(iconName), { className: "size-4" })}
           </div>
           <div>
-            <p className="text-sm font-medium">{title}</p>
+            <p className="text-sm font-medium text-foreground">{title}</p>
             {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
           </div>
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
+        <Button type="button" variant="ghost" size="icon-sm" className="rounded-full" onClick={onRemove}>
           <Trash2 className="size-4" />
         </Button>
       </div>
@@ -127,7 +129,7 @@ function IconField({ label, value, onChange }) {
     <Field>
       <FieldLabel>{label}</FieldLabel>
       <div className="space-y-2">
-        <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/70 px-3 py-2 text-sm">
+        <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2 text-sm">
           {createElement(resolveIcon(value), { className: "size-4 text-primary" })}
           <span className="text-muted-foreground">{value || "No icon selected"}</span>
         </div>
@@ -140,16 +142,33 @@ function IconField({ label, value, onChange }) {
 export default function PortfolioEditor({ portfolioIndex = 1 }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [isNewPortfolio, setIsNewPortfolio] = useState(false)
   const [formData, setFormData] = useState(() => initialFormState(portfolioIndex))
 
   const loadPortfolioData = useCallback(async () => {
     try {
       setLoading(true)
+      const portfolioListResponse = await fetchDashboardPortfolios()
+      const existingPortfolio = (portfolioListResponse?.portfolios || []).find(
+        (item) => Number(item.order_index) === Number(portfolioIndex)
+      )
+
+      if (!existingPortfolio) {
+        setIsNewPortfolio(true)
+        setFormData(initialFormState(portfolioIndex))
+        return
+      }
+
+      setIsNewPortfolio(false)
       const response = await fetchPortfolio(null, portfolioIndex)
 
       if (response) {
         const normalizedProjects = Array.isArray(response.projects) ? response.projects : response.projects?.results || []
-        const normalizedExperience = Array.isArray(response.experience) ? response.experience : response.experience?.results || []
+        const normalizedExperience = (Array.isArray(response.experience) ? response.experience : response.experience?.results || []).map((item) => ({
+          ...item,
+          highlights: ensureArray(item.highlights),
+          relatedComponents: ensureArray(item.relatedComponents),
+        }))
 
         setFormData((current) => ({
           ...current,
@@ -231,30 +250,46 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
     setSaving(true)
 
     try {
-      await updatePortfolio(
-        {
-          is_enabled: formData.isEnabled,
-          new_order_index: formData.orderIndex,
-          personalInfo: formData.personalInfo,
-          heroContent: formData.heroContent,
-          aboutContent: formData.aboutContent,
-          navigationLinks: formData.navigationLinks,
-          heroMetrics: formData.heroMetrics,
-          skillGroups: formData.skillGroups,
-          projects: formData.projects,
-          experience: formData.experience,
-          showcaseCategories: formData.showcaseCategories,
-          featuredModules: formData.featuredModules,
-          contactMethods: formData.contactMethods,
-          footerLinks: formData.footerLinks,
-          statusPills: formData.statusPills,
-        },
-        portfolioIndex
-      )
+      const payload = {
+        is_enabled: formData.isEnabled,
+        new_order_index: formData.orderIndex,
+        personalInfo: formData.personalInfo,
+        heroContent: formData.heroContent,
+        aboutContent: formData.aboutContent,
+        navigationLinks: formData.navigationLinks,
+        heroMetrics: formData.heroMetrics,
+        skillGroups: formData.skillGroups,
+        projects: formData.projects,
+        experience: formData.experience,
+        showcaseCategories: formData.showcaseCategories,
+        featuredModules: formData.featuredModules,
+        contactMethods: formData.contactMethods,
+        footerLinks: formData.footerLinks,
+        statusPills: formData.statusPills,
+      }
 
-      toast.success("Portfolio updated successfully")
+      if (isNewPortfolio) {
+        const createdPortfolio = await createNewPortfolio(payload, portfolioIndex)
+        setFormData((current) => ({
+          ...current,
+          ...createdPortfolio,
+          orderIndex: createdPortfolio?.orderIndex ?? current.orderIndex,
+          isEnabled: createdPortfolio?.isEnabled ?? current.isEnabled,
+        }))
+        setIsNewPortfolio(false)
+        toast.success("Portfolio created successfully")
+      } else {
+        const updatedPortfolio = await updatePortfolio(payload, portfolioIndex)
+        setFormData((current) => ({
+          ...current,
+          ...updatedPortfolio,
+          orderIndex: updatedPortfolio?.orderIndex ?? current.orderIndex,
+          isEnabled: updatedPortfolio?.isEnabled ?? current.isEnabled,
+        }))
+        toast.success("Portfolio updated successfully")
+      }
     } catch (error) {
-      toast.error(error.message || "Failed to update portfolio")
+      toast.error(error.message || (isNewPortfolio ? "Failed to create portfolio" : "Failed to update portfolio"))
     } finally {
       setSaving(false)
     }
@@ -262,7 +297,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
 
   if (loading) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-2xl border border-border/60 bg-card/80">
+      <div className="flex h-[420px] items-center justify-center rounded-3xl border border-border/60 bg-background shadow-sm">
         <div className="flex flex-col items-center gap-3 text-center">
           <Loader2 className="size-6 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading portfolio editor...</p>
@@ -272,32 +307,33 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pb-20">
-      <Card className="border-border/70 bg-card/95 shadow-sm">
-        <CardHeader>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex w-full min-w-0 flex-col gap-6 pb-24">
+      <Card className="rounded-3xl border-border/60 bg-background shadow-sm">
+        <CardHeader className="pb-6">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Badge variant="outline">Portfolio #{portfolioIndex}</Badge>
-                <Badge variant={formData.isEnabled ? "default" : "secondary"}>
+                <Badge variant="outline" className="rounded-full">Portfolio #{portfolioIndex}</Badge>
+                <Badge variant={formData.isEnabled ? "default" : "secondary"} className="rounded-full">
                   {formData.isEnabled ? "Live" : "Hidden"}
                 </Badge>
+                {isNewPortfolio ? <Badge variant="secondary" className="rounded-full">New</Badge> : null}
               </div>
-              <CardTitle className="text-2xl">Portfolio Editor</CardTitle>
+              <CardTitle className="text-3xl tracking-tight">Edit portfolio</CardTitle>
               <CardDescription>
-                Minimal, theme-aware content management for your public portfolio and dashboard.
+                Refine the public portfolio content with a quieter, cleaner editing workspace.
               </CardDescription>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/70 px-4 py-2">
+              <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3">
                 <Switch checked={formData.isEnabled} onCheckedChange={(checked) => setFormData((current) => ({ ...current, isEnabled: checked }))} />
                 <div>
                   <p className="text-sm font-medium">Public access</p>
                   <p className="text-xs text-muted-foreground">Control whether this portfolio is visible.</p>
                 </div>
               </div>
-              <Button onClick={handleSubmit} disabled={saving}>
+              <Button onClick={handleSubmit} disabled={saving} className="rounded-full px-5 shadow-none">
                 {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
                 {saving ? "Saving..." : "Save changes"}
               </Button>
@@ -306,18 +342,39 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="identity" className="gap-6">
-        <TabsList variant="line" className="w-full justify-start overflow-x-auto rounded-none border-b border-border/60 px-0 pb-1">
-          <TabsTrigger value="identity"><User className="size-4" /> Identity</TabsTrigger>
-          <TabsTrigger value="content"><LayoutTemplate className="size-4" /> Core Content</TabsTrigger>
-          <TabsTrigger value="sections"><FileText className="size-4" /> Sections</TabsTrigger>
-          <TabsTrigger value="links"><Link2 className="size-4" /> Links & Icons</TabsTrigger>
-          <TabsTrigger value="settings"><Settings2 className="size-4" /> Settings</TabsTrigger>
-        </TabsList>
+      {/* CHANGED flex-col HERE TO ENSURE STACKING */}
+      <Tabs defaultValue="identity" className="flex w-full flex-col gap-6">
+        
+        {/* CHANGED LAYOUT HERE TO SPAN FULL WIDTH */}
+        <div className="sticky top-[5.5rem] z-20 w-full mb-2">
+          <div className="w-full overflow-x-auto rounded-3xl border border-border/60 bg-background p-2 shadow-sm">
+            <TabsList
+              variant="line"
+              className="flex w-full gap-2 rounded-none border-0 bg-transparent p-0 shadow-none"
+            >
+              <TabsTrigger value="identity" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
+                <User className="mr-2 size-4" /> Identity
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
+                <LayoutTemplate className="mr-2 size-4" /> Content
+              </TabsTrigger>
+              <TabsTrigger value="sections" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
+                <FileText className="mr-2 size-4" /> Sections
+              </TabsTrigger>
+              <TabsTrigger value="links" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
+                <Link2 className="mr-2 size-4" /> Links
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
+                <Settings2 className="mr-2 size-4" /> Settings
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
 
-        <TabsContent value="identity" className="space-y-6">
+        {/* --- IDENTITY TAB --- */}
+        <TabsContent value="identity" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
           <EditorSection title="Personal information" description="Primary identity and profile metadata displayed throughout the portfolio.">
-            <FieldGroup className="grid gap-5 md:grid-cols-2">
+            <FieldGroup className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               <Field><FieldLabel>Full name</FieldLabel><Input value={formData.personalInfo.name} onChange={(e) => handleNestedChange("personalInfo", "name", e.target.value)} /></Field>
               <Field><FieldLabel>Short name</FieldLabel><Input value={formData.personalInfo.shortName} onChange={(e) => handleNestedChange("personalInfo", "shortName", e.target.value)} /></Field>
               <Field><FieldLabel>Professional title</FieldLabel><Input value={formData.personalInfo.title} onChange={(e) => handleNestedChange("personalInfo", "title", e.target.value)} /></Field>
@@ -330,7 +387,8 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
         </TabsContent>
 
-        <TabsContent value="content" className="space-y-6">
+        {/* --- CONTENT TAB --- */}
+        <TabsContent value="content" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
           <EditorSection title="Hero content" description="Top-of-page messaging and headline copy.">
             <FieldGroup>
               <Field><FieldLabel>Eyebrow</FieldLabel><Input value={formData.heroContent.eyebrow} onChange={(e) => handleNestedChange("heroContent", "eyebrow", e.target.value)} /></Field>
@@ -342,9 +400,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Hero metrics"
             description="Small high-impact stats shown near the hero area."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("heroMetrics")}><Plus className="mr-2 size-4" />Add metric</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("heroMetrics")}><Plus className="mr-2 size-4" />Add metric</Button>}
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.heroMetrics.map((metric, index) => (
                 <ItemFrame
                   key={`metric-${index}`}
@@ -362,6 +420,23 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
             </div>
           </EditorSection>
 
+          <EditorSection
+            title="Status pills"
+            description="Compact pills shown in the hero section."
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("statusPills")}><Plus className="mr-2 size-4" />Add pill</Button>}
+          >
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {formData.statusPills.map((item, index) => (
+                <ItemFrame key={`pill-${index}`} title={item.label || `Status pill ${index + 1}`} subtitle={item.icon || "Icon"} iconName={item.icon} onRemove={() => removeItem("statusPills", index)}>
+                  <FieldGroup className="grid gap-4 md:grid-cols-2">
+                    <Field><FieldLabel>Label</FieldLabel><Input value={item.label} onChange={(e) => handleArrayChange("statusPills", index, "label", e.target.value)} /></Field>
+                    <IconField label="Icon" value={item.icon} onChange={(nextIcon) => handleArrayChange("statusPills", index, "icon", nextIcon)} />
+                  </FieldGroup>
+                </ItemFrame>
+              ))}
+            </div>
+          </EditorSection>
+
           <EditorSection title="About section" description="Longer narrative content about you and your work.">
             <FieldGroup>
               <Field><FieldLabel>Section title</FieldLabel><Input value={formData.aboutContent.title} onChange={(e) => handleNestedChange("aboutContent", "title", e.target.value)} /></Field>
@@ -370,13 +445,14 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
         </TabsContent>
 
-        <TabsContent value="sections" className="space-y-6">
+        {/* --- SECTIONS TAB --- */}
+        <TabsContent value="sections" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
           <EditorSection
             title="Skill groups"
             description="Stack and capabilities used in the about section."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("skillGroups")}><Plus className="mr-2 size-4" />Add group</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("skillGroups")}><Plus className="mr-2 size-4" />Add group</Button>}
           >
-            <div className="space-y-4">
+            <div>
               {formData.skillGroups.map((group, index) => (
                 <ItemFrame key={`skill-${index}`} title={group.title || `Skill group ${index + 1}`} subtitle="Grouped skills with description" iconName="Sparkles" onRemove={() => removeItem("skillGroups", index)}>
                   <FieldGroup>
@@ -392,9 +468,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Projects"
             description="Portfolio cards for featured work."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("projects")}><Plus className="mr-2 size-4" />Add project</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("projects")}><Plus className="mr-2 size-4" />Add project</Button>}
           >
-            <div className="space-y-4">
+            <div>
               {formData.projects.map((project, index) => (
                 <ItemFrame key={`project-${index}`} title={project.title || `Project ${index + 1}`} subtitle={project.eyebrow || "Project category"} iconName="Globe" onRemove={() => removeItem("projects", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -412,9 +488,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Experience"
             description="Career timeline and role details."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("experience")}><Plus className="mr-2 size-4" />Add experience</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("experience")}><Plus className="mr-2 size-4" />Add experience</Button>}
           >
-            <div className="space-y-4">
+            <div>
               {formData.experience.map((item, index) => (
                 <ItemFrame key={`experience-${index}`} title={item.title || `Experience ${index + 1}`} subtitle={item.company || "Role and company"} iconName="User" onRemove={() => removeItem("experience", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -430,32 +506,13 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               ))}
             </div>
           </EditorSection>
-        </TabsContent>
-
-        <TabsContent value="links" className="space-y-6">
-          <EditorSection
-            title="Navigation links"
-            description="Header navigation items for the public portfolio."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("navigationLinks")}><Plus className="mr-2 size-4" />Add link</Button>}
-          >
-            <div className="grid gap-4 md:grid-cols-2">
-              {formData.navigationLinks.map((link, index) => (
-                <ItemFrame key={`nav-${index}`} title={link.label || `Link ${index + 1}`} subtitle={link.href || "Anchor or URL"} iconName="Link2" onRemove={() => removeItem("navigationLinks", index)}>
-                  <FieldGroup className="grid gap-4 md:grid-cols-2">
-                    <Field><FieldLabel>Label</FieldLabel><Input value={link.label} onChange={(e) => handleArrayChange("navigationLinks", index, "label", e.target.value)} /></Field>
-                    <Field><FieldLabel>Href</FieldLabel><Input value={link.href} onChange={(e) => handleArrayChange("navigationLinks", index, "href", e.target.value)} /></Field>
-                  </FieldGroup>
-                </ItemFrame>
-              ))}
-            </div>
-          </EditorSection>
 
           <EditorSection
             title="Showcase categories"
             description="UI system showcase content with relation mapping and icons."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("showcaseCategories")}><Plus className="mr-2 size-4" />Add category</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("showcaseCategories")}><Plus className="mr-2 size-4" />Add category</Button>}
           >
-            <div className="space-y-4">
+            <div>
               {formData.showcaseCategories.map((item, index) => (
                 <ItemFrame key={`showcase-${index}`} title={item.title || `Category ${index + 1}`} subtitle={item.relation || "Connected relation"} iconName={item.icon} onRemove={() => removeItem("showcaseCategories", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -473,9 +530,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Featured modules"
             description="Highlighted modules that pair with experience and showcase sections."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("featuredModules")}><Plus className="mr-2 size-4" />Add module</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("featuredModules")}><Plus className="mr-2 size-4" />Add module</Button>}
           >
-            <div className="space-y-4">
+            <div>
               {formData.featuredModules.map((item, index) => (
                 <ItemFrame key={`module-${index}`} title={item.title || `Module ${index + 1}`} subtitle={item.relation || "Connected relation"} iconName={item.icon} onRemove={() => removeItem("featuredModules", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -489,19 +546,39 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               ))}
             </div>
           </EditorSection>
+        </TabsContent>
+
+        {/* --- LINKS TAB --- */}
+        <TabsContent value="links" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+          <EditorSection
+            title="Navigation links"
+            description="Header navigation items for the public portfolio."
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("navigationLinks")}><Plus className="mr-2 size-4" />Add link</Button>}
+          >
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {formData.navigationLinks.map((link, index) => (
+                <ItemFrame key={`nav-${index}`} title={link.label || `Link ${index + 1}`} subtitle={link.href || "Anchor or URL"} iconName="Link2" onRemove={() => removeItem("navigationLinks", index)}>
+                  <FieldGroup className="grid gap-4 md:grid-cols-2">
+                    <Field><FieldLabel>Label</FieldLabel><Input value={link.label} onChange={(e) => handleArrayChange("navigationLinks", index, "label", e.target.value)} /></Field>
+                    <Field><FieldLabel>Href</FieldLabel><Input value={link.href} onChange={(e) => handleArrayChange("navigationLinks", index, "href", e.target.value)} /></Field>
+                  </FieldGroup>
+                </ItemFrame>
+              ))}
+            </div>
+          </EditorSection>
 
           <EditorSection
             title="Contact methods"
             description="Public contact cards shown in the contact section."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("contactMethods")}><Plus className="mr-2 size-4" />Add method</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("contactMethods")}><Plus className="mr-2 size-4" />Add method</Button>}
           >
-            <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
               {formData.contactMethods.map((item, index) => (
                 <ItemFrame key={`contact-${index}`} title={item.label || `Method ${index + 1}`} subtitle={item.value || item.href || "Contact detail"} iconName={item.icon} onRemove={() => removeItem("contactMethods", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
                     <Field><FieldLabel>Label</FieldLabel><Input value={item.label} onChange={(e) => handleArrayChange("contactMethods", index, "label", e.target.value)} /></Field>
                     <Field><FieldLabel>Value</FieldLabel><Input value={item.value} onChange={(e) => handleArrayChange("contactMethods", index, "value", e.target.value)} /></Field>
-                    <Field><FieldLabel>Href</FieldLabel><Input value={item.href} onChange={(e) => handleArrayChange("contactMethods", index, "href", e.target.value)} /></Field>
+                    <Field className="md:col-span-2"><FieldLabel>Href</FieldLabel><Input value={item.href} onChange={(e) => handleArrayChange("contactMethods", index, "href", e.target.value)} /></Field>
                     <IconField label="Icon" value={item.icon} onChange={(nextIcon) => handleArrayChange("contactMethods", index, "icon", nextIcon)} />
                   </FieldGroup>
                 </ItemFrame>
@@ -512,9 +589,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Footer links"
             description="Links displayed in the footer."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("footerLinks")}><Plus className="mr-2 size-4" />Add footer link</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("footerLinks")}><Plus className="mr-2 size-4" />Add footer link</Button>}
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.footerLinks.map((link, index) => (
                 <ItemFrame key={`footer-${index}`} title={link.label || `Footer link ${index + 1}`} subtitle={link.href || "Anchor or URL"} iconName="Globe" onRemove={() => removeItem("footerLinks", index)}>
                   <FieldGroup className="grid gap-4 md:grid-cols-2">
@@ -525,31 +602,15 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               ))}
             </div>
           </EditorSection>
-
-          <EditorSection
-            title="Status pills"
-            description="Compact pills shown in the hero section."
-            action={<Button type="button" variant="outline" size="sm" onClick={() => addItem("statusPills")}><Plus className="mr-2 size-4" />Add pill</Button>}
-          >
-            <div className="grid gap-4 md:grid-cols-2">
-              {formData.statusPills.map((item, index) => (
-                <ItemFrame key={`pill-${index}`} title={item.label || `Status pill ${index + 1}`} subtitle={item.icon || "Icon"} iconName={item.icon} onRemove={() => removeItem("statusPills", index)}>
-                  <FieldGroup className="grid gap-4 md:grid-cols-2">
-                    <Field><FieldLabel>Label</FieldLabel><Input value={item.label} onChange={(e) => handleArrayChange("statusPills", index, "label", e.target.value)} /></Field>
-                    <IconField label="Icon" value={item.icon} onChange={(nextIcon) => handleArrayChange("statusPills", index, "icon", nextIcon)} />
-                  </FieldGroup>
-                </ItemFrame>
-              ))}
-            </div>
-          </EditorSection>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
+        {/* --- SETTINGS TAB --- */}
+        <TabsContent value="settings" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
           <EditorSection title="Portfolio settings" description="Index and visibility controls for multi-portfolio management.">
-            <div className="grid gap-6 md:grid-cols-[1fr_auto]">
-              <div className="rounded-xl border border-border/60 bg-background/70 p-4">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_320px]">
+              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-primary">
                     <Sparkles className="size-4" />
                   </div>
                   <div>
@@ -567,7 +628,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border/60 bg-background/70 p-4 md:min-w-[240px]">
+              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 md:min-w-[240px]">
                 <Field>
                   <FieldLabel>Display index</FieldLabel>
                   <Input

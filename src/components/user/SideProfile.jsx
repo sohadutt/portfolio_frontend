@@ -5,17 +5,19 @@ import {
 } from "@/components/ui/sidebar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarImage, AvatarFallback, AvatarBadge } from "@/components/ui/avatar"
+import { Switch } from "@/components/ui/switch"
+import { 
+  Field, FieldContent, FieldDescription, FieldLabel 
+} from "@/components/ui/field"
 import { toast } from "sonner"
 
 // Make sure logoutUser and updateUserProfile are exported from your helper
-import { updateUserProfile, toggleShareStatus, logoutUser, THEME_MAP } from "@/helper/functions" 
-import { Save, User, Check, Copy, Camera, LogOut } from "lucide-react"
+import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP } from "@/helper/functions" 
+import { Save, User, Check, Camera, Copy, LogOut } from "lucide-react"
 
 // Cropper Imports
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
@@ -54,31 +56,37 @@ export function SideProfile({ profileData }) {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleThemeChange = (val) => {
-    setFormData((prev) => ({ ...prev, theme_mode: Number(val) }))
-  }
+  const handleShareToggle = async (pressed) => {
+    const previousEnabled = formData?.enable_share_token || false
+    setFormData((prev) => ({
+      ...prev,
+      enable_share_token: pressed,
+      share_token: pressed ? prev?.share_token : null,
+    }))
 
-  // --- SHARE & VISIBILITY LOGIC ---
-  const handleShareToggle = async () => {
     try {
-      const res = await toggleShareStatus()
-      setFormData(prev => ({ 
-        ...prev, 
-        enable_share_token: res.enable_share_token,
-        share_token: res.share_token
+      const response = await toggleShareStatus({ enable_share_token: pressed })
+      setFormData((prev) => ({
+        ...prev,
+        enable_share_token: response.enable_share_token,
+        share_token: response.share_token ?? prev?.share_token,
       }))
-      toast.success(res.enable_share_token ? "Portfolio is now public" : "Portfolio is now private")
+      toast.success(response.enable_share_token ? "Share access enabled" : "Share access disabled")
     } catch (error) {
-      toast.error(error.message || "Could not toggle sharing")
+      setFormData((prev) => ({
+        ...prev,
+        enable_share_token: previousEnabled,
+        share_token: previousEnabled ? prev?.share_token : null,
+      }))
+      toast.error(error.message || "Could not update share access")
     }
   }
 
-  const copyShareLink = () => {
+  const copyShareLink = async () => {
     if (!formData?.share_token) return
-    const frontendBase = window.location.origin 
-    const link = `${frontendBase}/portfolio/${formData.share_token}`
-    navigator.clipboard.writeText(link)
-    toast.success("Share link copied!")
+    const link = `${window.location.origin}/portfolio/${formData.share_token}`
+    await navigator.clipboard.writeText(link)
+    toast.success("Share link copied")
   }
 
   // --- IMAGE UPLOAD & HEIF HANDLING ---
@@ -150,17 +158,26 @@ export function SideProfile({ profileData }) {
   const handleSave = async () => {
     setLoading(true)
     try {
-      let dataToSend = formData
+      let dataToSend = {
+        first_name: formData?.first_name || "",
+        last_name: formData?.last_name || "",
+      }
       
       if (newImageFile) {
         dataToSend = new FormData()
-        Object.keys(formData).forEach(key => {
-          if (key !== 'profile_picture') dataToSend.append(key, formData[key])
-        })
+        dataToSend.append("first_name", formData?.first_name || "")
+        dataToSend.append("last_name", formData?.last_name || "")
         dataToSend.append('profile_picture', newImageFile)
       }
 
-      await updateUserProfile(dataToSend)
+      const response = await updateUserProfile(dataToSend)
+      const updatedProfile = response?.data || response
+      setFormData((prev) => ({
+        ...prev,
+        first_name: updatedProfile?.first_name ?? prev.first_name,
+        last_name: updatedProfile?.last_name ?? prev.last_name,
+        profile_picture: updatedProfile?.profile_picture ?? prev.profile_picture,
+      }))
       toast.success("Profile saved")
       setNewImageFile(null) 
     } catch (error) {
@@ -175,7 +192,6 @@ export function SideProfile({ profileData }) {
     try {
       await logoutUser()
       toast.success("Logged out successfully")
-      // Redirect to login page
       window.location.href = "/login"
     } catch {
       toast.error("Failed to log out")
@@ -184,12 +200,13 @@ export function SideProfile({ profileData }) {
 
   return (
     <>
-      <Sidebar>
-        <SidebarHeader className="border-b p-4">
+      <Sidebar variant="inset" collapsible="icon" className="border-r border-sidebar-border/60">
+        <SidebarHeader className="border-b border-sidebar-border p-4">
           <div className="flex items-center gap-3">
             <div 
-              className="group relative cursor-pointer" 
+              className="group relative cursor-pointer focus-within:outline-none" 
               onClick={() => fileInputRef.current?.click()}
+              title="Update profile picture"
             >
               <Avatar className="h-12 w-12 border shadow-sm transition-opacity group-hover:opacity-75">
                 <AvatarImage src={previewImage || formData?.profile_picture} alt={formData?.username} className="object-cover" />
@@ -202,7 +219,7 @@ export function SideProfile({ profileData }) {
                   </AvatarBadge>
                 )}
               </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 <Camera className="h-4 w-4 text-white" />
               </div>
               <input 
@@ -219,8 +236,8 @@ export function SideProfile({ profileData }) {
                 <span className="truncate text-sm font-semibold leading-none">
                   {formData?.username || "Guest"}
                 </span>
-                <Badge variant="secondary" className="h-4 px-1.5 py-0 text-[10px] uppercase tracking-wider">
-                  {formData?.tier || "Premium"}
+                <Badge variant="secondary" className="h-5 rounded-full px-2 py-0 text-[10px] uppercase tracking-wider">
+                  {TIER_MAP?.[formData?.tier] || "Premium"}
                 </Badge>
               </div>
               <span className="truncate text-xs leading-none text-muted-foreground">
@@ -246,59 +263,46 @@ export function SideProfile({ profileData }) {
           </SidebarGroup>
 
           <SidebarGroup>
-            <SidebarGroupLabel>Visibility & Sharing</SidebarGroupLabel>
+            <SidebarGroupLabel>Visibility</SidebarGroupLabel>
             <SidebarGroupContent className="p-2 space-y-4">
               
-              <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-card">
-                <div className="space-y-0.5">
-                  <Label htmlFor="share-toggle">Public Access</Label>
-                  <p className="text-xs text-muted-foreground">
-                    {formData?.enable_share_token ? "Portfolio is live" : "Portfolio is private"}
-                  </p>
-                </div>
-                
+              <Field orientation="horizontal" className="rounded-2xl border border-border/60 bg-background p-3 shadow-sm w-full">
+                <FieldContent>
+                  <FieldLabel htmlFor="sidebar-share-toggle">
+                    Share access
+                  </FieldLabel>
+                  <FieldDescription>
+                    {formData?.enable_share_token ? "Portfolio is public" : "Portfolio is private"}
+                  </FieldDescription>
+                </FieldContent>
                 <div className="flex items-center gap-2">
-                  {formData?.enable_share_token && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8" 
+                  {formData?.enable_share_token && formData?.share_token && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="rounded-full"
                       onClick={copyShareLink}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="size-4" />
                     </Button>
                   )}
-                  <Switch 
-                    id="share-toggle" 
-                    checked={formData?.enable_share_token || false} 
+                  <Switch
+                    id="sidebar-share-toggle"
+                    checked={formData?.enable_share_token || false}
                     onCheckedChange={handleShareToggle}
                   />
                 </div>
-              </div>
+              </Field>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="theme_select">Active Theme</Label>
-                <Select value={String(formData?.theme_mode ?? 0)} onValueChange={handleThemeChange}>
-                  <SelectTrigger id="theme_select">
-                    <SelectValue placeholder="Select a theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(THEME_MAP).map(([key, value]) => (
-                      <SelectItem key={key} value={key} className="capitalize">
-                        {value.replace('theme-', '')}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="border-t p-4 space-y-2">
+        <SidebarFooter className="border-t border-sidebar-border p-4 space-y-2">
           {isDirty && (
             <Button 
-              className="w-full shadow-sm" 
+              className="w-full rounded-full shadow-none" 
               onClick={handleSave}
               disabled={loading}
             >
@@ -308,7 +312,7 @@ export function SideProfile({ profileData }) {
           )}
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-muted-foreground hover:text-foreground" 
+            className="w-full justify-start rounded-full text-muted-foreground hover:text-foreground" 
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />

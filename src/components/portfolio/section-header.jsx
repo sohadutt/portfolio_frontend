@@ -1,21 +1,18 @@
 export function SectionHeader({ eyebrow, title, description }) {
   return (
-    <div className="max-w-2xl space-y-4">
-      {/* Eyebrow */}
+    <div className="max-w-2xl space-y-3">
       {eyebrow && (
-        <p className="text-sm font-semibold uppercase tracking-[0.26em] text-primary">
+        <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary/85">
           {eyebrow}
         </p>
       )}
-      
-      {/* shadcn Typography: H2 */}
-      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+
+      <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-balance sm:text-[2.45rem]">
         {title}
       </h2>
-      
-      {/* shadcn Typography: Muted/Lead */}
+
       {description && (
-        <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+        <p className="text-[15px] leading-7 text-muted-foreground sm:text-base">
           {description}
         </p>
       )}

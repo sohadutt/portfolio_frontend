@@ -9,7 +9,7 @@ export function ComponentShowcase({ data, activeHover, onRelationChange, isScrol
   return (
     <section
       id="components"
-      className="rounded-[2rem] border border-border/60 bg-card/70 p-8 backdrop-blur"
+      className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm"
     >
       <SectionHeader
         eyebrow="UI System"
@@ -27,8 +27,8 @@ export function ComponentShowcase({ data, activeHover, onRelationChange, isScrol
               key={title}
               className={`rounded-[1.75rem] border p-5 ${
                 isHighlighted
-                  ? 'border-primary/70 bg-primary/10 shadow-[0_24px_70px_-42px_var(--color-primary)]'
-                  : `border-border/60 bg-background/80 ${isScrolling ? '' : 'hover:-translate-y-1 hover:border-primary/40 hover:bg-primary/6'}`
+                  ? 'border-primary/30 bg-primary/6 shadow-sm'
+                  : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
               }`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'showcase' })}
               onFocus={() => !isScrolling && onRelationChange({ relation, source: 'showcase' })}
@@ -36,13 +36,13 @@ export function ComponentShowcase({ data, activeHover, onRelationChange, isScrol
               <div className="flex items-center gap-3">
                 <div
                   className={`flex size-11 items-center justify-center rounded-2xl ${
-                    isHighlighted ? 'bg-primary text-primary-foreground' : 'bg-primary/12 text-primary'
+                    isHighlighted ? 'bg-primary/12 text-primary' : 'bg-muted text-primary'
                   }`}
                 >
                   <Icon className="size-5" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-2xl">{title}</h3>
+                  <h3 className="text-xl font-semibold tracking-tight">{title}</h3>
                   <p className="text-sm text-muted-foreground">{items.length} planned patterns</p>
                 </div>
               </div>
@@ -57,10 +57,10 @@ export function ComponentShowcase({ data, activeHover, onRelationChange, isScrol
                 {items.map((item) => (
                   <span
                     key={item}
-                    className={`rounded-full border px-3 py-1.5 text-xs uppercase tracking-[0.15em] ${
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
                       isHighlighted
-                        ? 'border-primary/30 bg-primary/12 text-primary'
-                        : 'border-border/60 bg-card text-muted-foreground'
+                        ? 'border-primary/20 bg-background text-primary'
+                        : 'border-border/60 bg-background text-muted-foreground'
                     }`}
                   >
                     {item}

@@ -70,8 +70,13 @@ export default function PortfolioManager() {
     ))
     
     try {
-      await togglePortfolioVisibility(orderIndex)
+      const response = await togglePortfolioVisibility(orderIndex)
       toast.success(`Portfolio ${orderIndex} status updated`)
+      setData(prevData => prevData.map(item =>
+        item.order_index === orderIndex
+          ? { ...item, is_enabled: response?.is_enabled ?? !currentStatus }
+          : item
+      ))
     } catch (error) {
       setData(prevData => prevData.map(item => 
         item.order_index === orderIndex ? { ...item, is_enabled: currentStatus } : item
@@ -172,7 +177,7 @@ export default function PortfolioManager() {
 
   if (loading) {
     return (
-      <div className="flex h-[400px] w-full flex-col items-center justify-center space-y-4 rounded-xl border border-dashed bg-card/50">
+      <div className="flex h-[400px] w-full flex-col items-center justify-center space-y-4 rounded-2xl border border-border/60 bg-background shadow-sm">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         <p className="text-sm text-muted-foreground">Loading workspace...</p>
       </div>
@@ -180,18 +185,18 @@ export default function PortfolioManager() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="space-y-6">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <Input
           placeholder="Filter by title..."
           value={(table.getColumn("title")?.getFilterValue()) ?? ""}
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="max-w-sm bg-background"
+          className="w-full rounded-full bg-background"
         />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">Columns</Button>
+              <Button variant="outline" className="rounded-full">Columns</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => {
@@ -209,15 +214,16 @@ export default function PortfolioManager() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button onClick={() => navigate(`/dashboard/portfolios/${(data?.length || 0) + 1}/edit`)}>
+          <Button className="rounded-full shadow-none" onClick={() => navigate(`/dashboard/portfolios/${Math.max(...data.map((item) => Number(item.order_index) || 0), 0) + 1}/edit`)}>
             <Plus className="mr-2 h-4 w-4" /> New Portfolio
           </Button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border/60 bg-card/90 shadow-sm">
-        <Table>
-          <TableHeader className="bg-muted/35">
+      <div className="overflow-hidden rounded-3xl border border-border/60 bg-background shadow-sm">
+        <div className="overflow-x-auto">
+        <Table className="min-w-[760px]">
+          <TableHeader className="bg-muted/25">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -235,7 +241,7 @@ export default function PortfolioManager() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id} className="hover:bg-muted/30" data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -252,9 +258,10 @@ export default function PortfolioManager() {
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
       
-      <div className="flex items-center justify-between py-4">
+      <div className="flex flex-col gap-3 py-2 lg:flex-row lg:items-center lg:justify-between">
         <div className="text-sm text-muted-foreground">
            Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
            {Math.min(
@@ -264,7 +271,7 @@ export default function PortfolioManager() {
            of {table.getFilteredRowModel().rows.length} entries
         </div>
         
-        <Pagination className="w-auto mx-0">
+        <Pagination className="mx-0 w-auto justify-start lg:justify-end">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious 

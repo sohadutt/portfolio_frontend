@@ -48,14 +48,15 @@ export default function SubmissionInbox() {
   const handlePriorityChange = async (submissionId, priority) => {
     setUpdatingId(submissionId)
     try {
-      await updateSubmission(submissionId, { priority })
+      const updatedSubmission = await updateSubmission(submissionId, { priority })
       setSubmissions((current) =>
         current.map((submission) =>
           submission.id === submissionId
             ? {
                 ...submission,
-                priority,
-                priority_label: priorityOptions.find((item) => item.value === priority)?.label || submission.priority_label,
+                ...updatedSubmission,
+                priority: updatedSubmission?.priority ?? priority,
+                priority_label: updatedSubmission?.priority_label || priorityOptions.find((item) => item.value === priority)?.label || submission.priority_label,
               }
             : submission
         )
@@ -71,11 +72,11 @@ export default function SubmissionInbox() {
   const handleDismiss = async (submissionId, isDismissed) => {
     setUpdatingId(submissionId)
     try {
-      await updateSubmission(submissionId, { is_dismissed: !isDismissed })
+      const updatedSubmission = await updateSubmission(submissionId, { is_dismissed: !isDismissed })
       setSubmissions((current) =>
         current.map((submission) =>
           submission.id === submissionId
-            ? { ...submission, is_dismissed: !isDismissed }
+            ? { ...submission, ...updatedSubmission, is_dismissed: updatedSubmission?.is_dismissed ?? !isDismissed }
             : submission
         )
       )
@@ -96,13 +97,13 @@ export default function SubmissionInbox() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 rounded-2xl border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-8">
+      <div className="flex flex-col gap-4 rounded-3xl border bg-card p-7 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Submissions</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">{count} enquiry records</h2>
         </div>
-        <Button variant="outline" onClick={() => loadSubmissions(page)}>
+        <Button variant="outline" className="w-full rounded-full lg:w-auto" onClick={() => loadSubmissions(page)}>
           <RefreshCw className="mr-2 size-4" />
           Refresh
         </Button>
@@ -110,7 +111,7 @@ export default function SubmissionInbox() {
 
       <div className="grid gap-4">
         {submissions.length === 0 ? (
-          <div className="rounded-2xl border border-dashed bg-card p-10 text-center">
+          <div className="rounded-3xl border border-dashed bg-card p-12 text-center">
             <MailOpen className="mx-auto size-8 text-muted-foreground" />
             <p className="mt-4 text-lg font-semibold tracking-tight">No submissions yet</p>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -119,8 +120,8 @@ export default function SubmissionInbox() {
           </div>
         ) : (
           submissions.map((submission) => (
-            <article key={submission.id} className="rounded-2xl border bg-card p-6 shadow-sm">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <article key={submission.id} className="rounded-3xl border bg-card p-7 shadow-sm">
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-lg font-semibold tracking-tight">{submission.name}</h3>
@@ -139,13 +140,13 @@ export default function SubmissionInbox() {
                   <p className="text-sm leading-7 text-foreground/90">{submission.message}</p>
                 </div>
 
-                <div className="flex min-w-[220px] flex-col gap-3">
+                <div className="grid gap-3 xl:sticky xl:top-28">
                   <Select
                     value={String(submission.priority)}
                     onValueChange={(value) => handlePriorityChange(submission.id, Number(value))}
                     disabled={updatingId === submission.id}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Set priority" />
                     </SelectTrigger>
                     <SelectContent>
@@ -159,6 +160,7 @@ export default function SubmissionInbox() {
 
                   <Button
                     variant={submission.is_dismissed ? "outline" : "secondary"}
+                    className="w-full rounded-full"
                     onClick={() => handleDismiss(submission.id, submission.is_dismissed)}
                     disabled={updatingId === submission.id}
                   >
@@ -171,15 +173,15 @@ export default function SubmissionInbox() {
         )}
       </div>
 
-      <div className="flex items-center justify-between rounded-2xl border bg-card p-4">
+      <div className="flex flex-col gap-3 rounded-3xl border bg-card p-5 lg:flex-row lg:items-center lg:justify-between">
         <p className="text-sm text-muted-foreground">
           Page {page} of {pageCount}
         </p>
         <div className="flex gap-2">
-          <Button variant="outline" disabled={page <= 1} onClick={() => loadSubmissions(page - 1)}>
+          <Button className="rounded-full" variant="outline" disabled={page <= 1} onClick={() => loadSubmissions(page - 1)}>
             Previous
           </Button>
-          <Button variant="outline" disabled={page >= pageCount} onClick={() => loadSubmissions(page + 1)}>
+          <Button className="rounded-full" variant="outline" disabled={page >= pageCount} onClick={() => loadSubmissions(page + 1)}>
             Next
           </Button>
         </div>

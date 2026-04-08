@@ -16,7 +16,7 @@ import {
 
 export const personalInfo = {
   name: 'Soham Dutta',
-  shortName: 'SD',
+  shortName: 'sohadutt',
   title: 'Full-stack Developer',
   subtitle: 'JavaScript, Python, Django, React',
   location: 'India',
@@ -40,10 +40,47 @@ export const heroContent = {
     'I work across Django, Python automation, PostgreSQL, REST APIs, React, and Tailwind CSS. My recent work focuses on safer configuration tooling, reusable UI, and product-first engineering that removes manual friction for teams.',
 }
 
+export const heroActions = {
+  primary: {
+    label: 'View projects',
+    href: '#projects',
+  },
+  secondary: {
+    label: 'GitHub',
+    href: 'https://github.com/sohadutt',
+  },
+}
+
 export const heroMetrics = [
   { value: '2024', label: 'started backend and config automation work at Imagine.io' },
   { value: '70%', label: 'reduction in dependency on backend engineers for routine config updates' },
   { value: '3', label: 'core tracks across backend, frontend, and production workflows' },
+]
+
+export const heroFocus = {
+  eyebrow: 'Current focus',
+  title: 'Automation + product delivery',
+  areas: [
+    { label: 'Backend systems', value: 78 },
+    { label: 'Frontend delivery', value: 92 },
+    { label: 'Workflow thinking', value: 64 },
+  ],
+}
+
+export const heroBadges = [
+  { label: 'Full-stack' },
+  { label: 'Product-minded' },
+]
+
+export const heroHighlights = [
+  {
+    title: 'Backend systems',
+    description: 'Django, APIs, automation workflows and scalable backend logic.',
+  },
+  {
+    title: 'Frontend delivery',
+    description: 'React, Tailwind and modern UI systems integrated with APIs.',
+  },
 ]
 
 export const aboutContent = {
@@ -309,3 +346,93 @@ export const statusPills = [
   { label: 'Backend and config automation', icon: ArrowUpRight },
   { label: 'React and Tailwind delivery', icon: Component },
 ]
+
+export const sectionCopy = {
+  about: {
+    eyebrow: 'About',
+    title: aboutContent.title,
+    description: aboutContent.description,
+  },
+  projects: {
+    eyebrow: 'Projects',
+    title: 'Selected work from configuration systems to frontend delivery.',
+    description:
+      'These cards now reflect the projects and outcomes from your resume, with emphasis on secure configuration tooling, deployment reliability, and reusable UI work.',
+  },
+  experience: {
+    eyebrow: 'Experience',
+    title: 'Experience across backend automation, frontend delivery, and production workflows.',
+    description:
+      'Hover a role to expand the story, pull its orange spotlight forward, and surface the component direction connected to that work.',
+  },
+  components: {
+    eyebrow: 'UI System',
+    title: 'Related components now respond to the same hover story.',
+    description:
+      'The orange spotlight moves between engineering tracks and the UI patterns they influence, so the page feels connected instead of sectioned off.',
+  },
+  contact: {
+    eyebrow: 'Contact',
+    title: 'Open to roles and collaborations where backend reliability meets strong product thinking.',
+    description:
+      'Reach out for backend automation, Django and API work, or frontend implementation with React and Tailwind CSS.',
+  },
+}
+
+export const pageCopy = {
+  loadingTitle: 'Loading portfolio',
+  loadingDescription: 'Preparing the showcase experience.',
+}
+
+export const defaultPortfolioDocument = {
+  new_order_index: 1,
+  is_enabled: true,
+  personalInfo: { ...personalInfo },
+  navigationLinks: navigationLinks.map((item) => ({ ...item })),
+  heroContent: { ...heroContent },
+  heroActions: {
+    primary: { ...heroActions.primary },
+    secondary: { ...heroActions.secondary },
+  },
+  heroMetrics: heroMetrics.map((item) => ({ ...item })),
+  heroFocus: {
+    ...heroFocus,
+    areas: heroFocus.areas.map((item) => ({ ...item })),
+  },
+  heroBadges: heroBadges.map((item) => ({ ...item })),
+  heroHighlights: heroHighlights.map((item) => ({ ...item })),
+  aboutContent: { ...aboutContent },
+  skillGroups: skillGroups.map((item) => ({
+    ...item,
+    items: [...item.items],
+  })),
+  projects: projects.map((item) => ({
+    ...item,
+    stack: [...item.stack],
+  })),
+  experience: experience.map((item) => ({
+    ...item,
+    highlights: [...item.highlights],
+    relatedComponents: [...item.relatedComponents],
+  })),
+  showcaseCategories: showcaseCategories.map((item) => ({
+    ...item,
+    icon: item.icon.name,
+    items: [...item.items],
+  })),
+  featuredModules: featuredModules.map((item) => ({
+    ...item,
+    icon: item.icon.name,
+  })),
+  contactMethods: contactMethods.map((item) => ({
+    ...item,
+    icon: item.icon.name,
+  })),
+  footerLinks: footerLinks.map((item) => ({ ...item })),
+  statusPills: statusPills.map((item) => ({
+    ...item,
+    icon: item.icon.name,
+  })),
+  sectionCopy: JSON.parse(JSON.stringify(sectionCopy)),
+  pageCopy: { ...pageCopy },
+}

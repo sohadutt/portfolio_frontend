@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Navigate, useSearchParams } from "react-router-dom"
 import {
   BriefcaseBusiness,
   Layers,
@@ -12,7 +13,15 @@ import SignupForm from "@/components/user/SignupForm"
 import { THEME_MAP } from "@/helper/functions"
 
 export default function LoginPage() {
+  const accessToken = localStorage.getItem("access_token")
+  const [searchParams] = useSearchParams()
+  const requestedMode = searchParams.get("mode")
+  const source = searchParams.get("source")
   const [view, setView] = useState("login")
+
+  if (accessToken) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   useEffect(() => {
     const root = document.documentElement
@@ -23,12 +32,18 @@ export default function LoginPage() {
     root.classList.add("dark")
   }, [])
 
+  useEffect(() => {
+    if (requestedMode === "signup") {
+      setView("signup")
+    }
+  }, [requestedMode])
+
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <div className="hidden md:flex flex-col justify-between w-2/3 border-r border-border/50 p-10 lg:p-16">
+    <div className="flex min-h-screen bg-muted/20 text-foreground">
+      <div className="hidden md:flex w-2/3 flex-col justify-between border-r border-border/50 bg-background p-10 lg:p-16">
         <div className="space-y-12 max-w-2xl">
           <div className="flex items-center gap-4">
-            <div className="flex size-14 items-center justify-center rounded-xl border bg-muted">
+            <div className="flex size-14 items-center justify-center rounded-2xl border border-border/60 bg-muted/35">
               <BriefcaseBusiness className="size-7" />
             </div>
             <span className="text-xl font-semibold tracking-tight">
@@ -38,7 +53,7 @@ export default function LoginPage() {
 
           {/* HERO */}
           <div className="space-y-6">
-            <h1 className="text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+            <h1 className="text-5xl font-semibold tracking-tight leading-[1.02] lg:text-6xl">
               A better way to build,
               <br />
               manage and showcase
@@ -47,8 +62,9 @@ export default function LoginPage() {
             </h1>
 
             <p className="text-lg text-muted-foreground max-w-lg leading-relaxed">
-              Everything you need to organize projects, highlight experience,
-              and present your work in a clean, structured interface.
+              {source === "portfolio-builder"
+                ? "Start with the same builder powering this portfolio and make a version that feels fully yours."
+                : "Everything you need to organize projects, highlight experience, and present your work in a clean, structured interface."}
             </p>
           </div>
         </div>
@@ -89,8 +105,8 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="flex w-full md:w-1/3 items-center justify-center px-6">
-        <div className="w-full max-w-sm space-y-6">
+      <div className="flex w-full items-center justify-center px-6 py-10 md:w-1/3">
+        <div className="w-full max-w-sm space-y-6 rounded-[28px] border border-border/60 bg-background p-7 shadow-sm">
           {/* HEADER */}
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold tracking-tight">
@@ -99,7 +115,9 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">
               {view === "login"
                 ? "Enter your email and password to continue."
-                : "Create your account to get started."}
+                : source === "portfolio-builder"
+                  ? "Create your account to start building your own portfolio."
+                  : "Create your account to get started."}
             </p>
           </div>
           <Separator />

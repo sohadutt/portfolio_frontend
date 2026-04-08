@@ -42,6 +42,7 @@ export default function LoginForm() {
           required 
           value={formData.email}
           onChange={handleChange}
+          className="rounded-xl"
         />
       </div>
       <div className="space-y-2">
@@ -55,9 +56,10 @@ export default function LoginForm() {
           required 
           value={formData.password}
           onChange={handleChange}
+          className="rounded-xl"
         />
       </div>
-      <Button type="submit" className="w-full font-semibold mt-2" disabled={loading}>
+      <Button type="submit" className="mt-2 w-full rounded-full font-medium shadow-none" disabled={loading}>
         {loading ? (
           <>
             <Loader2 className="mr-2 size-4 animate-spin" />

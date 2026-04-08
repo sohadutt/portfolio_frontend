@@ -9,11 +9,11 @@ export function ThemeToggle({ theme, onToggle }) {
       aria-label="Toggle theme"
       aria-pressed={isDark}
       onClick={onToggle}
-      className="group relative inline-flex h-11 w-24 items-center rounded-full border border-border/70 bg-card/85 px-1.5 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.65)] backdrop-blur transition-all duration-500 hover:border-primary/50 hover:shadow-[0_14px_34px_-18px_rgba(225,98,54,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="group relative inline-flex h-11 w-24 items-center rounded-full border border-border/70 bg-background px-1.5 shadow-none backdrop-blur transition-all duration-500 hover:border-primary/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
     >
-      <span className="absolute inset-1 rounded-full bg-muted/70" />
+      <span className="absolute inset-1 rounded-full bg-muted/75" />
       <span
-        className={`absolute left-1.5 top-1.5 h-8 w-11 rounded-full bg-primary shadow-lg transition-all duration-500 ${
+        className={`absolute left-1.5 top-1.5 h-8 w-11 rounded-full bg-background ring-1 ring-border transition-all duration-500 ${
           isDark ? 'translate-x-10' : 'translate-x-0'
         }`}
       />
