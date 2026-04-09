@@ -1,29 +1,23 @@
-import { ArrowRight, ChartColumnIncreasing, CircleCheckBig, Sparkles } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowRight, Sparkles } from 'lucide-react'
+import { useState, createElement } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  getHeroActions,
-  getHeroBadges,
-  getHeroContent,
-  getHeroFocus,
-  getHeroHighlights,
-  getHeroMetrics,
-  getPortfolioPersonalInfo,
-  getStatusPills,
-} from '@/helper/portfolio-data'
+import { resolveIcon } from '@/helper/functions' // <-- Update this import path if you put it elsewhere
 
-export function HeroSection({ data, isScrolling }) {
+export function HeroSection({ data = {}, isScrolling }) {
   const [activeMetric, setActiveMetric] = useState(null)
   const [activeCapability, setActiveCapability] = useState(null)
-  const heroContent = getHeroContent(data)
-  const heroActions = getHeroActions(data)
-  const heroFocus = getHeroFocus(data)
-  const heroBadges = getHeroBadges(data)
-  const heroHighlights = getHeroHighlights(data)
-  const heroMetrics = getHeroMetrics(data)
-  const personalInfo = getPortfolioPersonalInfo(data)
-  const statusPills = getStatusPills(data)
+  
+  // Read directly from the API payload with safe fallbacks
+  const heroContent = data.heroContent || data.hero_content || {}
+  const heroActions = data.heroActions || data.hero_actions || {}
+  const heroFocus = data.heroFocus || data.hero_focus || { areas: [] }
+  const heroBadges = data.heroBadges || data.hero_badges || []
+  const heroHighlights = data.heroHighlights || data.hero_highlights || []
+  const heroMetrics = data.heroMetrics || data.hero_metrics || []
+  const personalInfo = data.personalInfo || {}
+  const statusPills = data.statusPills || data.status_pills || []
+  
   const subtitleTokens = (personalInfo.subtitle || "")
     .split(",")
     .map((item) => item.trim())
@@ -34,8 +28,8 @@ export function HeroSection({ data, isScrolling }) {
     <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
         <div className="mb-8 flex flex-wrap gap-2.5">
-          {statusPills.map(({ label, icon }, index) => {
-            const Icon = icon
+          {statusPills.map(({ label, icon, icon_name }, index) => {
+            const IconComponent = resolveIcon(icon || icon_name)
             const isActive = activeMetric === `pill-${index}`
 
             return (
@@ -50,7 +44,9 @@ export function HeroSection({ data, isScrolling }) {
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(`pill-${index}`)}
               >
-                <Icon className={`size-3.5 ${isActive ? 'text-primary' : 'text-primary/80'}`} />
+                {createElement(IconComponent, { 
+                  className: `size-3.5 ${isActive ? 'text-primary' : 'text-primary/80'}` 
+                })}
                 {label}
               </div>
             )
@@ -71,18 +67,22 @@ export function HeroSection({ data, isScrolling }) {
           </p>
 
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button asChild size="lg" className="rounded-full px-6 font-medium shadow-none">
-              <a href={heroActions.primary?.href || '#projects'}>
-                {heroActions.primary?.label || 'View projects'}
-                <ArrowRight className="ml-2 size-4" />
-              </a>
-            </Button>
+            {heroActions.primary?.label && (
+              <Button asChild size="lg" className="rounded-full px-6 font-medium shadow-none">
+                <a href={heroActions.primary.href || '#'}>
+                  {heroActions.primary.label}
+                  <ArrowRight className="ml-2 size-4" />
+                </a>
+              </Button>
+            )}
 
-            <Button asChild variant="outline" size="lg" className="rounded-full px-6 font-medium shadow-none">
-              <a href={heroActions.secondary?.href || personalInfo.github} target="_blank" rel="noreferrer">
-                {heroActions.secondary?.label || 'GitHub'}
-              </a>
-            </Button>
+            {heroActions.secondary?.label && (
+              <Button asChild variant="outline" size="lg" className="rounded-full px-6 font-medium shadow-none">
+                <a href={heroActions.secondary.href || '#'} target="_blank" rel="noreferrer">
+                  {heroActions.secondary.label}
+                </a>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -103,10 +103,13 @@ export function HeroSection({ data, isScrolling }) {
           </div>
 
           <div className="mt-6 space-y-4">
-            {heroFocus.areas.map((area, index) => (
+            {(heroFocus.areas || []).map((area, index) => (
               <div key={`${area.label}-${index}`}>
                 <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="text-foreground">{area.label}</span>
+                  <div className="flex items-center gap-2 text-foreground">
+                    {createElement(resolveIcon(area.icon || area.icon_name || "Component"), { className: "size-3.5 text-muted-foreground" })}
+                    <span>{area.label}</span>
+                  </div>
                   <span className="text-muted-foreground">{area.value}%</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted">
@@ -136,6 +139,9 @@ export function HeroSection({ data, isScrolling }) {
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(index)}
               >
+                <div className="mb-3">
+                   {createElement(resolveIcon(metric.icon || metric.icon_name || "Sparkles"), { className: "size-5 text-primary" })}
+                </div>
                 <p className="text-3xl font-semibold tracking-tight">
                   {metric.value}
                 </p>
@@ -176,7 +182,7 @@ export function HeroSection({ data, isScrolling }) {
             {heroHighlights.map((item, index) => {
               const cardKey = item.title || `highlight-${index}`
               const isActive = activeCapability === cardKey
-              const Icon = index === 0 ? CircleCheckBig : ChartColumnIncreasing
+              const IconComponent = resolveIcon(item.icon || item.icon_name || "FileText")
 
               return (
                 <div
@@ -191,7 +197,7 @@ export function HeroSection({ data, isScrolling }) {
                   onMouseEnter={() => !isScrolling && setActiveCapability(cardKey)}
                 >
                   <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
-                    <Icon className="size-5 text-primary" />
+                    {createElement(IconComponent, { className: "size-5 text-primary" })}
                     {item.title}
                   </div>
                   <p className="text-sm text-muted-foreground">{item.description}</p>

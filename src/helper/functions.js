@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as LucideIcons from 'lucide-react';
 import { URLS } from './urls';
 
 export const THEME_MAP = {
@@ -15,6 +16,21 @@ export const TIER_MAP = {
     2: 'Premium',
 };
 
+// --- ICON RESOLVER ---
+const normalizeIconName = (value = "") => value.replace(/[-_\s]/g, "").toLowerCase();
+
+export const resolveIcon = (iconName, fallback = LucideIcons.Component) => {
+    if (typeof iconName === "function") return iconName; // Already resolved
+    if (!iconName) return fallback;
+
+    const matchedKey = Object.keys(LucideIcons).find(
+        (key) => normalizeIconName(key) === normalizeIconName(iconName)
+    );
+
+    return matchedKey ? LucideIcons[matchedKey] : fallback;
+};
+
+// --- AXIOS SETUP ---
 const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
@@ -254,6 +270,10 @@ export const toggleShareStatus = async (data = {}) => {
 };
 
 // --- PORTFOLIO MANAGEMENT (AUTHENTICATED) ---
+export const fetchPortfolioAuthenticated = (index = 1) => {
+    return getRequest(URLS.PORTFOLIO_GET_AUTHENTICATED(index)).then(normalizePortfolioDocument);
+};
+
 export const updatePortfolio = async (data, index = 1) => {
     const response = await patchRequest(URLS.PORTFOLIO_UPDATE(index), data);
     return normalizePortfolioDocument(response);

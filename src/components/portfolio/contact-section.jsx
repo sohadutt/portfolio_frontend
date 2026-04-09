@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, createElement } from 'react'
 import { useParams } from 'react-router-dom'
-import { submitContactForm } from '@/helper/functions'
+import { submitContactForm, resolveIcon } from '@/helper/functions' // Use resolveIcon from functions
 import { toast } from 'sonner'
-import { getContactMethods, getPortfolioPersonalInfo } from '@/helper/portfolio-data'
 
 // UI Components
 import { Button } from '@/components/ui/button'
@@ -26,12 +25,17 @@ import {
 } from '@/components/ui/field'
 import { Loader2 } from 'lucide-react'
 
-export function ContactSection({ data, isScrolling }) {
+export function ContactSection({ data = {}, isScrolling }) {
   const { token } = useParams() 
   const [activeMethod, setActiveMethod] = useState(null)
-  const resolvedMethod = activeMethod
-  const contactMethods = getContactMethods(data)
-  const personalInfo = getPortfolioPersonalInfo(data)
+  
+  // Safely extract data from the API payload
+  const personalInfo = data.personalInfo || {}
+  const sectionCopy = data.sectionCopy || data.section_copy || {}
+  const contactCopy = sectionCopy.contact || {}
+  
+  const rawMethods = data.contactMethods || data.contact_methods || []
+  const contactMethods = Array.isArray(rawMethods) ? rawMethods : []
   
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
@@ -98,29 +102,32 @@ export function ContactSection({ data, isScrolling }) {
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
       <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
         <SectionHeader
-          eyebrow="Contact"
-          title="Open to roles and collaborations where backend reliability meets strong product thinking."
-          description="Reach out for backend automation, Django and API work, or frontend implementation with React and Tailwind CSS."
+          eyebrow={contactCopy.eyebrow || "Contact"}
+          title={contactCopy.title || "Let's build reliable, product-focused systems."}
+          description={contactCopy.description || "Reach out for backend automation, Django and API work, or frontend implementation with React and Tailwind CSS."}
         />
         <div className="mt-8 space-y-3">
-          {contactMethods.map(({ label, value, href, icon }) => {
-            const Icon = icon
-            const isActive = resolvedMethod === label
+          {contactMethods.map(({ label, value, href, icon, icon_name }, index) => {
+            // Dynamically resolve the icon string from the backend
+            const IconComponent = resolveIcon(icon || icon_name || "Mail")
+            const isActive = activeMethod === index
 
             return (
               <a
-                key={label}
+                key={label || index}
                 href={href || '#contact'}
-                className={`flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
+                className={`group flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
                   isActive
                     ? 'border-primary/30 bg-primary/6'
                     : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
                 }`}
-                onMouseEnter={() => !isScrolling && setActiveMethod(label)}
+                onMouseEnter={() => !isScrolling && setActiveMethod(index)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-2xl bg-muted text-primary">
-                    <Icon className="size-4" />
+                  <div className={`flex size-10 items-center justify-center rounded-2xl transition-transform duration-300 ${
+                    isActive ? "bg-primary/20 text-primary scale-110" : "bg-muted text-primary group-hover:scale-110"
+                  }`}>
+                    {createElement(IconComponent, { className: "size-4" })}
                   </div>
                   <div>
                     <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">

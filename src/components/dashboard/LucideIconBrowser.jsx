@@ -1,14 +1,13 @@
 import { createElement, useMemo, useState } from "react"
-import * as LucideIcons from "lucide-react"
 import { Copy, Search } from "lucide-react"
 import { toast } from "sonner"
 
 import lucideData from "@/helper/tags.json"
+import { resolveIcon } from "@/helper/functions" // FIXED: Pointed to your actual helper file
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { resolveIcon } from "@/helper/portfolio-data"
 
 export default function LucideIconBrowser() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -25,48 +24,71 @@ export default function LucideIconBrowser() {
 
   const handleCopy = async (iconName) => {
     await navigator.clipboard.writeText(iconName)
-    toast.success(`${iconName} copied`)
+    toast.success(`Copied "${iconName}" to clipboard`)
   }
 
   return (
     <Card className="overflow-hidden rounded-3xl border-border/70 bg-card/90 shadow-sm">
-      <CardHeader className="border-b border-border/60 p-7">
-        <CardTitle>Lucide Icon Browser</CardTitle>
-        <CardDescription>
-          Search your installed icon set and copy names for portfolio content, or use the visual picker inside the editor.
+      <CardHeader className="border-b border-border/60 p-7 pb-5">
+        <CardTitle className="text-2xl tracking-tight">Lucide Icon Browser</CardTitle>
+        <CardDescription className="text-base">
+          Search your installed icon set and copy names for portfolio content.
         </CardDescription>
-        <div className="relative mt-2">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative mt-4">
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search icons by name or tag..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            className="w-full rounded-full pl-9"
+            className="w-full rounded-full pl-10 bg-background/50 h-11"
           />
         </div>
       </CardHeader>
 
-      <CardContent className="min-h-0 p-0">
-        <ScrollArea className="h-[calc(100vh-15rem)] px-7 py-7">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-6">
+      <CardContent className="min-h-0 p-0 bg-muted/10">
+        <ScrollArea className="h-[calc(100vh-16rem)] px-7 py-6">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 pb-6">
             {filteredIcons.map(([key, tags]) => {
+              const IconComponent = resolveIcon(key)
+              
               return (
-                <div key={key} className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/70 p-4">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    {createElement(resolveIcon(key, LucideIcons.Component), { className: "size-5" })}
+                <div 
+                  key={key} 
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background p-3 transition-colors hover:border-primary/30 hover:bg-muted/20"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-110">
+                      {createElement(IconComponent, { className: "size-5" })}
+                    </div>
+                    <div className="min-w-0">
+                      {/* Formats "arrow-up-right" into "Arrow Up Right" */}
+                      <p className="truncate text-sm font-semibold capitalize text-foreground">
+                        {key.replace(/-/g, ' ')}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground font-mono">
+                        {key}
+                      </p>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{key}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {Array.isArray(tags) && tags.length ? tags.slice(0, 3).join(", ") : "No tags"}
-                    </p>
-                  </div>
-                  <Button type="button" variant="ghost" size="icon-sm" className="rounded-full" onClick={() => handleCopy(key)}>
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon-sm" 
+                    className="shrink-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" 
+                    onClick={() => handleCopy(key)}
+                    title="Copy icon name"
+                  >
                     <Copy className="size-4" />
                   </Button>
                 </div>
               )
             })}
+
+            {filteredIcons.length === 0 && (
+              <div className="col-span-full py-16 text-center">
+                <p className="text-muted-foreground">No icons found matching "{searchTerm}"</p>
+              </div>
+            )}
           </div>
         </ScrollArea>
       </CardContent>

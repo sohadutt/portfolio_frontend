@@ -37,7 +37,6 @@ const dashboardLinks = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/dashboard/portfolios", label: "Portfolios", icon: FolderKanban },
   { to: "/dashboard/submissions", label: "Submissions", icon: Mail },
-  { to: "/dashboard/icons", label: "Icon Browser", icon: Shapes },
 ]
 
 const ProtectedRoute = ({ children }) => {
@@ -61,6 +60,16 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
   const [isScrolling, setIsScrolling] = useState(false)
+
+  // --- DYNAMIC BROWSER TAB TITLE ---
+  useEffect(() => {
+    const ownerName = data?.personalInfo?.name || data?.personal_info?.name
+    if (ownerName) {
+      document.title = `${ownerName}'s Portfolio`
+    } else {
+      document.title = 'My Portfolio'
+    }
+  }, [data])
 
   useEffect(() => {
     applyTheme(data?.themeMode ?? data?.theme_mode)
@@ -266,6 +275,9 @@ function DashboardLayout() {
 
   useEffect(() => {
     let isMounted = true
+
+    // --- DYNAMIC BROWSER TAB TITLE FOR DASHBOARD ---
+    document.title = 'Dashboard | Portfolio Builder'
 
     getUserProfile()
       .then((response) => {

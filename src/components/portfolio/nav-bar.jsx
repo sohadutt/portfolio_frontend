@@ -1,13 +1,26 @@
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ThemeToggle } from '@/components/portfolio/theme-toggle'
-import { getNavigationLinks, getPortfolioPersonalInfo, getPortfolioProfileImage } from '@/helper/portfolio-data'
 
-export function NavBar({ data, theme, onToggleTheme, isVisible, onShow, onHide, isDefaultPortfolio = false }) {
-  const personalInfo = getPortfolioPersonalInfo(data)
-  const profileImage = getPortfolioProfileImage(data)
-  const navigationLinks = getNavigationLinks(data)
-  const fallbackInitials = personalInfo.shortName || personalInfo.name?.split(' ').map((part) => part[0]).join('').slice(0, 2) || 'SD'
+export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onHide, isDefaultPortfolio = false }) {
+  // Safely extract data from the API payload
+  const personalInfo = data.personalInfo || {}
+  
+  // Safely grab the profile image regardless of where the backend nested it
+  const profileImage = 
+    data.profile_picture ||
+    data.profilePicture ||
+    personalInfo.profile_picture ||
+    personalInfo.profilePicture ||
+    null
+
+  const rawLinks = data.navigationLinks || data.navigation_links || []
+  const navigationLinks = Array.isArray(rawLinks) ? rawLinks : []
+
+  // Create clean fallback initials (e.g., "Jane Doe" -> "JD")
+  const fallbackInitials = 
+    personalInfo.shortName || 
+    (personalInfo.name ? personalInfo.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() : 'SD')
 
   return (
     <header
@@ -29,29 +42,29 @@ export function NavBar({ data, theme, onToggleTheme, isVisible, onShow, onHide, 
                   : 'size-10 border border-border shadow-sm'
               }
             >
-              <AvatarImage src={profileImage || undefined} alt={personalInfo.name} />
+              <AvatarImage src={profileImage || undefined} alt={personalInfo.name || "Portfolio Owner"} />
               <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
                 {fallbackInitials}
               </AvatarFallback>
             </Avatar>
             <div className="hidden sm:grid sm:gap-1.5">
               <p className="text-sm font-semibold leading-none text-foreground">
-                {personalInfo.name}
+                {personalInfo.name || "Your Name"}
               </p>
               <p className="text-xs leading-none text-muted-foreground">
-                {personalInfo.title}
+                {personalInfo.title || "Your Title"}
               </p>
             </div>
           </a>
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {navigationLinks.map((link) => (
+            {navigationLinks.map((link, index) => (
               <a
-                key={`${link.label}-${link.href}`}
+                key={`${link.label || 'link'}-${index}`}
                 href={link.href || '#'}
                 className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                {link.label}
+                {link.label || "Link"}
               </a>
             ))}
           </nav>

@@ -34,6 +34,8 @@ export const URLS = {
     SUBMIT_ENQUIRY_SHARED: (token) => `${BASE_URL}/api/forms/submit/shared/${token}/`,
 
     // ---- Dashboard Management (Authenticated) ----
+    PORTFOLIO_GET_AUTHENTICATED: (idx = 1) => `${BASE_URL}/api/dashboard/portfolios/get/${idx}/`,
+    
     // Submissions
     DASHBOARD_SUBMISSIONS: `${BASE_URL}/api/dashboard/submissions/view/`,
     UPDATE_SUBMISSION: (formId) => `${BASE_URL}/api/dashboard/submissions/update/${formId}/`,
