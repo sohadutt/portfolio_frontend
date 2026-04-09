@@ -8,9 +8,10 @@ import {
   Routes,
   useOutletContext,
   useParams,
+  Link // Added Link for the GlobalFooter
 } from "react-router-dom"
 import { ReactLenis } from "lenis/react"
-import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Shapes, Sun } from "lucide-react"
+import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Sun } from "lucide-react"
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SideProfile } from "@/components/user/SideProfile"
@@ -27,11 +28,14 @@ import { WorkSection } from "@/components/portfolio/work-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ComponentShowcase } from "@/components/portfolio/component-showcase"
 import { ContactSection } from "@/components/portfolio/contact-section"
-import { Footer } from "@/components/portfolio/footer"
+import { Footer } from "@/components/portfolio/footer" // Your specific portfolio footer
 import { fetchPublicPortfolio, getUserProfile, THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
 import { Button } from "@/components/ui/button"
 import "lenis/dist/lenis.css"
+
+import Terms from "@/components/docs/terms"
+import Privacy from "@/components/docs/privacy"
 
 const dashboardLinks = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
@@ -55,13 +59,45 @@ const applyTheme = (themeMode) => {
   root.classList.add(themeClass)
 }
 
+// --- GLOBAL FOOTER FOR STANDARD PAGES ---
+function GlobalFooter() {
+  return (
+    <footer className="border-t py-6 bg-background text-foreground z-50">
+      <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 md:h-16 md:flex-row md:py-0">
+        <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
+          © {new Date().getFullYear()} Portfolio Builder. All rights reserved.
+        </p>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <Link to="/terms" className="hover:underline underline-offset-4 hover:text-foreground transition-colors">
+            Terms of Service
+          </Link>
+          <Link to="/privacy" className="hover:underline underline-offset-4 hover:text-foreground transition-colors">
+            Privacy Policy
+          </Link>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+// --- BASE LAYOUT FOR STANDARD PAGES (Login, Terms, Privacy) ---
+function BaseLayout() {
+  return (
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <main className="flex-1 flex flex-col">
+        <Outlet />
+      </main>
+      <GlobalFooter />
+    </div>
+  )
+}
+
 function PortfolioShell({ data, isDefaultPortfolio = false }) {
   const { theme, toggleTheme, mounted } = useTheme()
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
   const [isScrolling, setIsScrolling] = useState(false)
 
-  // --- DYNAMIC BROWSER TAB TITLE ---
   useEffect(() => {
     const ownerName = data?.personalInfo?.name || data?.personal_info?.name
     if (ownerName) {
@@ -77,22 +113,17 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
 
   useEffect(() => {
     let scrollTimeout
-
     function handlePointerMove(event) {
       setNavVisible(event.clientY <= 96 || window.scrollY < 24)
     }
-
     function handleScroll() {
       setIsScrolling(true)
       if (window.scrollY < 24) setNavVisible(true)
-
       clearTimeout(scrollTimeout)
       scrollTimeout = setTimeout(() => setIsScrolling(false), 140)
     }
-
     window.addEventListener("pointermove", handlePointerMove)
     window.addEventListener("scroll", handleScroll, { passive: true })
-
     return () => {
       clearTimeout(scrollTimeout)
       window.removeEventListener("pointermove", handlePointerMove)
@@ -276,7 +307,6 @@ function DashboardLayout() {
   useEffect(() => {
     let isMounted = true
 
-    // --- DYNAMIC BROWSER TAB TITLE FOR DASHBOARD ---
     document.title = 'Dashboard | Portfolio Builder'
 
     getUserProfile()
@@ -370,28 +400,6 @@ function DashboardLayout() {
                   {item.label}
                 </NavLink>
               ))}
-              <div className="flex w-full items-center justify-between gap-3 pt-2 md:hidden">
-                <div className="flex items-center gap-2 rounded-full border bg-card p-1">
-                  <Button
-                    type="button"
-                    variant={theme === "light" ? "default" : "ghost"}
-                    size="icon-sm"
-                    className="rounded-full"
-                    onClick={() => setTheme("light")}
-                  >
-                    <Sun className="size-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={theme === "dark" ? "default" : "ghost"}
-                    size="icon-sm"
-                    className="rounded-full"
-                    onClick={() => setTheme("dark")}
-                  >
-                    <Moon className="size-4" />
-                  </Button>
-                </div>
-              </div>
             </nav>
           </header>
 
@@ -409,12 +417,22 @@ function DashboardLayout() {
 export default function App() {
   return (
     <BrowserRouter>
+      {/* Remove the hardcoded wrapper here. The layouts handle the wrappers natively now. */}
       <Routes>
+        {/* PORTFOLIO ROUTES (These handle their own footer via PortfolioShell) */}
         <Route path="/" element={<DefaultPortfolioRoute />} />
         <Route path="/preview/:index" element={<DefaultPortfolioRoute />} />
         <Route path="/portfolio/:token" element={<SharedPortfolioRoute />} />
         <Route path="/portfolio/:token/:index" element={<SharedPortfolioRoute />} />
-        <Route path="/login" element={<LoginPage />} />
+
+        {/* BASE LAYOUT ROUTES (These use the GlobalFooter) */}
+        <Route element={<BaseLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+        </Route>
+
+        {/* DASHBOARD ROUTES (These have no footer, just the sidebar) */}
         <Route
           path="/dashboard"
           element={
@@ -429,6 +447,7 @@ export default function App() {
           <Route path="submissions" element={<SubmissionInbox />} />
           <Route path="icons" element={<LucideIconBrowser />} />
         </Route>
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
