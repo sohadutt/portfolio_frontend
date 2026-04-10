@@ -48,8 +48,8 @@ export default function Dashboard() {
   }
 
   return (
-    // We override the default width (usually 16rem) to 22rem to make the profile wider
-    <SidebarProvider style={{ "--sidebar-width": "22rem" }}>
+    // CHANGED: Increased the width from 22rem to 26rem to give the profile more room
+    <SidebarProvider style={{ "--sidebar-width": "26rem" }}>
       <div className="flex min-h-screen w-full bg-muted/10 text-foreground">
         
         {/* The Sidebar */}

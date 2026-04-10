@@ -8,7 +8,7 @@ import {
   Routes,
   useOutletContext,
   useParams,
-  Link // Added Link for the GlobalFooter
+  Link
 } from "react-router-dom"
 import { ReactLenis } from "lenis/react"
 import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Sun } from "lucide-react"

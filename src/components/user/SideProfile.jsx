@@ -15,20 +15,20 @@ import {
 } from "@/components/ui/field"
 import { toast } from "sonner"
 
-// Make sure logoutUser and updateUserProfile are exported from your helper
-import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP } from "@/helper/functions" 
-import { Save, User, Check, Camera, Copy, LogOut } from "lucide-react"
+// Added THEME_MAP for the selector
+import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP, THEME_MAP } from "@/helper/functions" 
+import { useTheme } from "@/hooks/use-theme" // Imported your theme hook
+import { Save, User, Check, Camera, Copy, LogOut, Moon, Sun } from "lucide-react"
 
-// Cropper Imports
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
 import heic2any from 'heic2any'
 
 export function SideProfile({ profileData }) {
+  const { theme, setTheme } = useTheme() // Hook initialization
   const [formData, setFormData] = useState(profileData || {})
   const [loading, setLoading] = useState(false)
   
-  // Avatar & Cropper State
   const fileInputRef = useRef(null)
   const imgRef = useRef(null)
   const [isCropModalOpen, setIsCropModalOpen] = useState(false)
@@ -43,6 +43,7 @@ export function SideProfile({ profileData }) {
   }, [profileData])
 
   const isDirty = useMemo(() => {
+    // Basic check to see if text fields or theme changed
     return JSON.stringify(formData) !== JSON.stringify(profileData) || newImageFile !== null
   }, [formData, profileData, newImageFile])
 
@@ -89,7 +90,6 @@ export function SideProfile({ profileData }) {
     toast.success("Share link copied")
   }
 
-  // --- IMAGE UPLOAD & HEIF HANDLING ---
   const handleFileSelect = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
       let file = e.target.files[0]
@@ -154,19 +154,23 @@ export function SideProfile({ profileData }) {
     }, 'image/jpeg', 0.95)
   }
 
-  // --- SAVING DATA ---
   const handleSave = async () => {
     setLoading(true)
     try {
+      // Parse theme_mode as integer since select options return strings
+      const themeModeInt = parseInt(formData?.theme_mode ?? 0, 10)
+
       let dataToSend = {
         first_name: formData?.first_name || "",
         last_name: formData?.last_name || "",
+        theme_mode: themeModeInt, // Send new theme
       }
       
       if (newImageFile) {
         dataToSend = new FormData()
         dataToSend.append("first_name", formData?.first_name || "")
         dataToSend.append("last_name", formData?.last_name || "")
+        dataToSend.append("theme_mode", themeModeInt) // Send new theme in FormData
         dataToSend.append('profile_picture', newImageFile)
       }
 
@@ -177,6 +181,7 @@ export function SideProfile({ profileData }) {
         first_name: updatedProfile?.first_name ?? prev.first_name,
         last_name: updatedProfile?.last_name ?? prev.last_name,
         profile_picture: updatedProfile?.profile_picture ?? prev.profile_picture,
+        theme_mode: updatedProfile?.theme_mode ?? prev.theme_mode,
       }))
       toast.success("Profile saved")
       setNewImageFile(null) 
@@ -187,7 +192,6 @@ export function SideProfile({ profileData }) {
     }
   }
 
-  // --- AUTH LOGIC ---
   const handleLogout = async () => {
     try {
       await logoutUser()
@@ -262,6 +266,48 @@ export function SideProfile({ profileData }) {
             </SidebarGroupContent>
           </SidebarGroup>
 
+          {/* --- NEW PREFERENCES GROUP --- */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Preferences</SidebarGroupLabel>
+            <SidebarGroupContent className="p-2 space-y-4">
+              
+              <div className="space-y-1.5 px-1">
+                <Label htmlFor="theme_mode" className="text-xs text-muted-foreground tracking-wider">Portfolio Theme</Label>
+                <select
+                  id="theme_mode"
+                  name="theme_mode"
+                  value={formData?.theme_mode ?? 0}
+                  onChange={handleChange}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  {Object.entries(THEME_MAP).map(([key, val]) => (
+                    <option key={key} value={key}>
+                      {val.replace("theme-", "").charAt(0).toUpperCase() + val.replace("theme-", "").slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Field orientation="horizontal" className="rounded-2xl border border-border/60 bg-background p-3 shadow-sm w-full">
+                <FieldContent>
+                  <FieldLabel htmlFor="app-dark-mode" className="flex items-center gap-2">
+                    {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                    Dark Mode
+                  </FieldLabel>
+                  <FieldDescription>
+                    Toggle app interface
+                  </FieldDescription>
+                </FieldContent>
+                <Switch
+                  id="app-dark-mode"
+                  checked={theme === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                />
+              </Field>
+
+            </SidebarGroupContent>
+          </SidebarGroup>
+
           <SidebarGroup>
             <SidebarGroupLabel>Visibility</SidebarGroupLabel>
             <SidebarGroupContent className="p-2 space-y-4">
@@ -321,7 +367,6 @@ export function SideProfile({ profileData }) {
         </SidebarFooter>
       </Sidebar>
 
-      {/* CROP MODAL */}
       <Dialog open={isCropModalOpen} onOpenChange={setIsCropModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
