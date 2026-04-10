@@ -4,6 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* =========================================
+     CUSTOM SIDEBAR WIDTH (Tailwind v4 Setup)
+     ========================================= */
+  --sidebar-width: 26rem;
+  --sidebar-width-icon: 3.5rem;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

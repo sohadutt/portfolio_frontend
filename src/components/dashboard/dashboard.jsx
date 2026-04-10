@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   return (
     // CHANGED: Increased the width from 22rem to 26rem to give the profile more room
-    <SidebarProvider style={{ "--sidebar-width": "26rem" }}>
+    <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted/10 text-foreground">
         
         {/* The Sidebar */}
@@ -75,7 +75,7 @@ export default function Dashboard() {
             
             <div className="flex items-center gap-4">
                <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-wider font-medium">
-                  {TIER_MAP?.[data?.tier] || 'Premium'} Tier
+                  {TIER_MAP?.[data?.tier] || 'None'} Tier
                </Badge>
             </div>
           </header>

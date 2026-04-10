@@ -13,11 +13,17 @@ import { Switch } from "@/components/ui/switch"
 import { 
   Field, FieldContent, FieldDescription, FieldLabel 
 } from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { toast } from "sonner"
 
-// Added THEME_MAP for the selector
 import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP, THEME_MAP } from "@/helper/functions" 
-import { useTheme } from "@/hooks/use-theme" // Imported your theme hook
+import { useTheme } from "@/hooks/use-theme" 
 import { Save, User, Check, Camera, Copy, LogOut, Moon, Sun } from "lucide-react"
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
@@ -25,7 +31,7 @@ import 'react-image-crop/dist/ReactCrop.css'
 import heic2any from 'heic2any'
 
 export function SideProfile({ profileData }) {
-  const { theme, setTheme } = useTheme() // Hook initialization
+  const { theme, setTheme } = useTheme() 
   const [formData, setFormData] = useState(profileData || {})
   const [loading, setLoading] = useState(false)
   
@@ -43,7 +49,6 @@ export function SideProfile({ profileData }) {
   }, [profileData])
 
   const isDirty = useMemo(() => {
-    // Basic check to see if text fields or theme changed
     return JSON.stringify(formData) !== JSON.stringify(profileData) || newImageFile !== null
   }, [formData, profileData, newImageFile])
 
@@ -157,20 +162,19 @@ export function SideProfile({ profileData }) {
   const handleSave = async () => {
     setLoading(true)
     try {
-      // Parse theme_mode as integer since select options return strings
       const themeModeInt = parseInt(formData?.theme_mode ?? 0, 10)
 
       let dataToSend = {
         first_name: formData?.first_name || "",
         last_name: formData?.last_name || "",
-        theme_mode: themeModeInt, // Send new theme
+        theme_mode: themeModeInt, 
       }
       
       if (newImageFile) {
         dataToSend = new FormData()
         dataToSend.append("first_name", formData?.first_name || "")
         dataToSend.append("last_name", formData?.last_name || "")
-        dataToSend.append("theme_mode", themeModeInt) // Send new theme in FormData
+        dataToSend.append("theme_mode", themeModeInt) 
         dataToSend.append('profile_picture', newImageFile)
       }
 
@@ -208,11 +212,11 @@ export function SideProfile({ profileData }) {
         <SidebarHeader className="border-b border-sidebar-border p-4">
           <div className="flex items-center gap-3">
             <div 
-              className="group relative cursor-pointer focus-within:outline-none" 
+              className="group relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full focus-within:outline-none" 
               onClick={() => fileInputRef.current?.click()}
               title="Update profile picture"
             >
-              <Avatar className="h-12 w-12 border shadow-sm transition-opacity group-hover:opacity-75">
+              <Avatar className="h-full w-full border shadow-sm transition-opacity group-hover:opacity-75">
                 <AvatarImage src={previewImage || formData?.profile_picture} alt={formData?.username} className="object-cover" />
                 <AvatarFallback className="bg-muted font-medium text-muted-foreground">
                   {initials}
@@ -223,7 +227,7 @@ export function SideProfile({ profileData }) {
                   </AvatarBadge>
                 )}
               </Avatar>
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 <Camera className="h-4 w-4 text-white" />
               </div>
               <input 
@@ -265,53 +269,32 @@ export function SideProfile({ profileData }) {
               </div>
             </SidebarGroupContent>
           </SidebarGroup>
-
-          {/* --- NEW PREFERENCES GROUP --- */}
           <SidebarGroup>
             <SidebarGroupLabel>Preferences</SidebarGroupLabel>
-            <SidebarGroupContent className="p-2 space-y-4">
-              
+            <SidebarGroupContent className="p-2 space-y-4">             
               <div className="space-y-1.5 px-1">
                 <Label htmlFor="theme_mode" className="text-xs text-muted-foreground tracking-wider">Portfolio Theme</Label>
-                <select
-                  id="theme_mode"
-                  name="theme_mode"
-                  value={formData?.theme_mode ?? 0}
-                  onChange={handleChange}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                <Select 
+                  value={String(formData?.theme_mode ?? "0")} 
+                  onValueChange={(val) => setFormData(prev => ({ ...prev, theme_mode: val }))}
                 >
-                  {Object.entries(THEME_MAP).map(([key, val]) => (
-                    <option key={key} value={key}>
-                      {val.replace("theme-", "").charAt(0).toUpperCase() + val.replace("theme-", "").slice(1)}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="theme_mode" className="w-full bg-background shadow-sm">
+                    <SelectValue placeholder="Select a theme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(THEME_MAP).map(([key, val]) => (
+                      <SelectItem key={key} value={key}>
+                        {val.replace("theme-", "").charAt(0).toUpperCase() + val.replace("theme-", "").slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-
-              <Field orientation="horizontal" className="rounded-2xl border border-border/60 bg-background p-3 shadow-sm w-full">
-                <FieldContent>
-                  <FieldLabel htmlFor="app-dark-mode" className="flex items-center gap-2">
-                    {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                    Dark Mode
-                  </FieldLabel>
-                  <FieldDescription>
-                    Toggle app interface
-                  </FieldDescription>
-                </FieldContent>
-                <Switch
-                  id="app-dark-mode"
-                  checked={theme === 'dark'}
-                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-                />
-              </Field>
-
             </SidebarGroupContent>
           </SidebarGroup>
-
           <SidebarGroup>
             <SidebarGroupLabel>Visibility</SidebarGroupLabel>
-            <SidebarGroupContent className="p-2 space-y-4">
-              
+            <SidebarGroupContent className="p-2 space-y-4">  
               <Field orientation="horizontal" className="rounded-2xl border border-border/60 bg-background p-3 shadow-sm w-full">
                 <FieldContent>
                   <FieldLabel htmlFor="sidebar-share-toggle">
