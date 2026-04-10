@@ -34,7 +34,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
-// Helpers (Ensure these are exported correctly from your functions.js)
+// Helpers
 import { fetchDashboardPortfolios, togglePortfolioVisibility } from "@/helper/functions"
 
 export default function PortfolioManager() {
@@ -138,7 +138,8 @@ export default function PortfolioManager() {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            {/* FIXED: Added !transition-none to stop the menu from flying across the screen */}
+            <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-48 !transition-none">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}>
                 <Eye className="mr-2 h-4 w-4" /> View Live
@@ -198,7 +199,8 @@ export default function PortfolioManager() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-full">Columns</Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            {/* FIXED: Also added !transition-none here so the Columns menu doesn't fly either */}
+            <DropdownMenuContent align="end" className="!transition-none">
               {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => {
                 return (
                   <DropdownMenuCheckboxItem
