@@ -341,7 +341,7 @@ function DashboardLayout() {
   return (
     <SidebarProvider
       style={{
-        "--sidebar-width": "18rem",
+        "--sidebar-width": "18rem", // Sidebar width
         "--sidebar-width-icon": "3.5rem",
       }}
     >
@@ -355,7 +355,7 @@ function DashboardLayout() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">Dashboard</p>
                 <h1 className="truncate text-xl font-semibold tracking-tight">
-                  Portfolio control center
+                  Portfolio Control Center
                 </h1>
               </div>
               <div className="hidden items-center gap-3 md:flex">

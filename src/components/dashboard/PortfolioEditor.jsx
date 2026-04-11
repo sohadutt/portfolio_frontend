@@ -457,10 +457,10 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               <Field><FieldLabel>Full name</FieldLabel><Input value={formData.personalInfo.name} onChange={(e) => handleNestedChange("personalInfo", "name", e.target.value)} placeholder="e.g. Jane Doe" /></Field>
               <Field><FieldLabel>Short name</FieldLabel><Input value={formData.personalInfo.shortName} onChange={(e) => handleNestedChange("personalInfo", "shortName", e.target.value)} placeholder="e.g. jdoe" /></Field>
               <Field><FieldLabel>Professional title</FieldLabel><Input value={formData.personalInfo.title} onChange={(e) => handleNestedChange("personalInfo", "title", e.target.value)} placeholder="e.g. Full-stack Developer" /></Field>
-              <Field><FieldLabel>Subtitle</FieldLabel><Input value={formData.personalInfo.subtitle} onChange={(e) => handleNestedChange("personalInfo", "subtitle", e.target.value)} placeholder="e.g. React, Python, PostgreSQL" /></Field>
+              <Field><FieldLabel>Core Competency</FieldLabel><Input value={formData.personalInfo.subtitle} onChange={(e) => handleNestedChange("personalInfo", "subtitle", e.target.value)} placeholder="e.g. React, Python, PostgreSQL" /></Field>
               <Field><FieldLabel>Location</FieldLabel><Input value={formData.personalInfo.location} onChange={(e) => handleNestedChange("personalInfo", "location", e.target.value)} placeholder="e.g. New York, USA" /></Field>
               <Field><FieldLabel>Public email</FieldLabel><Input type="email" value={formData.personalInfo.email} onChange={(e) => handleNestedChange("personalInfo", "email", e.target.value)} placeholder="e.g. hello@example.com" /></Field>
-              <Field><FieldLabel>GitHub URL</FieldLabel><Input value={formData.personalInfo.github} onChange={(e) => handleNestedChange("personalInfo", "github", e.target.value)} placeholder="e.g. https://github.com/username" /></Field>
+              <Field><FieldLabel>GitHub/Portfolio URL</FieldLabel><Input value={formData.personalInfo.github} onChange={(e) => handleNestedChange("personalInfo", "github", e.target.value)} placeholder="e.g. https://github.com/username" /></Field>
               <Field><FieldLabel>LinkedIn URL</FieldLabel><Input value={formData.personalInfo.linkedin} onChange={(e) => handleNestedChange("personalInfo", "linkedin", e.target.value)} placeholder="e.g. https://linkedin.com/in/username" /></Field>
             </FieldGroup>
           </EditorSection>
@@ -486,7 +486,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
             }
           >
             <FieldGroup>
-              <Field><FieldLabel>Eyebrow</FieldLabel><Input value={formData.heroContent.eyebrow} onChange={(e) => handleNestedChange("heroContent", "eyebrow", e.target.value)} placeholder="e.g. Hello, I'm Jane" /></Field>
+              <Field><FieldLabel>Name</FieldLabel><Input value={formData.heroContent.eyebrow} onChange={(e) => handleNestedChange("heroContent", "eyebrow", e.target.value)} placeholder="e.g. Hello, I'm Jane" /></Field>
               <Field><FieldLabel>Title</FieldLabel><Textarea rows={3} value={formData.heroContent.title} onChange={(e) => handleNestedChange("heroContent", "title", e.target.value)} placeholder="e.g. I build scalable backend systems..." /></Field>
               <Field><FieldLabel>Description</FieldLabel><Textarea rows={5} value={formData.heroContent.description} onChange={(e) => handleNestedChange("heroContent", "description", e.target.value)} placeholder="e.g. I specialize in Python, Django, and React..." /></Field>
             </FieldGroup>
