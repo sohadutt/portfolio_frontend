@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://portfolio-backend-ccv5.onrender.com';
 
 export const URLS = {
     // ---- Authentications & Security ----
