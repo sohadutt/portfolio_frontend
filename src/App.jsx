@@ -28,7 +28,7 @@ import { WorkSection } from "@/components/portfolio/work-section"
 import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ComponentShowcase } from "@/components/portfolio/component-showcase"
 import { ContactSection } from "@/components/portfolio/contact-section"
-import { Footer } from "@/components/portfolio/footer" // Your specific portfolio footer
+import { Footer } from "@/components/portfolio/footer" 
 import { fetchPublicPortfolio, getUserProfile, THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
 import { Button } from "@/components/ui/button"
@@ -341,7 +341,7 @@ function DashboardLayout() {
   return (
     <SidebarProvider
       style={{
-        "--sidebar-width": "14.5rem",
+        "--sidebar-width": "18rem",
         "--sidebar-width-icon": "3.5rem",
       }}
     >

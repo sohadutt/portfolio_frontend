@@ -13,9 +13,6 @@ import {
 } from "@/components/ui/empty"
 import { Badge } from "@/components/ui/badge"
 
-// Import your editor here when you're ready to mount it!
-// import PortfolioEditor from "@/components/portfolio/PortfolioEditor"
-
 export default function Dashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -48,17 +45,10 @@ export default function Dashboard() {
   }
 
   return (
-    // CHANGED: Increased the width from 22rem to 26rem to give the profile more room
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted/10 text-foreground">
-        
-        {/* The Sidebar */}
         <SideProfile profileData={data} />
-
-        {/* The Main Content Area */}
         <main className="relative flex-1 flex flex-col min-w-0">
-          
-          {/* Top Header / Navigation Bar */}
           <header className="flex h-16 items-center justify-between border-b border-border/60 px-6 bg-background/80 backdrop-blur-md sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="h-9 w-9 hover:bg-muted/50 rounded-xl" />
@@ -92,10 +82,7 @@ export default function Dashboard() {
                 Here is an overview of your portfolio platform and current settings.
               </p>
             </div>
-
-            {/* Premium Dashboard Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* Card 1 */}
               <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-sm transition-all hover:shadow-md hover:border-border">
                 <div className="flex items-center gap-4">
                   <div className="flex size-12 items-center justify-center bg-blue-500/10 rounded-2xl text-blue-500">
@@ -123,8 +110,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-
-              {/* Card 3 */}
               <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-sm transition-all hover:shadow-md hover:border-border">
                 <div className="flex items-center gap-4">
                   <div className="flex size-12 items-center justify-center bg-purple-500/10 rounded-2xl text-purple-500">
@@ -137,10 +122,6 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-
-            {/* This is where you can drop your `<PortfolioEditor portfolioIndex={1} />`!
-              For now, here is a polished empty state.
-            */}
             <div className="rounded-3xl border border-dashed border-border/60 bg-muted/20 h-[450px] flex flex-col items-center justify-center text-center group transition-colors hover:bg-muted/30">
                <div className="flex size-14 items-center justify-center rounded-full bg-background border border-border/50 shadow-sm mb-4 group-hover:scale-105 transition-transform">
                  <Sparkles className="size-6 text-muted-foreground" />

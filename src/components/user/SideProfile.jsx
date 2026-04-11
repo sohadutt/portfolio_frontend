@@ -208,7 +208,7 @@ export function SideProfile({ profileData }) {
 
   return (
     <>
-      <Sidebar variant="inset" collapsible="icon" className="border-r border-sidebar-border/60">
+      <Sidebar variant="inset" collapsible="icon" className="border-r">
         <SidebarHeader className="border-b border-sidebar-border p-4">
           <div className="flex items-center gap-3">
             <div 
@@ -230,12 +230,12 @@ export function SideProfile({ profileData }) {
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                 <Camera className="h-4 w-4 text-white" />
               </div>
-              <input 
-                type="file" 
-                accept="image/*,.heic,.heif" 
-                ref={fileInputRef} 
-                className="hidden" 
-                onChange={handleFileSelect} 
+              <input
+                type="file"
+                accept="image/*,.heic,.heif"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileSelect}
               />
             </div>
 
@@ -254,7 +254,6 @@ export function SideProfile({ profileData }) {
             </div>
           </div>
         </SidebarHeader>
-
         <SidebarContent className="gap-0">
           <SidebarGroup>
             <SidebarGroupLabel>Personal Info</SidebarGroupLabel>
@@ -301,10 +300,10 @@ export function SideProfile({ profileData }) {
                     Share access
                   </FieldLabel>
                   <FieldDescription>
-                    {formData?.enable_share_token ? "Portfolio is public" : "Portfolio is private"}
+                    {formData?.enable_share_token ? "Portfolio is Public" : "Portfolio is Private"}
                   </FieldDescription>
                 </FieldContent>
-                <div className="flex items-center gap-2">
+                <div className="flex gap-2">
                   {formData?.enable_share_token && formData?.share_token && (
                     <Button
                       type="button"
@@ -323,11 +322,9 @@ export function SideProfile({ profileData }) {
                   />
                 </div>
               </Field>
-
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-
         <SidebarFooter className="border-t border-sidebar-border p-4 space-y-2">
           {isDirty && (
             <Button 
@@ -349,7 +346,6 @@ export function SideProfile({ profileData }) {
           </Button>
         </SidebarFooter>
       </Sidebar>
-
       <Dialog open={isCropModalOpen} onOpenChange={setIsCropModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
