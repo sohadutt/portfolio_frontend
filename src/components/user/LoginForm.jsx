@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { loginUser } from "@/helper/functions"
 import { toast } from "sonner"
 import { Loader2, ArrowRight } from "lucide-react"
@@ -12,7 +13,7 @@ export default function LoginForm() {
   const [formData, setFormData] = useState({ email: "", password: "" })
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handleSubmit = async (e) => {
@@ -22,6 +23,8 @@ export default function LoginForm() {
     try {
       await loginUser(formData)
       toast.success("Welcome back!")
+      // Using window.location.href is actually smart here—it forces a full page 
+      // reload so your API interceptors instantly pick up the new token!
       window.location.href = "/dashboard"
     } catch (err) {
       toast.error(err.message || "Failed to login. Please check your credentials.")
@@ -31,7 +34,7 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-2">
         <Label htmlFor="login-email">Email</Label>
         <Input 
@@ -42,12 +45,20 @@ export default function LoginForm() {
           required 
           value={formData.email}
           onChange={handleChange}
-          className="rounded-xl"
+          className="rounded-xl bg-muted/20"
         />
       </div>
+      
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="login-password">Password</Label>
+          {/* Added the missing "Forgot password" link! */}
+          <Link 
+            to="/forgot-password" 
+            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+          >
+            Forgot password?
+          </Link>
         </div>
         <Input 
           id="login-password" 
@@ -56,10 +67,15 @@ export default function LoginForm() {
           required 
           value={formData.password}
           onChange={handleChange}
-          className="rounded-xl"
+          className="rounded-xl bg-muted/20"
         />
       </div>
-      <Button type="submit" className="mt-2 w-full rounded-full font-medium shadow-none" disabled={loading}>
+
+      <Button 
+        type="submit" 
+        className="mt-4 w-full rounded-full font-medium shadow-none h-11" 
+        disabled={loading}
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 size-4 animate-spin" />
