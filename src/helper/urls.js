@@ -1,4 +1,4 @@
-const BASE_URL = 'https://portfolio-backend-ccv5.onrender.com';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export const URLS = {
     // ---- Authentications & Security ----
