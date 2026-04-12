@@ -20,13 +20,12 @@ export const TIER_MAP = {
 const normalizeIconName = (value = "") => value.replace(/[-_\s]/g, "").toLowerCase();
 
 export const resolveIcon = (iconName, fallback = LucideIcons.Component) => {
-    if (typeof iconName === "function") return iconName; // Already resolved
+    if (typeof iconName === "function") return iconName;
     if (!iconName) return fallback;
 
     const matchedKey = Object.keys(LucideIcons).find(
         (key) => normalizeIconName(key) === normalizeIconName(iconName)
     );
-
     return matchedKey ? LucideIcons[matchedKey] : fallback;
 };
 

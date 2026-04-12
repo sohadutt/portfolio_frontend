@@ -3,7 +3,7 @@ import { Copy, Search } from "lucide-react"
 import { toast } from "sonner"
 
 import lucideData from "@/helper/tags.json"
-import { resolveIcon } from "@/helper/functions" // FIXED: Pointed to your actual helper file
+import { resolveIcon } from "@/helper/functions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,13 +28,13 @@ export default function LucideIconBrowser() {
   }
 
   return (
-    <Card className="overflow-hidden rounded-3xl border-border/70 bg-card/90 shadow-sm">
-      <CardHeader className="border-b border-border/60 p-7 pb-5">
-        <CardTitle className="text-2xl tracking-tight">Lucide Icon Browser</CardTitle>
-        <CardDescription className="text-base">
+    <Card className="overflow-hidden rounded-[1.5rem] sm:rounded-3xl border-border/70 bg-card/90 shadow-sm">
+      <CardHeader className="border-b border-border/60 p-5 sm:p-7 pb-5">
+        <CardTitle className="text-xl sm:text-2xl tracking-tight">Lucide Icon Browser</CardTitle>
+        <CardDescription className="text-sm sm:text-base">
           Search your installed icon set and copy names for portfolio content.
         </CardDescription>
-        <div className="relative mt-4">
+        <div className="relative mt-3 sm:mt-4">
           <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search icons by name or tag..."
@@ -46,7 +46,7 @@ export default function LucideIconBrowser() {
       </CardHeader>
 
       <CardContent className="min-h-0 p-0 bg-muted/10">
-        <ScrollArea className="h-[calc(100vh-16rem)] px-7 py-6">
+        <ScrollArea className="h-[calc(100dvh-16rem)] px-4 sm:px-7 py-4 sm:py-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 pb-6">
             {filteredIcons.map(([key, tags]) => {
               const IconComponent = resolveIcon(key)
@@ -54,18 +54,18 @@ export default function LucideIconBrowser() {
               return (
                 <div 
                   key={key} 
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-background p-3 transition-colors hover:border-primary/30 hover:bg-muted/20"
+                  onClick={() => handleCopy(key)}
+                  className="group flex cursor-pointer items-center justify-between gap-3 rounded-xl sm:rounded-2xl border border-border/60 bg-background p-3 transition-all hover:border-primary/30 hover:bg-muted/20 active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-110">
-                      {createElement(IconComponent, { className: "size-5" })}
+                    <div className="flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-primary/10 text-primary transition-transform duration-200 group-hover:scale-110">
+                      {createElement(IconComponent, { className: "size-4 sm:size-5" })}
                     </div>
                     <div className="min-w-0">
-                      {/* Formats "arrow-up-right" into "Arrow Up Right" */}
                       <p className="truncate text-sm font-semibold capitalize text-foreground">
                         {key.replace(/-/g, ' ')}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground font-mono">
+                      <p className="truncate text-[10px] sm:text-xs text-muted-foreground font-mono">
                         {key}
                       </p>
                     </div>
@@ -73,12 +73,15 @@ export default function LucideIconBrowser() {
                   <Button 
                     type="button" 
                     variant="ghost" 
-                    size="icon-sm" 
-                    className="shrink-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" 
-                    onClick={() => handleCopy(key)}
+                    size="icon" 
+                    className="size-8 shrink-0 rounded-full opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100" 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCopy(key)
+                    }}
                     title="Copy icon name"
                   >
-                    <Copy className="size-4" />
+                    <Copy className="size-3.5 sm:size-4" />
                   </Button>
                 </div>
               )
