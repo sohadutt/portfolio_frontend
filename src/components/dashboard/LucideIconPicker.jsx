@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { resolveIcon } from "@/helper/functions" // FIXED: Pointed to the correct helper file
+import { resolveIcon } from "@/helper/functions"
 
 function IconTile({ iconName, selected, onSelect }) {
   return (

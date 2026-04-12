@@ -218,6 +218,7 @@ function PublicPortfolioView({ token, index = 1 }) {
             <div className="space-y-1">
               <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary/90">Loading portfolio</p>
               <p className="text-sm text-slate-300">Preparing the showcase experience.</p>
+              <p className="text-sm text-slate-300">First load can take upto 30s due to server whine-down..</p>
             </div>
           </div>
         </div>
