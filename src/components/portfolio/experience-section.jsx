@@ -28,15 +28,18 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
     : (Array.isArray(rawModules.results) ? rawModules.results : [])
 
   return (
-    <section id="experience" className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-      <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
+    // Reduced grid gap on mobile
+    <section id="experience" className="grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+      {/* Reduced outer padding and border radius on small screens */}
+      <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-border/60 bg-background/95 p-5 sm:p-8 shadow-sm">
         <SectionHeader
           eyebrow={expCopy.eyebrow || "Experience"}
           title={expCopy.title || "Experience across backend automation, frontend delivery, and production workflows."}
-          description={expCopy.description || "Hover a role to expand the story, pull its orange spotlight forward, and surface the component direction connected to that work."}
+          description={expCopy.description || "Hover or tap a role to expand the story, pull its orange spotlight forward, and surface the component direction connected to that work."}
         />
         
-        <div className="mt-8 space-y-5">
+        {/* Adjusted spacing between items */}
+        <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-5">
           {experience.map((item, index) => {
             const isHighlighted = resolvedRelation === item.relation
             const isExpanded = isHighlighted && activeSource === 'experience'
@@ -49,52 +52,56 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
             return (
               <article
                 key={item.title || index}
-                className={`rounded-[1.6rem] border p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
+                // Scaled down inner padding, added cursor-pointer for mobile tap affordance
+                className={`cursor-pointer lg:cursor-default rounded-[1.25rem] sm:rounded-[1.6rem] border p-4 sm:p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
                 onMouseEnter={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
                 onFocus={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
+                onClick={() => onRelationChange({ relation: item.relation, source: 'experience' })}
               >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">{item.period}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                  <p className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">{item.period}</p>
 
                   <Badge
                     variant="secondary"
-                    className="rounded-full px-3 py-1 font-medium"
+                    // Scaled badge padding for mobile
+                    className="rounded-full px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium"
                   >
                     {item.company}
                   </Badge>
                 </div>
 
-                <h3 className="mt-4 scroll-m-20 text-xl font-semibold tracking-tight">
+                <h3 className="mt-3 sm:mt-4 scroll-m-20 text-lg sm:text-xl font-semibold tracking-tight">
                   {item.title}
                 </h3>
 
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-2 sm:mt-3 text-sm leading-relaxed sm:leading-7 text-muted-foreground">
                   {item.summary}
                 </p>
 
                 <div
                   className={`grid transition-all duration-500 ease-in-out ${
-                    isExpanded ? 'mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-70'
+                    isExpanded ? 'mt-4 sm:mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-70'
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <div className="rounded-[1.35rem] border border-border/60 bg-muted/35 p-4">
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+                    {/* Adjusted expanded area padding */}
+                    <div className="rounded-[1rem] sm:rounded-[1.35rem] border border-border/60 bg-muted/35 p-3 sm:p-4">
+                      <p className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">
                         Expanded focus
                       </p>
 
-                      <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                      <ul className="mt-2 sm:mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
                         {safeHighlights.map((highlight, hIdx) => (
                           <li key={hIdx}>{highlight}</li>
                         ))}
                       </ul>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
+                      <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
                         {safeComponents.map((component, cIdx) => (
                           <Badge
                             key={cIdx}
                             variant="outline"
-                            className="rounded-full border-primary/20 bg-background px-3 py-1 text-xs font-medium text-primary hover:bg-primary/8 transition-colors"
+                            className="rounded-full border-primary/20 bg-background px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium text-primary hover:bg-primary/8 transition-colors"
                           >
                             {component}
                           </Badge>
@@ -112,7 +119,6 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
       <div className="grid gap-4 sm:grid-cols-2">
         {featuredModules.map((module, index) => {
           const { title, body, icon, icon_name, relation, details } = module
-          // Dynamically resolve the backend string to a React component
           const IconComponent = resolveIcon(icon || icon_name || "Blocks")
           
           const isHighlighted = resolvedRelation === relation
@@ -121,23 +127,26 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
           return (
             <article
               key={title || index}
-              className={`group rounded-[1.75rem] border bg-background/95 p-6 shadow-sm transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
+              // Added onClick for touch devices, reduced padding on mobile
+              className={`cursor-pointer lg:cursor-default group rounded-[1.5rem] sm:rounded-[1.75rem] border bg-background/95 p-5 sm:p-6 shadow-sm transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onFocus={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
+              onClick={() => onRelationChange({ relation, source: 'module' })}
             >
               <div
-                className={`flex size-12 items-center justify-center rounded-2xl transition-transform duration-300 ${
+                // Scaled down icon background on mobile
+                className={`flex size-10 sm:size-12 items-center justify-center rounded-xl sm:rounded-2xl transition-transform duration-300 ${
                   isHighlighted ? 'bg-primary text-primary-foreground scale-110' : 'bg-primary/10 text-primary group-hover:scale-110'
                 }`}
               >
-                {createElement(IconComponent, { className: "size-6" })}
+                {createElement(IconComponent, { className: "size-5 sm:size-6" })}
               </div>
 
-              <h3 className="mt-6 scroll-m-20 text-xl font-semibold tracking-tight">
+              <h3 className="mt-5 sm:mt-6 scroll-m-20 text-lg sm:text-xl font-semibold tracking-tight">
                 {title}
               </h3>
 
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              <p className="mt-2 sm:mt-3 text-sm leading-relaxed sm:leading-7 text-muted-foreground">
                 {body}
               </p>
 
@@ -147,7 +156,7 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
                 }`}
               >
                 <div className="overflow-hidden">
-                  <div className="border-t border-border/60 pt-4 text-sm leading-6 text-muted-foreground">
+                  <div className="border-t border-border/60 pt-3 sm:pt-4 text-sm leading-6 text-muted-foreground">
                     {details}
                   </div>
                 </div>

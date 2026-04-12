@@ -67,7 +67,7 @@ function GlobalFooter() {
         <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
           © {new Date().getFullYear()} Portfolio Builder. All rights reserved.
         </p>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
           <Link to="/terms" className="hover:underline underline-offset-4 hover:text-foreground transition-colors">
             Terms of Service
           </Link>
@@ -209,7 +209,7 @@ function PublicPortfolioView({ token, index = 1 }) {
   if (loading || !data) {
     if (isDefaultPortfolio) {
       return (
-        <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white">
+        <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-primary/30 blur-2xl" />
@@ -249,16 +249,17 @@ function DashboardOverview() {
 
   return (
     <div className="grid gap-6">
-      <section className="grid gap-4 xl:grid-cols-3 2xl:grid-cols-4">
-        <article className="rounded-3xl border bg-card p-7 shadow-sm">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {/* Adjusted padding (p-5 sm:p-7) for smaller screens */}
+        <article className="rounded-3xl border bg-card p-5 sm:p-7 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Account</p>
-          <p className="mt-3 text-2xl font-semibold tracking-tight">@{profile?.username}</p>
-          <p className="mt-2 text-sm text-muted-foreground">{profile?.email}</p>
+          <p className="mt-3 truncate text-xl sm:text-2xl font-semibold tracking-tight">@{profile?.username}</p>
+          <p className="mt-2 truncate text-sm text-muted-foreground">{profile?.email}</p>
         </article>
 
-        <article className="rounded-3xl border bg-card p-7 shadow-sm">
+        <article className="rounded-3xl border bg-card p-5 sm:p-7 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Portfolio Access</p>
-          <p className="mt-3 text-2xl font-semibold tracking-tight">
+          <p className="mt-3 text-xl sm:text-2xl font-semibold tracking-tight">
             {profile?.enable_share_token ? "Public" : "Private"}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -266,9 +267,9 @@ function DashboardOverview() {
           </p>
         </article>
 
-        <article className="rounded-3xl border bg-card p-7 shadow-sm">
+        <article className="rounded-3xl border bg-card p-5 sm:p-7 shadow-sm sm:col-span-2 xl:col-span-1">
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Theme</p>
-          <p className="mt-3 text-2xl font-semibold tracking-tight">
+          <p className="mt-3 text-xl sm:text-2xl font-semibold tracking-tight capitalize">
             {(THEME_MAP[profile?.theme_mode] || "theme-ocean").replace("theme-", "")}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -277,14 +278,14 @@ function DashboardOverview() {
         </article>
       </section>
 
-      <section className="rounded-3xl border bg-card p-7 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+      <section className="rounded-3xl border bg-card p-5 sm:p-7 shadow-sm">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <BriefcaseBusiness className="size-5" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold tracking-tight">Workspace</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Workspace</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
               Use the dashboard routes above to manage portfolios, update content, and review contact submissions.
             </p>
           </div>
@@ -329,7 +330,7 @@ function DashboardLayout() {
 
   if (loading || !profile) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white">
+      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
         <div className="flex flex-col items-center gap-3 text-center">
           <Loader2 className="size-8 animate-spin text-primary" />
           <p className="text-sm tracking-[0.18em] text-slate-300 uppercase">Loading dashboard</p>
@@ -348,48 +349,54 @@ function DashboardLayout() {
       <div className="flex min-h-screen w-full bg-muted/20 text-foreground">
         <SideProfile profileData={profile} />
 
-        <SidebarInset className="min-w-0 bg-transparent">
+        <SidebarInset className="min-w-0 bg-transparent flex flex-col w-full">
           <header className="sticky top-0 z-30 border-b border-border/60 bg-background/92 backdrop-blur">
-            <div className="flex items-center gap-4 px-6 py-4 lg:px-10 2xl:px-12">
-              <SidebarTrigger className="shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">Dashboard</p>
-                <h1 className="truncate text-xl font-semibold tracking-tight">
-                  Portfolio Control Center
-                </h1>
+            {/* Flexbox layout updated to support mobile devices natively */}
+            <div className="flex items-center justify-between gap-2 px-4 py-4 sm:px-6 lg:px-10 2xl:px-12">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                <SidebarTrigger className="shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="hidden text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground sm:block">Dashboard</p>
+                  <h1 className="truncate text-lg sm:text-xl font-semibold tracking-tight">
+                    Control Center
+                  </h1>
+                </div>
               </div>
-              <div className="hidden items-center gap-3 md:flex">
-                <div className="flex items-center gap-2 rounded-full border bg-card p-1">
+              
+              {/* Theme toggle now always visible on mobile */}
+              <div className="flex shrink-0 items-center gap-3">
+                <div className="flex items-center gap-1 sm:gap-2 rounded-full border bg-card p-1">
                   <Button
                     type="button"
                     variant={theme === "light" ? "default" : "ghost"}
-                    size="icon-sm"
-                    className="rounded-full"
+                    size="icon"
+                    className="size-7 sm:size-8 rounded-full"
                     onClick={() => setTheme("light")}
                   >
-                    <Sun className="size-4" />
+                    <Sun className="size-3 sm:size-4" />
                   </Button>
                   <Button
                     type="button"
                     variant={theme === "dark" ? "default" : "ghost"}
-                    size="icon-sm"
-                    className="rounded-full"
+                    size="icon"
+                    className="size-7 sm:size-8 rounded-full"
                     onClick={() => setTheme("dark")}
                   >
-                    <Moon className="size-4" />
+                    <Moon className="size-3 sm:size-4" />
                   </Button>
                 </div>
               </div>
             </div>
 
-            <nav className="flex flex-wrap gap-3 px-6 pb-4 lg:px-10 2xl:px-12">
+            {/* Changed flex-wrap to a scrollable horizontal nav for mobile */}
+            <nav className="flex overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] gap-2 sm:gap-3 px-4 pb-4 sm:px-6 lg:px-10 2xl:px-12">
               {dashboardLinks.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                    `inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                       isActive
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -403,7 +410,7 @@ function DashboardLayout() {
             </nav>
           </header>
 
-          <main className="flex-1 px-6 py-8 lg:px-10 2xl:px-12">
+          <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10 2xl:px-12 w-full max-w-[100vw]">
             <Outlet context={{ profile }} />
           </main>
         </SidebarInset>
@@ -417,22 +424,21 @@ function DashboardLayout() {
 export default function App() {
   return (
     <BrowserRouter>
-      {/* Remove the hardcoded wrapper here. The layouts handle the wrappers natively now. */}
       <Routes>
-        {/* PORTFOLIO ROUTES (These handle their own footer via PortfolioShell) */}
+        {/* PORTFOLIO ROUTES */}
         <Route path="/" element={<DefaultPortfolioRoute />} />
         <Route path="/preview/:index" element={<DefaultPortfolioRoute />} />
         <Route path="/portfolio/:token" element={<SharedPortfolioRoute />} />
         <Route path="/portfolio/:token/:index" element={<SharedPortfolioRoute />} />
 
-        {/* BASE LAYOUT ROUTES (These use the GlobalFooter) */}
+        {/* BASE LAYOUT ROUTES */}
         <Route element={<BaseLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
         </Route>
 
-        {/* DASHBOARD ROUTES (These have no footer, just the sidebar) */}
+        {/* DASHBOARD ROUTES */}
         <Route
           path="/dashboard"
           element={

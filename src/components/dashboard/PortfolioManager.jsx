@@ -90,8 +90,14 @@ export default function PortfolioManager() {
       accessorKey: "title", 
       header: "Portfolio Title",
       cell: ({ row }) => (
-        <div className="font-medium">
-          {row.getValue("title") || row.original.name || `Portfolio #${row.original.order_index}`}
+        <div className="flex flex-col gap-1.5 sm:gap-0 sm:flex-row sm:items-center">
+          <div className="font-medium truncate max-w-[160px] sm:max-w-[300px]">
+            {row.getValue("title") || row.original.name || `Portfolio #${row.original.order_index}`}
+          </div>
+          {/* MOBILE ONLY: Show the badge under the title on small screens */}
+          <Badge variant="secondary" className="w-fit text-[10px] uppercase tracking-wider sm:hidden">
+            #{row.original.order_index}
+          </Badge>
         </div>
       ),
     },
@@ -118,7 +124,8 @@ export default function PortfolioManager() {
               checked={isEnabled}
               onCheckedChange={() => handleToggleVisibility(orderIndex, isEnabled)}
             />
-            <span className="text-xs text-muted-foreground w-12">
+            {/* MOBILE ONLY: Hide the text label on tiny screens to save space */}
+            <span className="hidden sm:inline-block text-xs text-muted-foreground w-12">
               {isEnabled ? "Visible" : "Hidden"}
             </span>
           </div>
@@ -131,24 +138,25 @@ export default function PortfolioManager() {
       cell: ({ row }) => {
         const portfolio = row.original
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            {/* FIXED: Added !transition-none to stop the menu from flying across the screen */}
-            <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-48 !transition-none">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}>
-                <Eye className="mr-2 h-4 w-4" /> View Live
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`/dashboard/portfolios/${portfolio.order_index}/edit`)}>
-                <Pencil className="mr-2 h-4 w-4" /> Edit Content
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex justify-end sm:justify-start">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-48 !transition-none">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}>
+                  <Eye className="mr-2 h-4 w-4" /> View Live
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate(`/dashboard/portfolios/${portfolio.order_index}/edit`)}>
+                  <Pencil className="mr-2 h-4 w-4" /> Edit Content
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )
       },
     },
@@ -187,19 +195,19 @@ export default function PortfolioManager() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      {/* Search and Action Buttons: Stacked on mobile, row on md+ */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <Input
           placeholder="Filter by title..."
           value={(table.getColumn("title")?.getFilterValue()) ?? ""}
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
-          className="w-full rounded-full bg-background"
+          className="w-full md:max-w-sm rounded-full bg-background"
         />
-        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+        <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-full">Columns</Button>
             </DropdownMenuTrigger>
-            {/* FIXED: Also added !transition-none here so the Columns menu doesn't fly either */}
             <DropdownMenuContent align="end" className="!transition-none">
               {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => {
                 return (
@@ -216,21 +224,29 @@ export default function PortfolioManager() {
             </DropdownMenuContent>
           </DropdownMenu>
           
-          <Button className="rounded-full shadow-none" onClick={() => navigate(`/dashboard/portfolios/${Math.max(...data.map((item) => Number(item.order_index) || 0), 0) + 1}/edit`)}>
+          <Button 
+            className="flex-1 md:flex-none rounded-full shadow-none" 
+            onClick={() => navigate(`/dashboard/portfolios/${Math.max(...data.map((item) => Number(item.order_index) || 0), 0) + 1}/edit`)}
+          >
             <Plus className="mr-2 h-4 w-4" /> New Portfolio
           </Button>
         </div>
       </div>
 
       <div className="overflow-hidden rounded-3xl border border-border/60 bg-background shadow-sm">
-        <div className="overflow-x-auto">
-        <Table className="min-w-[760px]">
+        {/* Removed min-w-[760px] to allow native mobile squishing */}
+        <Table>
           <TableHeader className="bg-muted/25">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  // Hide the Index column completely on small screens
+                  const isHiddenMobile = header.column.id === "order_index";
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead 
+                      key={header.id} 
+                      className={isHiddenMobile ? "hidden sm:table-cell" : ""}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -244,11 +260,18 @@ export default function PortfolioManager() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="hover:bg-muted/30" data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    // Hide the Index column completely on small screens
+                    const isHiddenMobile = cell.column.id === "order_index";
+                    return (
+                      <TableCell 
+                        key={cell.id} 
+                        className={isHiddenMobile ? "hidden sm:table-cell py-3 sm:py-4" : "py-3 sm:py-4"}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (
@@ -260,10 +283,10 @@ export default function PortfolioManager() {
             )}
           </TableBody>
         </Table>
-        </div>
       </div>
       
-      <div className="flex flex-col gap-3 py-2 lg:flex-row lg:items-center lg:justify-between">
+      {/* Pagination Footer: Center aligned on mobile, spaced out on lg */}
+      <div className="flex flex-col gap-4 py-2 sm:flex-row sm:items-center sm:justify-between text-center sm:text-left">
         <div className="text-sm text-muted-foreground">
            Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
            {Math.min(
@@ -273,8 +296,8 @@ export default function PortfolioManager() {
            of {table.getFilteredRowModel().rows.length} entries
         </div>
         
-        <Pagination className="mx-0 w-auto justify-start lg:justify-end">
-          <PaginationContent>
+        <Pagination className="mx-auto sm:mx-0 w-auto justify-center sm:justify-end">
+          <PaginationContent className="flex-wrap justify-center gap-1">
             <PaginationItem>
               <PaginationPrevious 
                 href="#" 
@@ -287,7 +310,7 @@ export default function PortfolioManager() {
             </PaginationItem>
             
             {Array.from({ length: table.getPageCount() }).map((_, i) => (
-              <PaginationItem key={i}>
+              <PaginationItem key={i} className="hidden sm:inline-block">
                 <PaginationLink 
                   href="#"
                   isActive={table.getState().pagination.pageIndex === i}

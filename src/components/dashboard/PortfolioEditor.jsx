@@ -49,28 +49,28 @@ const extractList = (field) => {
 
 function EditorSection({ title, description, action, preview, children }) {
   return (
-    <Card className="overflow-hidden border-border/60 bg-background shadow-sm mb-6 last:mb-0 rounded-[2rem]">
-      <CardHeader className="border-b border-border/50 pb-6 bg-muted/10">
+    <Card className="overflow-hidden border-border/60 bg-background shadow-sm mb-6 last:mb-0 rounded-[1.5rem] sm:rounded-[2rem]">
+      <CardHeader className="border-b border-border/50 p-4 sm:p-6 pb-5 sm:pb-6 bg-muted/10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-widest text-primary/80">Editing Section</span>
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary/80">Editing Section</span>
             </div>
-            <CardTitle className="text-2xl tracking-tight">{title}</CardTitle>
-            {description ? <CardDescription className="text-base">{description}</CardDescription> : null}
+            <CardTitle className="text-xl sm:text-2xl tracking-tight">{title}</CardTitle>
+            {description ? <CardDescription className="text-sm sm:text-base">{description}</CardDescription> : null}
           </div>
-          {action}
+          {action && <div className="w-full sm:w-auto">{action}</div>}
         </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="p-4 sm:p-6 pt-5 sm:pt-6">
         {preview && (
-          <div className="mb-8 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
-            <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-4 py-2.5">
-              <Eye className="size-4 text-muted-foreground" />
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live Preview</p>
+          <div className="mb-6 sm:mb-8 overflow-hidden rounded-xl sm:rounded-2xl border border-border/60 bg-card shadow-sm">
+            <div className="flex items-center gap-2 border-b border-border/50 bg-muted/30 px-3 sm:px-4 py-2 sm:py-2.5">
+              <Eye className="size-3.5 sm:size-4 text-muted-foreground" />
+              <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live Preview</p>
             </div>
-            <div className="p-6 sm:p-8">
+            <div className="p-4 sm:p-8">
               {preview}
             </div>
           </div>
@@ -83,20 +83,20 @@ function EditorSection({ title, description, action, preview, children }) {
 
 function ItemFrame({ title, subtitle, iconName, onRemove, children }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 mb-4 last:mb-0 transition-colors hover:border-primary/30">
-      <div className="mb-4 flex items-start justify-between gap-4 border-b border-border/50 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            {createElement(resolveIcon(iconName), { className: "size-4" })}
+    <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5 mb-4 last:mb-0 transition-colors hover:border-primary/30">
+      <div className="mb-4 flex items-start justify-between gap-3 sm:gap-4 border-b border-border/50 pb-3 sm:pb-4">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="flex size-8 sm:size-10 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-primary/10 text-primary">
+            {createElement(resolveIcon(iconName), { className: "size-3.5 sm:size-4" })}
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-primary/70 mb-0.5">Live Item Preview</p>
-            <p className="text-sm font-medium text-foreground">{title || "Untitled"}</p>
-            {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
+          <div className="min-w-0">
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-primary/70 mb-0.5 truncate">Live Item Preview</p>
+            <p className="text-xs sm:text-sm font-medium text-foreground truncate">{title || "Untitled"}</p>
+            {subtitle ? <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{subtitle}</p> : null}
           </div>
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={onRemove}>
-          <Trash2 className="size-4" />
+        <Button type="button" variant="ghost" size="icon-sm" className="shrink-0 rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={onRemove}>
+          <Trash2 className="size-3.5 sm:size-4" />
         </Button>
       </div>
       {children}
@@ -110,8 +110,8 @@ function IconField({ label, value, onChange }) {
       <FieldLabel>{label}</FieldLabel>
       <div className="space-y-2">
         <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2 text-sm">
-          {createElement(resolveIcon(value), { className: "size-4 text-primary" })}
-          <span className="text-muted-foreground">{value || "No icon selected"}</span>
+          {createElement(resolveIcon(value), { className: "size-4 shrink-0 text-primary" })}
+          <span className="text-muted-foreground truncate">{value || "No icon selected"}</span>
         </div>
         <LucideIconPicker value={value} onChange={onChange} />
       </div>
@@ -216,7 +216,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         }))
       }
     } catch (error) {
-      console.error("Portfolio Loading Error:", error)
       toast.error(error.message || "Failed to load portfolio data.")
     } finally {
       setLoading(false)
@@ -317,20 +316,16 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         contactMethods: formData.contactMethods,
         footerLinks: formData.footerLinks,
         statusPills: formData.statusPills,
-        
-        // AUTOMATIC MAPPING: Generates relatedComponents under the hood based on the relation tag
         experience: formData.experience.map(exp => {
           const matchingItems = formData.showcaseCategories
             .filter(cat => cat.relation === exp.relation)
             .flatMap(cat => Array.isArray(cat.items) ? cat.items : []);
-            
-          // Grab up to 4 unique components mapped to this relation
           const autoComponents = Array.from(new Set(matchingItems)).slice(0, 4);
 
           return {
             ...exp,
             relatedComponents: autoComponents,
-            related_components: autoComponents // Sends snake_case as well just to be totally safe for Django
+            related_components: autoComponents 
           }
         }),
       }
@@ -362,7 +357,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
 
   if (loading) {
     return (
-      <div className="flex h-[420px] items-center justify-center rounded-3xl border border-border/60 bg-background shadow-sm">
+      <div className="flex h-[420px] items-center justify-center rounded-3xl border border-border/60 bg-background shadow-sm mx-4 sm:mx-0">
         <div className="flex flex-col items-center gap-3 text-center">
           <Loader2 className="size-6 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading portfolio editor...</p>
@@ -372,33 +367,33 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
   }
 
   return (
-    <div className="flex w-full min-w-0 flex-col gap-6 pb-24">
-      <Card className="rounded-3xl border-border/60 bg-background shadow-sm">
-        <CardHeader className="pb-6">
+    <div className="flex w-full min-w-0 flex-col gap-4 sm:gap-6 pb-24">
+      <Card className="rounded-[1.5rem] sm:rounded-3xl border-border/60 bg-background shadow-sm">
+        <CardHeader className="p-4 sm:p-6 pb-5 sm:pb-6">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="rounded-full">Portfolio #{portfolioIndex}</Badge>
-                <Badge variant={formData.isEnabled ? "default" : "secondary"} className="rounded-full">
+            <div className="space-y-2.5 sm:space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="rounded-full text-[10px] sm:text-xs">Portfolio #{portfolioIndex}</Badge>
+                <Badge variant={formData.isEnabled ? "default" : "secondary"} className="rounded-full text-[10px] sm:text-xs">
                   {formData.isEnabled ? "Live" : "Hidden"}
                 </Badge>
-                {isNewPortfolio ? <Badge variant="secondary" className="rounded-full">New</Badge> : null}
+                {isNewPortfolio ? <Badge variant="secondary" className="rounded-full text-[10px] sm:text-xs">New</Badge> : null}
               </div>
-              <CardTitle className="text-3xl tracking-tight">Edit portfolio</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl sm:text-3xl tracking-tight">Edit portfolio</CardTitle>
+              <CardDescription className="text-sm">
                 Refine the public portfolio content with a quieter, cleaner editing workspace.
               </CardDescription>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-muted/20 px-4 py-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+              <div className="flex flex-1 items-center gap-3 rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 px-3 py-2.5 sm:px-4 sm:py-3">
                 <Switch checked={formData.isEnabled} onCheckedChange={(checked) => setFormData((current) => ({ ...current, isEnabled: checked }))} />
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-medium">Public access</p>
-                  <p className="text-xs text-muted-foreground">Control whether this portfolio is visible.</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">Control whether this portfolio is visible.</p>
                 </div>
               </div>
-              <Button onClick={handleSubmit} disabled={saving} className="rounded-full px-5 shadow-none">
+              <Button onClick={handleSubmit} disabled={saving} className="rounded-full sm:px-5 shadow-none w-full sm:w-auto h-11 sm:h-10">
                 {saving ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
                 {saving ? "Saving..." : "Save changes"}
               </Button>
@@ -407,45 +402,44 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="identity" className="flex w-full flex-col gap-6">
-        <div className="sticky top-[5.5rem] z-20 w-full mb-2">
-          <div className="w-full overflow-x-auto rounded-3xl border border-border/60 bg-background p-2 shadow-sm">
+      <Tabs defaultValue="identity" className="flex w-full flex-col gap-4 sm:gap-6">
+        <div className="sticky top-[4.5rem] sm:top-[5.5rem] z-20 w-full mb-1 sm:mb-2">
+          <div className="w-full overflow-x-auto rounded-2xl sm:rounded-3xl border border-border/60 bg-background/95 backdrop-blur-sm p-1.5 sm:p-2 shadow-sm [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <TabsList
               variant="line"
-              className="flex w-full gap-2 rounded-none border-0 bg-transparent p-0 shadow-none"
+              className="flex w-max min-w-full gap-1 sm:gap-2 rounded-none border-0 bg-transparent p-0 shadow-none"
             >
-              <TabsTrigger value="identity" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
-                <User className="mr-2 size-4" /> Identity
+              <TabsTrigger value="identity" className="flex-1 shrink-0 flex justify-center items-center rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+                <User className="mr-1.5 sm:mr-2 size-3.5 sm:size-4" /> Identity
               </TabsTrigger>
-              <TabsTrigger value="content" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
-                <LayoutTemplate className="mr-2 size-4" /> Content
+              <TabsTrigger value="content" className="flex-1 shrink-0 flex justify-center items-center rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+                <LayoutTemplate className="mr-1.5 sm:mr-2 size-3.5 sm:size-4" /> Content
               </TabsTrigger>
-              <TabsTrigger value="sections" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
-                <FileText className="mr-2 size-4" /> Sections
+              <TabsTrigger value="sections" className="flex-1 shrink-0 flex justify-center items-center rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+                <FileText className="mr-1.5 sm:mr-2 size-3.5 sm:size-4" /> Sections
               </TabsTrigger>
-              <TabsTrigger value="links" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
-                <Link2 className="mr-2 size-4" /> Links
+              <TabsTrigger value="links" className="flex-1 shrink-0 flex justify-center items-center rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+                <Link2 className="mr-1.5 sm:mr-2 size-3.5 sm:size-4" /> Links
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex-1 flex justify-center items-center rounded-2xl px-4 py-2.5">
-                <Settings2 className="mr-2 size-4" /> Settings
+              <TabsTrigger value="settings" className="flex-1 shrink-0 flex justify-center items-center rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm">
+                <Settings2 className="mr-1.5 sm:mr-2 size-3.5 sm:size-4" /> Settings
               </TabsTrigger>
             </TabsList>
           </div>
         </div>
 
-        {/* --- IDENTITY TAB --- */}
-        <TabsContent value="identity" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+        <TabsContent value="identity" className="rounded-[1.5rem] sm:rounded-3xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-7 shadow-sm">
           <EditorSection 
             title="Personal information" 
             description="Primary identity and profile metadata displayed throughout the portfolio."
             preview={
-              <div className="flex flex-col items-center text-center space-y-3">
-                <h2 className="text-3xl font-bold tracking-tight">{formData.personalInfo.name || "Your Name"}</h2>
-                <div className="space-y-1">
-                  <p className="text-lg font-medium text-primary">{formData.personalInfo.title || "Professional Title"}</p>
-                  <p className="text-sm text-muted-foreground max-w-md mx-auto">{formData.personalInfo.subtitle || "Your subtitle describing your main skills..."}</p>
+              <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{formData.personalInfo.name || "Your Name"}</h2>
+                <div className="space-y-0.5 sm:space-y-1">
+                  <p className="text-base sm:text-lg font-medium text-primary">{formData.personalInfo.title || "Professional Title"}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">{formData.personalInfo.subtitle || "Your subtitle describing your main skills..."}</p>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground font-medium pt-2">
+                <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground font-medium pt-2">
                   <span>{formData.personalInfo.location || "City, Country"}</span>
                   <span className="h-1 w-1 rounded-full bg-border" />
                   <span>{formData.personalInfo.email || "hello@example.com"}</span>
@@ -453,7 +447,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               </div>
             }
           >
-            <FieldGroup className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <FieldGroup className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
               <Field><FieldLabel>Full name</FieldLabel><Input value={formData.personalInfo.name} onChange={(e) => handleNestedChange("personalInfo", "name", e.target.value)} placeholder="e.g. Jane Doe" /></Field>
               <Field><FieldLabel>Short name</FieldLabel><Input value={formData.personalInfo.shortName} onChange={(e) => handleNestedChange("personalInfo", "shortName", e.target.value)} placeholder="e.g. jdoe" /></Field>
               <Field><FieldLabel>Professional title</FieldLabel><Input value={formData.personalInfo.title} onChange={(e) => handleNestedChange("personalInfo", "title", e.target.value)} placeholder="e.g. Full-stack Developer" /></Field>
@@ -466,20 +460,19 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
         </TabsContent>
 
-        {/* --- CONTENT TAB --- */}
-        <TabsContent value="content" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+        <TabsContent value="content" className="rounded-[1.5rem] sm:rounded-3xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-7 shadow-sm">
           <EditorSection 
             title="Hero content" 
             description="Top-of-page messaging and headline copy."
             preview={
-              <div className="space-y-4 max-w-3xl">
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary/80">
+              <div className="space-y-3 sm:space-y-4 max-w-3xl">
+                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-primary/80">
                   {formData.heroContent.eyebrow || "Eyebrow Text"}
                 </p>
-                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl leading-[1.1]">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
                   {formData.heroContent.title || "Your main hero headline goes here..."}
                 </h1>
-                <p className="text-lg text-muted-foreground leading-relaxed">
+                <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed">
                   {formData.heroContent.description || "A descriptive paragraph explaining what you do and your core focus areas."}
                 </p>
               </div>
@@ -493,13 +486,13 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
 
           <EditorSection title="Hero actions" description="Call to action buttons rendered in the hero area.">
-            <FieldGroup className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-4">
+            <FieldGroup className="grid gap-4 sm:gap-6 md:grid-cols-2">
+              <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5 space-y-3 sm:space-y-4">
                 <h4 className="text-sm font-semibold">Primary Action</h4>
                 <Field><FieldLabel>Label</FieldLabel><Input value={formData.heroActions?.primary?.label} onChange={(e) => handleActionChange("primary", "label", e.target.value)} placeholder="e.g. View projects" /></Field>
                 <Field><FieldLabel>Href</FieldLabel><Input value={formData.heroActions?.primary?.href} onChange={(e) => handleActionChange("primary", "href", e.target.value)} placeholder="e.g. #projects" /></Field>
               </div>
-              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 space-y-4">
+              <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5 space-y-3 sm:space-y-4">
                 <h4 className="text-sm font-semibold">Secondary Action</h4>
                 <Field><FieldLabel>Label</FieldLabel><Input value={formData.heroActions?.secondary?.label} onChange={(e) => handleActionChange("secondary", "label", e.target.value)} placeholder="e.g. GitHub" /></Field>
                 <Field><FieldLabel>Href</FieldLabel><Input value={formData.heroActions?.secondary?.href} onChange={(e) => handleActionChange("secondary", "href", e.target.value)} placeholder="e.g. https://github.com" /></Field>
@@ -510,7 +503,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Hero metrics"
             description="Small high-impact stats shown near the hero area."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("heroMetrics")}><Plus className="mr-2 size-4" />Add metric</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("heroMetrics")}><Plus className="mr-2 size-4" />Add metric</Button>}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.heroMetrics.map((metric, index) => (
@@ -530,9 +523,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Hero focus"
             description="Focus area chart and metrics displayed in the hero section."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={addFocusArea}><Plus className="mr-2 size-4" />Add focus area</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={addFocusArea}><Plus className="mr-2 size-4" />Add focus area</Button>}
           >
-            <FieldGroup className="mb-6 grid gap-4 md:grid-cols-2">
+            <FieldGroup className="mb-4 sm:mb-6 grid gap-4 md:grid-cols-2">
               <Field><FieldLabel>Eyebrow</FieldLabel><Input value={formData.heroFocus?.eyebrow} onChange={(e) => handleNestedChange("heroFocus", "eyebrow", e.target.value)} placeholder="e.g. Current focus" /></Field>
               <Field><FieldLabel>Title</FieldLabel><Input value={formData.heroFocus?.title} onChange={(e) => handleNestedChange("heroFocus", "title", e.target.value)} placeholder="e.g. Backend architecture" /></Field>
             </FieldGroup>
@@ -556,17 +549,17 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
             title="Hero badges & Highlights"
             description="Tags and detail cards shown under the hero."
           >
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <div>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <h4 className="text-sm font-medium">Badges</h4>
-                  <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("heroBadges")}><Plus className="mr-2 size-4" />Add badge</Button>
+                  <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("heroBadges")}><Plus className="mr-2 size-4" />Add badge</Button>
                 </div>
-                <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-4">
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                   {formData.heroBadges.map((badge, index) => (
                     <div key={`badge-${index}`} className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/20 p-2 pl-3">
-                      <Input value={badge.label} placeholder="Label" className="h-8 border-0 bg-transparent px-0 focus-visible:ring-0" onChange={(e) => handleArrayChange("heroBadges", index, "label", e.target.value)} />
-                      <Button variant="ghost" size="icon-sm" className="shrink-0 text-muted-foreground" onClick={() => removeItem("heroBadges", index)}><Trash2 className="size-3" /></Button>
+                      <Input value={badge.label} placeholder="Label" className="h-8 border-0 bg-transparent px-0 focus-visible:ring-0 text-sm" onChange={(e) => handleArrayChange("heroBadges", index, "label", e.target.value)} />
+                      <Button variant="ghost" size="icon-sm" className="shrink-0 text-muted-foreground" onClick={() => removeItem("heroBadges", index)}><Trash2 className="size-3 sm:size-3.5" /></Button>
                     </div>
                   ))}
                 </div>
@@ -575,9 +568,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               <Separator />
 
               <div>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <h4 className="text-sm font-medium">Highlights</h4>
-                  <Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("heroHighlights")}><Plus className="mr-2 size-4" />Add highlight</Button>
+                  <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("heroHighlights")}><Plus className="mr-2 size-4" />Add highlight</Button>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   {formData.heroHighlights.map((highlight, index) => (
@@ -597,7 +590,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Status pills"
             description="Compact pills shown in the hero section."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("statusPills")}><Plus className="mr-2 size-4" />Add pill</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("statusPills")}><Plus className="mr-2 size-4" />Add pill</Button>}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.statusPills.map((item, index) => (
@@ -615,9 +608,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
             title="About section" 
             description="Longer narrative content about you and your work."
             preview={
-              <div className="space-y-4">
-                <h2 className="text-3xl font-bold tracking-tight">{formData.aboutContent.title || "Section Title"}</h2>
-                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              <div className="space-y-3 sm:space-y-4">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{formData.aboutContent.title || "Section Title"}</h2>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
                   {formData.aboutContent.description || "Write a detailed narrative about your background, experience, and what you do."}
                 </p>
               </div>
@@ -625,22 +618,21 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           >
             <FieldGroup>
               <Field><FieldLabel>Section title</FieldLabel><Input value={formData.aboutContent.title} onChange={(e) => handleNestedChange("aboutContent", "title", e.target.value)} placeholder="e.g. About Me" /></Field>
-              <Field><FieldLabel>Description</FieldLabel><Textarea rows={7} value={formData.aboutContent.description} onChange={(e) => handleNestedChange("aboutContent", "description", e.target.value)} placeholder="e.g. Here is my story..." /></Field>
+              <Field><FieldLabel>Description</FieldLabel><Textarea rows={6} sm:rows={7} value={formData.aboutContent.description} onChange={(e) => handleNestedChange("aboutContent", "description", e.target.value)} placeholder="e.g. Here is my story..." /></Field>
             </FieldGroup>
           </EditorSection>
 
           <EditorSection title="Section copy" description="Overarching headers and descriptions for major page sections.">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
               {['projects', 'experience', 'components', 'contact'].map((sec) => (
-                <div key={sec} className="rounded-3xl border border-border/60 bg-muted/10 p-6 space-y-6">
-                  {/* Internal Mini-Preview for Section Copy */}
-                  <div className="border-b border-border/50 pb-5 space-y-2">
-                    <p className="text-xs font-bold uppercase tracking-widest text-primary/80">{formData.sectionCopy?.[sec]?.eyebrow || "Eyebrow"}</p>
-                    <h3 className="text-2xl font-bold tracking-tight">{formData.sectionCopy?.[sec]?.title || "Section Title"}</h3>
-                    <p className="text-sm text-muted-foreground">{formData.sectionCopy?.[sec]?.description || "Section description preview..."}</p>
+                <div key={sec} className="rounded-xl sm:rounded-3xl border border-border/60 bg-muted/10 p-4 sm:p-6 space-y-4 sm:space-y-6">
+                  <div className="border-b border-border/50 pb-4 sm:pb-5 space-y-1.5 sm:space-y-2">
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary/80">{formData.sectionCopy?.[sec]?.eyebrow || "Eyebrow"}</p>
+                    <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{formData.sectionCopy?.[sec]?.title || "Section Title"}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{formData.sectionCopy?.[sec]?.description || "Section description preview..."}</p>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <Field><FieldLabel>Eyebrow</FieldLabel><Input value={formData.sectionCopy?.[sec]?.eyebrow} onChange={(e) => handleSectionCopyChange(sec, "eyebrow", e.target.value)} placeholder="e.g. Selected Work" /></Field>
                     <Field><FieldLabel>Title</FieldLabel><Input value={formData.sectionCopy?.[sec]?.title} onChange={(e) => handleSectionCopyChange(sec, "title", e.target.value)} placeholder="e.g. My Projects" /></Field>
                     <Field><FieldLabel>Description</FieldLabel><Textarea rows={3} value={formData.sectionCopy?.[sec]?.description} onChange={(e) => handleSectionCopyChange(sec, "description", e.target.value)} placeholder="e.g. A collection of..." /></Field>
@@ -649,33 +641,13 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               ))}
             </div>
           </EditorSection>
-
-          <EditorSection 
-            title="Page copy" 
-            description="System text and loading states."
-            preview={
-              <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
-                <Loader2 className="size-8 animate-spin text-primary" />
-                <div>
-                  <h3 className="text-lg font-semibold">{formData.pageCopy?.loadingTitle || "Loading..."}</h3>
-                  <p className="text-sm text-muted-foreground">{formData.pageCopy?.loadingDescription || "Please wait while we set things up."}</p>
-                </div>
-              </div>
-            }
-          >
-            <FieldGroup className="grid gap-4 md:grid-cols-2">
-              <Field><FieldLabel>Loading Title</FieldLabel><Input value={formData.pageCopy?.loadingTitle} onChange={(e) => handleNestedChange("pageCopy", "loadingTitle", e.target.value)} placeholder="e.g. Loading..." /></Field>
-              <Field><FieldLabel>Loading Description</FieldLabel><Input value={formData.pageCopy?.loadingDescription} onChange={(e) => handleNestedChange("pageCopy", "loadingDescription", e.target.value)} placeholder="e.g. Please wait." /></Field>
-            </FieldGroup>
-          </EditorSection>
         </TabsContent>
 
-        {/* --- SECTIONS TAB --- */}
-        <TabsContent value="sections" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+        <TabsContent value="sections" className="rounded-[1.5rem] sm:rounded-3xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-7 shadow-sm">
           <EditorSection
             title="Skill groups"
             description="Stack and capabilities used in the about section."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("skillGroups")}><Plus className="mr-2 size-4" />Add group</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("skillGroups")}><Plus className="mr-2 size-4" />Add group</Button>}
           >
             <div>
               {formData.skillGroups.map((group, index) => (
@@ -694,7 +666,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Projects"
             description="Portfolio cards for featured work."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("projects")}><Plus className="mr-2 size-4" />Add project</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("projects")}><Plus className="mr-2 size-4" />Add project</Button>}
           >
             <div>
               {formData.projects.map((project, index) => (
@@ -717,7 +689,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Experience"
             description="Career timeline and role details."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("experience")}><Plus className="mr-2 size-4" />Add experience</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("experience")}><Plus className="mr-2 size-4" />Add experience</Button>}
           >
             <div>
               {formData.experience.map((item, index) => (
@@ -741,7 +713,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Showcase categories"
             description="UI system showcase content with relation mapping and icons."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("showcaseCategories")}><Plus className="mr-2 size-4" />Add category</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("showcaseCategories")}><Plus className="mr-2 size-4" />Add category</Button>}
           >
             <div>
               {formData.showcaseCategories.map((item, index) => (
@@ -761,7 +733,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Featured modules"
             description="Highlighted modules that pair with experience and showcase sections."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("featuredModules")}><Plus className="mr-2 size-4" />Add module</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("featuredModules")}><Plus className="mr-2 size-4" />Add module</Button>}
           >
             <div>
               {formData.featuredModules.map((item, index) => (
@@ -779,12 +751,11 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
         </TabsContent>
 
-        {/* --- LINKS TAB --- */}
-        <TabsContent value="links" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+        <TabsContent value="links" className="rounded-[1.5rem] sm:rounded-3xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-7 shadow-sm">
           <EditorSection
             title="Navigation links"
             description="Header navigation items for the public portfolio."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("navigationLinks")}><Plus className="mr-2 size-4" />Add link</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("navigationLinks")}><Plus className="mr-2 size-4" />Add link</Button>}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.navigationLinks.map((link, index) => (
@@ -804,7 +775,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Contact methods"
             description="Public contact cards shown in the contact section."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("contactMethods")}><Plus className="mr-2 size-4" />Add method</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("contactMethods")}><Plus className="mr-2 size-4" />Add method</Button>}
           >
             <div className="grid gap-4 md:grid-cols-2">
               {formData.contactMethods.map((item, index) => (
@@ -823,7 +794,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           <EditorSection
             title="Footer links"
             description="Links displayed in the footer."
-            action={<Button type="button" variant="outline" size="sm" className="rounded-full" onClick={() => addItem("footerLinks")}><Plus className="mr-2 size-4" />Add footer link</Button>}
+            action={<Button type="button" variant="outline" size="sm" className="w-full sm:w-auto rounded-full" onClick={() => addItem("footerLinks")}><Plus className="mr-2 size-4" />Add footer link</Button>}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {formData.footerLinks.map((link, index) => (
@@ -841,31 +812,30 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           </EditorSection>
         </TabsContent>
 
-        {/* --- SETTINGS TAB --- */}
-        <TabsContent value="settings" className="rounded-3xl border border-border/60 bg-card/80 p-6 shadow-sm md:p-7">
+        <TabsContent value="settings" className="rounded-[1.5rem] sm:rounded-3xl border border-border/60 bg-card/80 p-4 sm:p-6 md:p-7 shadow-sm">
           <EditorSection title="Portfolio settings" description="Index and visibility controls for multi-portfolio management.">
-            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_320px]">
-              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5">
+            <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1.4fr)_320px]">
+              <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-primary">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-primary">
                     <Sparkles className="size-4" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium">Visibility</p>
-                    <p className="text-xs text-muted-foreground">This portfolio is currently {formData.isEnabled ? "visible" : "hidden"}.</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">This portfolio is currently {formData.isEnabled ? "visible" : "hidden"}.</p>
                   </div>
                 </div>
                 <Separator className="my-4" />
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
                     <p className="text-sm font-medium">Public access</p>
-                    <p className="text-xs text-muted-foreground">Enable or disable this portfolio without losing content.</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">Enable or disable this portfolio without losing content.</p>
                   </div>
                   <Switch checked={formData.isEnabled} onCheckedChange={(checked) => setFormData((current) => ({ ...current, isEnabled: checked }))} />
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-border/60 bg-muted/20 p-5 md:min-w-[240px]">
+              <div className="rounded-xl sm:rounded-2xl border border-border/60 bg-muted/20 p-4 sm:p-5 md:min-w-[240px]">
                 <Field>
                   <FieldLabel>Display index</FieldLabel>
                   <Input
@@ -875,7 +845,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
                     onChange={(e) => setFormData((current) => ({ ...current, orderIndex: Number(e.target.value) || 1 }))}
                   />
                 </Field>
-                <p className="mt-3 text-xs text-muted-foreground">
+                <p className="mt-3 text-[10px] sm:text-xs text-muted-foreground">
                   Use the portfolio index to control multi-portfolio ordering on the backend.
                 </p>
               </div>

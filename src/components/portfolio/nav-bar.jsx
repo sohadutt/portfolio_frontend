@@ -1,8 +1,18 @@
+import { useState } from 'react'
+import { Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ThemeToggle } from '@/components/portfolio/theme-toggle'
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onHide, isDefaultPortfolio = false }) {
+  const [isOpen, setIsOpen] = useState(false)
+
   // Safely extract data from the API payload
   const personalInfo = data.personalInfo || {}
   
@@ -57,6 +67,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
             </div>
           </a>
 
+          {/* Desktop Navigation */}
           <nav className="hidden items-center gap-1 lg:flex">
             {navigationLinks.map((link, index) => (
               <a
@@ -71,9 +82,50 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            
+            {/* Desktop CTA */}
             <Button asChild className="hidden rounded-full px-6 font-medium shadow-none sm:inline-flex">
               <a href="/login?mode=signup&source=portfolio-builder">Make your portfolio</a>
             </Button>
+
+            {/* Mobile Navigation Sheet */}
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full lg:hidden">
+                  <Menu className="size-5" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              
+              {/* Refined Mobile Drawer Styling */}
+              <SheetContent side="right" className="flex w-[85vw] flex-col px-6 py-8 sm:w-[400px]">
+                <SheetTitle className="text-left text-lg font-semibold tracking-tight text-foreground">
+                  Menu
+                </SheetTitle>
+                
+                <div className="mt-8 flex flex-col h-full">
+                  <nav className="flex flex-col gap-6">
+                    {navigationLinks.map((link, index) => (
+                      <a
+                        key={`mobile-${link.label || 'link'}-${index}`}
+                        href={link.href || '#'}
+                        onClick={() => setIsOpen(false)}
+                        className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label || "Link"}
+                      </a>
+                    ))}
+                  </nav>
+                  
+                  {/* Mobile CTA properly aligned with margin-top instead of auto-bottom */}
+                  <div className="mt-10 sm:hidden">
+                    <Button asChild size="lg" className="w-full rounded-full shadow-none font-semibold">
+                      <a href="/login?mode=signup&source=portfolio-builder">Make your portfolio</a>
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
