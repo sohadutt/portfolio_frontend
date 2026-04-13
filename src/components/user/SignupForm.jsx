@@ -40,7 +40,16 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
       setOtpOpen(true)
       toast.success("Account created. Enter the OTP sent to your email.")
     } catch (err) {
-      toast.error(err.message || "Failed to create account.")
+      // IF SERVER RETURNS 400 -> Open the verification modal anyway
+      if (err.status === 400) {
+        setOtpValue("")
+        setOtpOpen(true)
+        toast.info("Account requires verification. Please check your email for the code.")
+        // Note: You might want to trigger requestOTP(formData.email) here automatically 
+        // if your backend requires a fresh code to be sent on 400.
+      } else {
+        toast.error(err.message || "Failed to create account.")
+      }
     } finally {
       setLoading(false)
     }
@@ -94,7 +103,7 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
             required
             value={formData.email}
             onChange={handleChange}
-            className="rounded-xl"
+            className="rounded-xl h-11 bg-muted/20"
           />
         </div>
         <div className="space-y-2">
@@ -106,10 +115,10 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
             required
             value={formData.password}
             onChange={handleChange}
-            className="rounded-xl"
+            className="rounded-xl h-11 bg-muted/20"
           />
         </div>
-        <Button type="submit" className="mt-2 w-full rounded-full font-medium shadow-none" disabled={loading}>
+        <Button type="submit" className="mt-2 w-full rounded-full font-medium shadow-none h-11" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="mr-2 size-4 animate-spin" />
@@ -164,7 +173,7 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full rounded-full sm:w-auto"
+                className="w-full rounded-full sm:w-auto h-11"
                 disabled={otpLoading || resendLoading}
                 onClick={handleResendOtp}
               >
@@ -177,7 +186,7 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
                   "Resend OTP"
                 )}
               </Button>
-              <Button type="submit" className="w-full rounded-full font-medium shadow-none sm:w-auto" disabled={otpLoading}>
+              <Button type="submit" className="w-full rounded-full font-medium shadow-none sm:w-auto h-11" disabled={otpLoading}>
                 {otpLoading ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginForm({ redirectTo = "/dashboard" }) {
+export default function LoginForm({ redirectTo = "/dashboard", onRequireVerification }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ email: "", password: "" })
@@ -25,8 +25,23 @@ export default function LoginForm({ redirectTo = "/dashboard" }) {
       await loginUser(formData)
       toast.success("Welcome back!")
       navigate(redirectTo, { replace: true })
-    } catch (err) {
-      toast.error(err.message || "Failed to login. Please check your credentials.")
+    } catch (error) {
+      // 1. Unverified Account 
+      // (Catches a 403 Forbidden or specific verification messages from the backend)
+      if (error.status === 403 || (error.message && (error.message.toLowerCase().includes("verify") || error.message.toLowerCase().includes("inactive")))) {
+        toast.warning("Please verify your email to continue.")
+        if (onRequireVerification) {
+          onRequireVerification(formData.email) // Triggers the Verify screen in LoginPage
+        }
+      } 
+      // 2. Wrong Password or Email
+      else if (error.status === 401 || error.status === 400) {
+        toast.error("Incorrect email or password.")
+      } 
+      // 3. General Fallback
+      else {
+        toast.error(error.message || "Failed to log in. Please check your credentials.")
+      }
     } finally {
       setLoading(false)
     }
@@ -44,14 +59,13 @@ export default function LoginForm({ redirectTo = "/dashboard" }) {
           required 
           value={formData.email}
           onChange={handleChange}
-          className="rounded-xl bg-muted/20"
+          className="rounded-xl bg-muted/20 h-11"
         />
       </div>
       
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="login-password">Password</Label>
-          {/* Added the missing "Forgot password" link! */}
           <Link 
             to="/forgot-password" 
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -66,7 +80,7 @@ export default function LoginForm({ redirectTo = "/dashboard" }) {
           required 
           value={formData.password}
           onChange={handleChange}
-          className="rounded-xl bg-muted/20"
+          className="rounded-xl bg-muted/20 h-11"
         />
       </div>
 

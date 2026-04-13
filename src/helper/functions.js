@@ -116,6 +116,7 @@ const extractError = (error) => {
 const createRequestError = (error) => {
     const normalizedError = new Error(extractError(error));
     normalizedError.details = error.response?.data;
+    normalizedError.status = error.response?.status;
     return normalizedError;
 };
 
