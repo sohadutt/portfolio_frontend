@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { useNavigate } from "react-router-dom"
 import {
   flexRender,
@@ -32,8 +33,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
-// Helpers
-import { fetchDashboardPortfolios, togglePortfolioVisibility } from "@/helper/functions"
+import {
+  loadDashboardPortfolios,
+  selectDashboardPortfolios,
+  updatePortfolioVisibility,
+} from "@/store/portfolioSlice"
 
 const ACTION_MENU_WIDTH = 192
 const ACTION_MENU_HEIGHT = 112
@@ -137,52 +141,34 @@ function PortfolioActionMenu({ onPreview, onEdit }) {
 }
 
 export default function PortfolioManager() {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { items: data, loading } = useSelector(selectDashboardPortfolios)
   
-  // Table State
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
 
-  // Fetch Portfolios on mount
   useEffect(() => {
-    loadPortfolios()
-  }, [])
-
-  const loadPortfolios = async () => {
-    setLoading(true)
-    try {
-      const res = await fetchDashboardPortfolios()
-      setData(res?.portfolios || [])
-    } catch (error) {
-      toast.error(error.message || "Failed to load portfolios")
-    } finally {
-      setLoading(false)
+    async function loadPortfolios() {
+      try {
+        await dispatch(loadDashboardPortfolios()).unwrap()
+      } catch (error) {
+        toast.error(error.message || "Failed to load portfolios")
+      }
     }
-  }
 
-  const handleToggleVisibility = async (orderIndex, currentStatus) => {
-    setData(prevData => prevData.map(item => 
-      item.order_index === orderIndex ? { ...item, is_enabled: !currentStatus } : item
-    ))
-    
+    loadPortfolios()
+  }, [dispatch])
+
+  const handleToggleVisibility = useCallback(async (orderIndex, currentStatus) => {
     try {
-      const response = await togglePortfolioVisibility(orderIndex)
+      await dispatch(updatePortfolioVisibility({ orderIndex, currentStatus })).unwrap()
       toast.success(`Portfolio ${orderIndex} status updated`)
-      setData(prevData => prevData.map(item =>
-        item.order_index === orderIndex
-          ? { ...item, is_enabled: response?.is_enabled ?? !currentStatus }
-          : item
-      ))
     } catch (error) {
-      setData(prevData => prevData.map(item => 
-        item.order_index === orderIndex ? { ...item, is_enabled: currentStatus } : item
-      ))
       toast.error(error.message || "Failed to update visibility")
     }
-  }
+  }, [dispatch])
 
   const columns = useMemo(() => [
     {
@@ -193,7 +179,6 @@ export default function PortfolioManager() {
           <div className="font-medium truncate max-w-[160px] sm:max-w-[300px]">
             {row.getValue("title") || row.original.name || `Portfolio #${row.original.order_index}`}
           </div>
-          {/* MOBILE ONLY: Show the badge under the title on small screens */}
           <Badge variant="secondary" className="w-fit text-[10px] uppercase tracking-wider sm:hidden">
             #{row.original.order_index}
           </Badge>
@@ -223,7 +208,6 @@ export default function PortfolioManager() {
               checked={isEnabled}
               onCheckedChange={() => handleToggleVisibility(orderIndex, isEnabled)}
             />
-            {/* MOBILE ONLY: Hide the text label on tiny screens to save space */}
             <span className="hidden sm:inline-block text-xs text-muted-foreground w-12">
               {isEnabled ? "Visible" : "Hidden"}
             </span>
@@ -244,8 +228,9 @@ export default function PortfolioManager() {
         )
       },
     },
-  ], [navigate])
+  ], [handleToggleVisibility, navigate])
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

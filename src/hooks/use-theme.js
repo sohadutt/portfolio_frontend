@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'portfolio-theme'
+const DARK_SCHEME_QUERY = '(prefers-color-scheme: dark)'
+const isThemeName = (theme) => theme === 'light' || theme === 'dark'
 
 function getPreferredTheme() {
   if (typeof window === 'undefined') {
@@ -9,15 +11,18 @@ function getPreferredTheme() {
 
   const savedTheme = window.localStorage.getItem(STORAGE_KEY)
 
-  if (savedTheme === 'light' || savedTheme === 'dark') {
+  if (isThemeName(savedTheme)) {
     return savedTheme
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return window.matchMedia(DARK_SCHEME_QUERY).matches ? 'dark' : 'light'
 }
 
 export function useTheme() {
   const [theme, setTheme] = useState(getPreferredTheme)
+  const toggleTheme = useCallback(() => {
+    setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))
+  }, [])
 
   useEffect(() => {
     const root = document.documentElement
@@ -31,7 +36,7 @@ export function useTheme() {
       return undefined
     }
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = window.matchMedia(DARK_SCHEME_QUERY)
 
     function handleChange(event) {
       const savedTheme = window.localStorage.getItem(STORAGE_KEY)
@@ -49,6 +54,6 @@ export function useTheme() {
     theme,
     mounted: true,
     setTheme,
-    toggleTheme: () => setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark')),
+    toggleTheme,
   }
 }

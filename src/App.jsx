@@ -8,6 +8,7 @@ import {
   useParams,
   Link
 } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux"
 import { ReactLenis } from "lenis/react"
 import { Loader2 } from "lucide-react"
 
@@ -20,8 +21,9 @@ import { ExperienceSection } from "@/components/portfolio/experience-section"
 import { ComponentShowcase } from "@/components/portfolio/component-showcase"
 import { ContactSection } from "@/components/portfolio/contact-section"
 import { Footer } from "@/components/portfolio/footer" 
-import { fetchPublicPortfolio, THEME_MAP } from "@/helper/functions"
+import { THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
+import { loadPublicPortfolio, selectPublicPortfolio } from "@/store/portfolioSlice"
 import "lenis/dist/lenis.css"
 
 const LoginPage = lazy(() => import("@/components/user/LoginPage"))
@@ -202,29 +204,17 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
 }
 
 function PublicPortfolioView({ token, index = 1 }) {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const dispatch = useDispatch()
+  const { data, loading } = useSelector(selectPublicPortfolio)
   const isDefaultPortfolio = !token && Number(index) === 1
 
   useEffect(() => {
-    let isMounted = true
-
-    fetchPublicPortfolio(token, index)
-      .then((response) => {
-        if (!isMounted) return
-        setData(response)
-      })
+    dispatch(loadPublicPortfolio({ token, index }))
+      .unwrap()
       .catch((error) => {
         console.error("Portfolio Load Error:", error)
       })
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [index, token])
+  }, [dispatch, index, token])
 
   if (loading || !data) {
     if (isDefaultPortfolio) {
