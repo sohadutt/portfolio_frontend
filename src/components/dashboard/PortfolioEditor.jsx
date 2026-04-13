@@ -403,7 +403,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
       </Card>
 
       <Tabs defaultValue="identity" className="flex w-full flex-col gap-4 sm:gap-6">
-        <div className="sticky top-[4.5rem] sm:top-[5.5rem] z-20 w-full mb-1 sm:mb-2">
+        <div className="sticky top-18 sm:top-[5.5rem] z-20 w-full mb-1 sm:mb-2">
           <div className="w-full overflow-x-auto rounded-2xl sm:rounded-3xl border border-border/60 bg-background/95 backdrop-blur-sm p-1.5 sm:p-2 shadow-sm [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <TabsList
               variant="line"
