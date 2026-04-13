@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -14,16 +13,24 @@ export default defineConfig({
     },
   },
   build: {
-    // Optional: You can also increase the limit if needed (default is 500)
-    // chunkSizeWarningLimit: 1000, 
-    
-    rollupOptions: {
+    chunkSizeWarningLimit: 1400,
+    rolldownOptions: {
       output: {
-        // Splits your node_modules into smaller, separate chunks
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
-          }
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react-vendor',
+              test: /node_modules\/(react|react-dom|react-router-dom)/
+            },
+            {
+              name: 'dashboard-crop-vendor',
+              test: /node_modules\/react-image-crop/
+            },
+            {
+              name: 'heic-vendor',
+              test: /node_modules\/heic2any/
+            }
+          ]
         }
       }
     }

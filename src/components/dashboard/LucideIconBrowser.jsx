@@ -48,7 +48,7 @@ export default function LucideIconBrowser() {
       <CardContent className="min-h-0 p-0 bg-muted/10">
         <ScrollArea className="h-[calc(100dvh-16rem)] px-4 sm:px-7 py-4 sm:py-6">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 pb-6">
-            {filteredIcons.map(([key, tags]) => {
+            {filteredIcons.map(([key]) => {
               const IconComponent = resolveIcon(key)
               
               return (

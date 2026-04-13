@@ -17,11 +17,7 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams()
   const requestedMode = searchParams.get("mode")
   const source = searchParams.get("source")
-  const [view, setView] = useState("login")
-
-  if (accessToken) {
-    return <Navigate to="/dashboard" replace />
-  }
+  const [view, setView] = useState(() => (requestedMode === "signup" ? "signup" : "login"))
 
   useEffect(() => {
     const root = document.documentElement
@@ -32,11 +28,9 @@ export default function LoginPage() {
     root.classList.add("dark")
   }, [])
 
-  useEffect(() => {
-    if (requestedMode === "signup") {
-      setView("signup")
-    }
-  }, [requestedMode])
+  if (accessToken) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   return (
     // Changed to a column layout on mobile, row on desktop (md+)

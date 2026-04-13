@@ -23,15 +23,12 @@ import {
 import { toast } from "sonner"
 
 import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP, THEME_MAP } from "@/helper/functions" 
-import { useTheme } from "@/hooks/use-theme" 
 import { Save, User, Check, Camera, Copy, LogOut, Moon, Sun } from "lucide-react"
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
-import heic2any from 'heic2any'
 
 export function SideProfile({ profileData }) {
-  const { theme, setTheme } = useTheme() 
   const [formData, setFormData] = useState(profileData || {})
   const [loading, setLoading] = useState(false)
   
@@ -103,6 +100,7 @@ export function SideProfile({ profileData }) {
       if (fileExt === 'heic' || fileExt === 'heif') {
         toast.loading("Converting HEIC image...", { id: "heic-convert" })
         try {
+          const { default: heic2any } = await import('heic2any')
           const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg" })
           file = new File([convertedBlob], "converted.jpg", { type: "image/jpeg" })
           toast.success("Converted successfully!", { id: "heic-convert" })

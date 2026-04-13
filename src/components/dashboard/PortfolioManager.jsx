@@ -21,8 +21,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -36,6 +34,107 @@ import {
 
 // Helpers
 import { fetchDashboardPortfolios, togglePortfolioVisibility } from "@/helper/functions"
+
+const ACTION_MENU_WIDTH = 192
+const ACTION_MENU_HEIGHT = 112
+const ACTION_MENU_MARGIN = 8
+
+function getMenuPosition(event) {
+  const maxX = window.innerWidth - ACTION_MENU_WIDTH - ACTION_MENU_MARGIN
+  const maxY = window.innerHeight - ACTION_MENU_HEIGHT - ACTION_MENU_MARGIN
+
+  return {
+    x: Math.max(ACTION_MENU_MARGIN, Math.min(event.clientX, maxX)),
+    y: Math.max(ACTION_MENU_MARGIN, Math.min(event.clientY, maxY)),
+  }
+}
+
+function PortfolioActionMenu({ onPreview, onEdit }) {
+  const [open, setOpen] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    if (!open) return
+
+    function handlePointerDown(event) {
+      if (!event.target.closest("[data-portfolio-action-menu]")) {
+        setOpen(false)
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") setOpen(false)
+    }
+
+    function handleResize() {
+      setOpen(false)
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown)
+    window.addEventListener("keydown", handleKeyDown)
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown)
+      window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [open])
+
+  const openAtPointer = (event) => {
+    setPosition(getMenuPosition(event))
+    setOpen((current) => !current)
+  }
+
+  const runAction = (action) => {
+    setOpen(false)
+    action()
+  }
+
+  return (
+    <div className="flex justify-end sm:justify-start" data-portfolio-action-menu>
+      <Button
+        variant="ghost"
+        className="h-8 w-8 p-0"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onPointerDown={(event) => {
+          event.preventDefault()
+          openAtPointer(event)
+        }}
+      >
+        <span className="sr-only">Open menu</span>
+        <MoreHorizontal className="h-4 w-4" />
+      </Button>
+
+      {open ? (
+        <div
+          role="menu"
+          className="fixed z-50 w-48 rounded-md bg-popover/95 p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 backdrop-blur-xl"
+          style={{ left: position.x, top: position.y }}
+        >
+          <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+          <button
+            type="button"
+            role="menuitem"
+            className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden hover:bg-foreground/10 focus:bg-foreground/10"
+            onClick={() => runAction(onPreview)}
+          >
+            <Eye className="h-4 w-4" /> View Live
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-hidden hover:bg-foreground/10 focus:bg-foreground/10"
+            onClick={() => runAction(onEdit)}
+          >
+            <Pencil className="h-4 w-4" /> Edit Content
+          </button>
+        </div>
+      ) : null}
+    </div>
+  )
+}
 
 export default function PortfolioManager() {
   const navigate = useNavigate()
@@ -138,25 +237,10 @@ export default function PortfolioManager() {
       cell: ({ row }) => {
         const portfolio = row.original
         return (
-          <div className="flex justify-end sm:justify-start">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-48 !transition-none">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}>
-                  <Eye className="mr-2 h-4 w-4" /> View Live
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate(`/dashboard/portfolios/${portfolio.order_index}/edit`)}>
-                  <Pencil className="mr-2 h-4 w-4" /> Edit Content
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <PortfolioActionMenu
+            onPreview={() => window.open(`/preview/${portfolio.order_index}`, "_blank")}
+            onEdit={() => navigate(`/dashboard/portfolios/${portfolio.order_index}/edit`)}
+          />
         )
       },
     },

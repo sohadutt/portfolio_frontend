@@ -1,5 +1,7 @@
 import axios from 'axios';
-import * as LucideIcons from 'lucide-react';
+import { createElement } from 'react';
+import { Component } from 'lucide-react';
+import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
 import { URLS } from './urls';
 
 export const THEME_MAP = {
@@ -18,15 +20,21 @@ export const TIER_MAP = {
 
 // --- ICON RESOLVER ---
 const normalizeIconName = (value = "") => value.replace(/[-_\s]/g, "").toLowerCase();
+const iconNameMap = new Map(iconNames.map((name) => [normalizeIconName(name), name]));
 
-export const resolveIcon = (iconName, fallback = LucideIcons.Component) => {
+export const resolveIcon = (iconName, fallback = Component) => {
     if (typeof iconName === "function") return iconName;
-    if (!iconName) return fallback;
 
-    const matchedKey = Object.keys(LucideIcons).find(
-        (key) => normalizeIconName(key) === normalizeIconName(iconName)
-    );
-    return matchedKey ? LucideIcons[matchedKey] : fallback;
+    const resolvedName = iconNameMap.get(normalizeIconName(iconName));
+    if (!resolvedName) return fallback;
+
+    return function ResolvedLucideIcon(props) {
+        return createElement(DynamicIcon, {
+            ...props,
+            name: resolvedName,
+            fallback,
+        });
+    };
 };
 
 // --- AXIOS SETUP ---
@@ -40,7 +48,7 @@ const api = axios.create({
 // --- INTERCEPTORS ---
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token');
-    if (token) {
+    if (token && !config.skipAuth) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -50,6 +58,10 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        if (originalRequest?.skipAuthRedirect) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             const refreshToken = localStorage.getItem('refresh_token');
@@ -64,7 +76,9 @@ api.interceptors.response.use(
                     
                     return api(originalRequest);
                 } catch {
-                    localStorage.clear();
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    localStorage.removeItem('user_info');
                     window.location.href = '/login';
                 }
             }
@@ -101,12 +115,6 @@ const createRequestError = (error) => {
 const unwrapResponseData = (responseData) => responseData?.data ?? responseData;
 
 const ensureArray = (value) => (Array.isArray(value) ? value : []);
-
-const normalizePortfolioCollection = (value) => {
-    if (Array.isArray(value)) return value;
-    if (Array.isArray(value?.results)) return value.results;
-    return [];
-};
 
 const normalizePortfolioDocument = (payload = {}) => {
     const document = unwrapResponseData(payload) || {};
@@ -161,9 +169,9 @@ const normalizePortfolioDocument = (payload = {}) => {
 };
 
 // --- BASE REQUEST HELPERS ---
-export const getRequest = async (url, params = {}) => {
+export const getRequest = async (url, params = {}, config = {}) => {
     try {
-        const response = await api.get(url, { params });
+        const response = await api.get(url, { ...config, params });
         return response.data;
     } catch (error) {
         throw createRequestError(error);
@@ -286,7 +294,7 @@ export const createNewPortfolio = async (data, index = 1) => {
 // --- PORTFOLIO DATA (PUBLIC) ---
 export const fetchPortfolio = (token = null, index = 1) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);
-    return getRequest(url).then(normalizePortfolioDocument);
+    return getRequest(url, {}, { skipAuth: true, skipAuthRedirect: true }).then(normalizePortfolioDocument);
 };
 export const fetchPublicPortfolio = (token = null, index = 1) => fetchPortfolio(token, index);
 
