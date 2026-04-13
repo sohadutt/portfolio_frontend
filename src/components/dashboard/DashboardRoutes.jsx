@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { NavLink, Outlet, useOutletContext, useParams } from "react-router-dom"
+import { Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom"
 import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Sun } from "lucide-react"
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
@@ -29,9 +29,7 @@ const applyTheme = (themeMode) => {
   root.classList.add(themeClass)
 }
 
-export function DashboardOverview() {
-  const { profile } = useOutletContext()
-
+export function DashboardOverview({ profile }) {
   return (
     <div className="grid gap-6">
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -88,6 +86,7 @@ export { PortfolioManager, SubmissionInbox, LucideIconBrowser }
 
 export default function DashboardLayout() {
   const { theme, setTheme } = useTheme()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -104,6 +103,12 @@ export default function DashboardLayout() {
       })
       .catch((error) => {
         console.error("Dashboard Load Error:", error)
+        if (error.response?.status === 401) {
+          localStorage.removeItem("access_token")
+          localStorage.removeItem("refresh_token")
+          localStorage.removeItem("user_info")
+          navigate("/login", { replace: true })
+        }
       })
       .finally(() => {
         if (isMounted) setLoading(false)
@@ -112,7 +117,7 @@ export default function DashboardLayout() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [navigate])
 
   if (loading || !profile) {
     return (
@@ -194,7 +199,14 @@ export default function DashboardLayout() {
           </header>
 
           <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10 2xl:px-12 w-full max-w-[100vw]">
-            <Outlet context={{ profile }} />
+            <Routes>
+              <Route index element={<DashboardOverview profile={profile} />} />
+              <Route path="portfolios" element={<PortfolioManager />} />
+              <Route path="portfolios/:index/edit" element={<EditPortfolioRoute />} />
+              <Route path="submissions" element={<SubmissionInbox />} />
+              <Route path="icons" element={<LucideIconBrowser />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
           </main>
         </SidebarInset>
 

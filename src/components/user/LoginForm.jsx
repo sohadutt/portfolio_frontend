@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "@/helper/functions"
 import { toast } from "sonner"
 import { Loader2, ArrowRight } from "lucide-react"
@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginForm() {
+export default function LoginForm({ redirectTo = "/dashboard" }) {
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ email: "", password: "" })
 
@@ -23,9 +24,7 @@ export default function LoginForm() {
     try {
       await loginUser(formData)
       toast.success("Welcome back!")
-      // Using window.location.href is actually smart here—it forces a full page 
-      // reload so your API interceptors instantly pick up the new token!
-      window.location.href = "/dashboard"
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       toast.error(err.message || "Failed to login. Please check your credentials.")
     } finally {

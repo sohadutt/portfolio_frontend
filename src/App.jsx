@@ -5,6 +5,7 @@ import {
   Outlet,
   Route,
   Routes,
+  useLocation,
   useParams,
   Link
 } from "react-router-dom"
@@ -30,21 +31,6 @@ const LoginPage = lazy(() => import("@/components/user/LoginPage"))
 const Terms = lazy(() => import("@/components/docs/terms"))
 const Privacy = lazy(() => import("@/components/docs/privacy"))
 const DashboardLayout = lazy(() => import("@/components/dashboard/DashboardRoutes"))
-const DashboardOverview = lazy(() =>
-  import("@/components/dashboard/DashboardRoutes").then((module) => ({ default: module.DashboardOverview }))
-)
-const PortfolioManager = lazy(() =>
-  import("@/components/dashboard/DashboardRoutes").then((module) => ({ default: module.PortfolioManager }))
-)
-const EditPortfolioRoute = lazy(() =>
-  import("@/components/dashboard/DashboardRoutes").then((module) => ({ default: module.EditPortfolioRoute }))
-)
-const SubmissionInbox = lazy(() =>
-  import("@/components/dashboard/DashboardRoutes").then((module) => ({ default: module.SubmissionInbox }))
-)
-const LucideIconBrowser = lazy(() =>
-  import("@/components/dashboard/DashboardRoutes").then((module) => ({ default: module.LucideIconBrowser }))
-)
 
 function PageFallback({ label = "Loading" }) {
   return (
@@ -66,8 +52,9 @@ function withPageSuspense(children, label) {
 }
 
 const ProtectedRoute = ({ children }) => {
+  const location = useLocation()
   const token = localStorage.getItem("access_token")
-  if (!token) return <Navigate to="/login" replace />
+  if (!token) return <Navigate to="/login" replace state={{ from: location }} />
   return children
 }
 
@@ -274,19 +261,13 @@ export default function App() {
 
         {/* DASHBOARD ROUTES */}
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               {withPageSuspense(<DashboardLayout />, "Loading dashboard")}
             </ProtectedRoute>
           }
-        >
-          <Route index element={withPageSuspense(<DashboardOverview />, "Loading dashboard")} />
-          <Route path="portfolios" element={withPageSuspense(<PortfolioManager />, "Loading portfolios")} />
-          <Route path="portfolios/:index/edit" element={withPageSuspense(<EditPortfolioRoute />, "Loading editor")} />
-          <Route path="submissions" element={withPageSuspense(<SubmissionInbox />, "Loading submissions")} />
-          <Route path="icons" element={withPageSuspense(<LucideIconBrowser />, "Loading icons")} />
-        </Route>
+        />
         
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

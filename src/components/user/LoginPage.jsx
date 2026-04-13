@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Navigate, useSearchParams } from "react-router-dom"
+import { Navigate, useLocation, useSearchParams } from "react-router-dom"
 import {
   BriefcaseBusiness,
   Layers,
@@ -14,10 +14,13 @@ import { THEME_MAP } from "@/helper/functions"
 
 export default function LoginPage() {
   const accessToken = localStorage.getItem("access_token")
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const requestedMode = searchParams.get("mode")
   const source = searchParams.get("source")
   const [view, setView] = useState(() => (requestedMode === "signup" ? "signup" : "login"))
+  const from = location.state?.from
+  const redirectTo = from ? `${from.pathname || "/dashboard"}${from.search || ""}${from.hash || ""}` : "/dashboard"
 
   useEffect(() => {
     const root = document.documentElement
@@ -29,7 +32,7 @@ export default function LoginPage() {
   }, [])
 
   if (accessToken) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={redirectTo} replace />
   }
 
   return (
@@ -121,7 +124,7 @@ export default function LoginPage() {
           
           {/* FORM */}
           <div className="space-y-4">
-            {view === "login" ? <LoginForm /> : <SignupForm />}
+            {view === "login" ? <LoginForm redirectTo={redirectTo} /> : <SignupForm redirectTo={redirectTo} />}
           </div>
           
           <Separator />

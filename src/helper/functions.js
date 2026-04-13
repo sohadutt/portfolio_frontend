@@ -45,6 +45,13 @@ const api = axios.create({
     withCredentials: true,
 });
 
+const clearAuthSession = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_info');
+    delete api.defaults.headers.common['Authorization'];
+};
+
 // --- INTERCEPTORS ---
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token');
@@ -76,11 +83,11 @@ api.interceptors.response.use(
                     
                     return api(originalRequest);
                 } catch {
-                    localStorage.removeItem('access_token');
-                    localStorage.removeItem('refresh_token');
-                    localStorage.removeItem('user_info');
+                    clearAuthSession();
                     window.location.href = '/login';
                 }
+            } else {
+                clearAuthSession();
             }
         }
         return Promise.reject(error);
@@ -256,10 +263,7 @@ export const logoutUser = async () => {
     try {
         if (refresh) await postRequest(URLS.LOGOUT, { refresh });
     } finally {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user_info');
-        delete api.defaults.headers.common['Authorization'];
+        clearAuthSession();
     }
 };
 

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Label } from "@/components/ui/label"
 
-export default function SignupForm() {
+export default function SignupForm({ redirectTo = "/dashboard" }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [otpLoading, setOtpLoading] = useState(false)
@@ -60,7 +60,7 @@ export default function SignupForm() {
       await verifyOTP(formData.email, otpValue)
       setOtpOpen(false)
       toast.success("Account verified successfully.")
-      navigate("/dashboard", { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       toast.error(err.message || "Failed to verify OTP.")
     } finally {
