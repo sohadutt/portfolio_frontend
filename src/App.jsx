@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react"
+import { lazy, Suspense, useEffect, useState, useRef, useMemo } from "react"
 import {
   BrowserRouter,
   Navigate,
@@ -10,7 +10,6 @@ import {
   Link
 } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
-import { ReactLenis } from "lenis/react"
 import { Loader2 } from "lucide-react"
 
 import { Toaster } from "@/components/ui/sonner"
@@ -25,7 +24,6 @@ import { Footer } from "@/components/portfolio/footer"
 import { THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
 import { loadPublicPortfolio, selectPublicPortfolio } from "@/store/portfolioSlice"
-import "lenis/dist/lenis.css"
 
 const LoginPage = lazy(() => import("@/components/user/LoginPage"))
 const Terms = lazy(() => import("@/components/docs/terms"))
@@ -68,7 +66,6 @@ const applyTheme = (themeMode) => {
   root.classList.add(themeClass)
 }
 
-// --- GLOBAL FOOTER FOR STANDARD PAGES ---
 function GlobalFooter() {
   return (
     <footer className="border-t py-6 bg-background text-foreground z-50">
@@ -89,7 +86,6 @@ function GlobalFooter() {
   )
 }
 
-// --- BASE LAYOUT FOR STANDARD PAGES (Login, Terms, Privacy) ---
 function BaseLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -105,7 +101,9 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   const { theme, toggleTheme, mounted } = useTheme()
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
-  const [isScrolling, setIsScrolling] = useState(false)
+  
+  // We only use a ref now. NO React state for scrolling.
+  const isScrollingRef = useRef(false)
 
   useEffect(() => {
     const ownerName = data?.personalInfo?.name || data?.personal_info?.name
@@ -122,23 +120,60 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
 
   useEffect(() => {
     let scrollTimeout
+    let ticking = false
+    
     function handlePointerMove(event) {
-      setNavVisible(event.clientY <= 96 || window.scrollY < 24)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setNavVisible((prev) => {
+            const next = event.clientY <= 96 || window.scrollY < 24
+            return prev === next ? prev : next 
+          })
+          ticking = false
+        })
+        ticking = true
+      }
     }
+
     function handleScroll() {
-      setIsScrolling(true)
-      if (window.scrollY < 24) setNavVisible(true)
+      // 1. Direct DOM Manipulation - Zero React Re-renders
+      if (!isScrollingRef.current) {
+        isScrollingRef.current = true
+        document.body.style.pointerEvents = 'none' 
+      }
+
+      // 2. Safe State Update (Only triggers if it actually changes)
+      setNavVisible((prev) => {
+        if (window.scrollY < 24 && !prev) return true
+        return prev
+      })
+
       clearTimeout(scrollTimeout)
-      scrollTimeout = setTimeout(() => setIsScrolling(false), 140)
+      
+      // 3. Restore DOM after scrolling stops
+      scrollTimeout = setTimeout(() => {
+        isScrollingRef.current = false
+        document.body.style.pointerEvents = '' 
+      }, 150)
     }
+
     window.addEventListener("pointermove", handlePointerMove)
     window.addEventListener("scroll", handleScroll, { passive: true })
+    
     return () => {
       clearTimeout(scrollTimeout)
       window.removeEventListener("pointermove", handlePointerMove)
       window.removeEventListener("scroll", handleScroll)
+      document.body.style.pointerEvents = '' // Cleanup
     }
   }, [])
+
+  // Memoize sections based ONLY on data to prevent re-renders when activeHover changes
+  const memoizedHero = useMemo(() => <HeroSection data={data} />, [data])
+  const memoizedAbout = useMemo(() => <AboutSection data={data} />, [data])
+  const memoizedWork = useMemo(() => <WorkSection data={data} isDefaultPortfolio={isDefaultPortfolio} />, [data, isDefaultPortfolio])
+  const memoizedContact = useMemo(() => <ContactSection data={data} />, [data])
+  const memoizedFooter = useMemo(() => <Footer data={data} />, [data])
 
   if (!mounted) {
     return (
@@ -149,44 +184,43 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   }
 
   return (
-    <ReactLenis root options={{ duration: 1.1, smoothWheel: true }}>
-      <div className="relative flex min-h-screen flex-col bg-muted/30 text-foreground">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.9),transparent_42%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_42%)]" />
-        <NavBar
+    <div className="relative flex min-h-screen flex-col bg-muted/30 text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.9),transparent_42%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_42%)]" />
+      
+      <NavBar
+        data={data}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        isVisible={navVisible}
+        isDefaultPortfolio={isDefaultPortfolio}
+        onShow={() => setNavVisible(true)}
+        onHide={() => {
+          if (window.scrollY >= 24) setNavVisible(false)
+        }}
+      />
+
+      <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+        {memoizedHero}
+        {memoizedAbout}
+        {memoizedWork}
+        
+        <ExperienceSection
           data={data}
-          theme={theme}
-          onToggleTheme={toggleTheme}
-          isVisible={navVisible}
-          isDefaultPortfolio={isDefaultPortfolio}
-          onShow={() => setNavVisible(true)}
-          onHide={() => {
-            if (window.scrollY >= 24) setNavVisible(false)
-          }}
+          activeHover={activeHover}
+          onRelationChange={setActiveHover}
         />
+        <ComponentShowcase
+          data={data}
+          activeHover={activeHover}
+          onRelationChange={setActiveHover}
+        />
+        
+        {memoizedContact}
+      </main>
 
-        <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 pt-28 sm:px-6 lg:px-8">
-          <HeroSection data={data} isScrolling={isScrolling} />
-          <AboutSection data={data} isScrolling={isScrolling} />
-          <WorkSection data={data} isScrolling={isScrolling} isDefaultPortfolio={isDefaultPortfolio} />
-          <ExperienceSection
-            data={data}
-            isScrolling={isScrolling}
-            activeHover={activeHover}
-            onRelationChange={(next) => !isScrolling && setActiveHover(next)}
-          />
-          <ComponentShowcase
-            data={data}
-            isScrolling={isScrolling}
-            activeHover={activeHover}
-            onRelationChange={(next) => !isScrolling && setActiveHover(next)}
-          />
-          <ContactSection data={data} isScrolling={isScrolling} />
-        </main>
-
-        <Footer data={data} isScrolling={isScrolling} />
-        <Toaster position="bottom-right" />
-      </div>
-    </ReactLenis>
+      {memoizedFooter}
+      <Toaster position="bottom-right" />
+    </div>
   )
 }
 
@@ -246,20 +280,17 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* PORTFOLIO ROUTES */}
         <Route path="/" element={<DefaultPortfolioRoute />} />
         <Route path="/preview/:index" element={<DefaultPortfolioRoute />} />
         <Route path="/portfolio/:token" element={<SharedPortfolioRoute />} />
         <Route path="/portfolio/:token/:index" element={<SharedPortfolioRoute />} />
 
-        {/* BASE LAYOUT ROUTES */}
         <Route element={<BaseLayout />}>
           <Route path="/login" element={withPageSuspense(<LoginPage />, "Loading login")} />
           <Route path="/terms" element={withPageSuspense(<Terms />, "Loading terms")} />
           <Route path="/privacy" element={withPageSuspense(<Privacy />, "Loading privacy")} />
         </Route>
 
-        {/* DASHBOARD ROUTES */}
         <Route
           path="/dashboard/*"
           element={
