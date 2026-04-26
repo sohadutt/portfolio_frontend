@@ -155,7 +155,7 @@ export function ContactSection({ data = {}, isScrolling }) {
                 value={formData.name}
                 onChange={handleChange}
                 className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
-                placeholder={personalInfo.name || "Your name"}
+                placeholder={"Your name"}
                 required
               />
               {errors.name && <FieldError>{errors.name}</FieldError>}
@@ -170,7 +170,7 @@ export function ContactSection({ data = {}, isScrolling }) {
                 value={formData.email}
                 onChange={handleChange}
                 className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
-                placeholder={personalInfo.email || "hello@example.com"}
+                placeholder={"hello@example.com"}
                 required
               />
               {errors.email && <FieldError>{errors.email}</FieldError>}
