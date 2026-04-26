@@ -9,6 +9,8 @@ export const URLS = {
     REQUEST_OTP: `${BASE_URL}/api/auth/otp/request/`,
     VERIFY_OTP: `${BASE_URL}/api/auth/otp/verify/`,
     REFRESH_TOKEN: `${BASE_URL}/api/auth/refresh/`,
+    FORGOT_PASSWORD: `${BASE_URL}/api/auth/password-change/`,
+    RESET_PASSWORD: `${BASE_URL}/api/auth/password-reset/`,
 
     // ---- User Profile & Management ----
     USER_PROFILE: `${BASE_URL}/api/profile/`,

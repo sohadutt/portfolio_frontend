@@ -219,8 +219,29 @@ export const patchRequest = async (url, data, isMultipart = false) => {
 // --- SPECIFIC API CALLS ---
 export const initializeCSRF = async () => getRequest(URLS.CSRF);
 
-export const registerUser = async (data) => postRequest(URLS.REGISTER, data);
+// intercepts the 400 error to hit the verification flow automatically
+export const registerUser = async (data) => {
+    try {
+        return await postRequest(URLS.REGISTER, data);
+    } catch (error) {
+        if (error.status === 400 && data.email) {
+            await requestOTP(data.email);
+            return {
+                requiresVerification: true,
+                email: data.email,
+                message: error.message || "Proceeding to verification."
+            };
+        }
+        throw error;
+    }
+};
+
 export const requestOTP = async (email) => postRequest(URLS.REQUEST_OTP, { email });
+
+// --- PASSWORD RECOVERY ---
+export const forgotPassword = async (email) => postRequest(URLS.FORGOT_PASSWORD, { email });
+export const resetPassword = async (data) => postRequest(URLS.RESET_PASSWORD, data);
+
 
 const extractAuthPayload = (responseData) => ({
     ...(responseData || {}),

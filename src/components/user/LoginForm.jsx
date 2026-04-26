@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { loginUser } from "@/helper/functions"
 import { toast } from "sonner"
 import { Loader2, ArrowRight } from "lucide-react"
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginForm({ redirectTo = "/dashboard", onRequireVerification }) {
+export default function LoginForm({ redirectTo = "/dashboard", onRequireVerification, onForgotPassword }) {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({ email: "", password: "" })
@@ -26,20 +26,14 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
       toast.success("Welcome back!")
       navigate(redirectTo, { replace: true })
     } catch (error) {
-      // 1. Unverified Account 
-      // (Catches a 403 Forbidden or specific verification messages from the backend)
       if (error.status === 403 || (error.message && (error.message.toLowerCase().includes("verify") || error.message.toLowerCase().includes("inactive")))) {
         toast.warning("Please verify your email to continue.")
         if (onRequireVerification) {
-          onRequireVerification(formData.email) // Triggers the Verify screen in LoginPage
+          onRequireVerification(formData.email)
         }
-      } 
-      // 2. Wrong Password or Email
-      else if (error.status === 401 || error.status === 400) {
+      } else if (error.status === 401 || error.status === 400) {
         toast.error("Incorrect email or password.")
-      } 
-      // 3. General Fallback
-      else {
+      } else {
         toast.error(error.message || "Failed to log in. Please check your credentials.")
       }
     } finally {
@@ -66,12 +60,14 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="login-password">Password</Label>
-          <Link 
-            to="/forgot-password" 
+          {/* Changed from Link to a button triggering the prop function */}
+          <button 
+            type="button"
+            onClick={onForgotPassword}
             className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
           >
             Forgot password?
-          </Link>
+          </button>
         </div>
         <Input 
           id="login-password" 
