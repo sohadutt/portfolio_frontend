@@ -237,28 +237,21 @@ function PublicPortfolioView({ token, index = 1 }) {
       })
   }, [dispatch, index, token])
 
+  // UPDATED: Now shows this loading state for ALL portfolios while loading
   if (loading || !data) {
-    if (isDefaultPortfolio) {
-      return (
-        <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-primary/30 blur-2xl" />
-              <Loader2 className="relative size-8 animate-spin text-primary" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary/90">Loading portfolio</p>
-              <p className="text-sm text-slate-300">Preparing the showcase experience.</p>
-              <p className="text-sm text-slate-300">First load can take upto 30s due to server whine-down..</p>
-            </div>
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-primary/30 blur-2xl" />
+            <Loader2 className="relative size-8 animate-spin text-primary" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary/90">Loading portfolio</p>
+            <p className="text-sm text-slate-300">Preparing the showcase experience.</p>
+            <p className="text-sm text-slate-300">First load can take upto 30s due to server whine-down..</p>
           </div>
         </div>
-      )
-    }
-
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
       </div>
     )
   }
