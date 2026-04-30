@@ -24,6 +24,22 @@ import { Footer } from "@/components/portfolio/footer"
 import { THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
 import { loadPublicPortfolio, selectPublicPortfolio } from "@/store/portfolioSlice"
+import { GoogleOAuthProvider } from '@react-oauth/google'
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+function GoogleProviderWrapper({ children }) {
+  if (!GOOGLE_CLIENT_ID) {
+    console.warn("Google Client ID is not set. Google OAuth features will be disabled.")
+    return children
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      {children}
+    </GoogleOAuthProvider>
+  )
+}
 
 const LoginPage = lazy(() => import("@/components/user/LoginPage"))
 const Terms = lazy(() => import("@/components/docs/terms"))
@@ -102,7 +118,6 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   const [activeHover, setActiveHover] = useState(null)
   const [navVisible, setNavVisible] = useState(true)
   
-  // We only use a ref now. NO React state for scrolling.
   const isScrollingRef = useRef(false)
 
   useEffect(() => {
@@ -136,13 +151,11 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
     }
 
     function handleScroll() {
-      // 1. Direct DOM Manipulation - Zero React Re-renders
       if (!isScrollingRef.current) {
         isScrollingRef.current = true
         document.body.style.pointerEvents = 'none' 
       }
 
-      // 2. Safe State Update (Only triggers if it actually changes)
       setNavVisible((prev) => {
         if (window.scrollY < 24 && !prev) return true
         return prev
@@ -150,7 +163,6 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
 
       clearTimeout(scrollTimeout)
       
-      // 3. Restore DOM after scrolling stops
       scrollTimeout = setTimeout(() => {
         isScrollingRef.current = false
         document.body.style.pointerEvents = '' 
@@ -164,11 +176,10 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
       clearTimeout(scrollTimeout)
       window.removeEventListener("pointermove", handlePointerMove)
       window.removeEventListener("scroll", handleScroll)
-      document.body.style.pointerEvents = '' // Cleanup
+      document.body.style.pointerEvents = ''
     }
   }, [])
 
-  // Memoize sections based ONLY on data to prevent re-renders when activeHover changes
   const memoizedHero = useMemo(() => <HeroSection data={data} />, [data])
   const memoizedAbout = useMemo(() => <AboutSection data={data} />, [data])
   const memoizedWork = useMemo(() => <WorkSection data={data} isDefaultPortfolio={isDefaultPortfolio} />, [data, isDefaultPortfolio])
@@ -237,7 +248,6 @@ function PublicPortfolioView({ token, index = 1 }) {
       })
   }, [dispatch, index, token])
 
-  // UPDATED: Now shows this loading state for ALL portfolios while loading
   if (loading || !data) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
@@ -269,7 +279,7 @@ function SharedPortfolioRoute() {
   return <PublicPortfolioView token={token} index={Number(index || 1)} />
 }
 
-export default function App() {
+function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
@@ -296,5 +306,13 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+  )
+}
+
+export default function App() {
+  return (
+    <GoogleProviderWrapper>
+      <AppRouter />
+    </GoogleProviderWrapper>
   )
 }

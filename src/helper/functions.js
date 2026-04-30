@@ -219,7 +219,6 @@ export const patchRequest = async (url, data, isMultipart = false) => {
 // --- SPECIFIC API CALLS ---
 export const initializeCSRF = async () => getRequest(URLS.CSRF);
 
-// intercepts the 400 error to hit the verification flow automatically
 export const registerUser = async (data) => {
     try {
         return await postRequest(URLS.REGISTER, data);
@@ -270,8 +269,14 @@ const persistAuthSession = (responseData) => {
     return responseData;
 };
 
+// --- AUTHENTICATION ---
 export const loginUser = async (credentials) => {
     const data = await postRequest(URLS.LOGIN, credentials);
+    return persistAuthSession(data);
+};
+
+export const loginWithGoogle = async (credential) => {
+    const data = await postRequest(URLS.GOOGLE_LOGIN, { credential });
     return persistAuthSession(data);
 };
 
