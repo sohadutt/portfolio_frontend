@@ -5,7 +5,7 @@ export const URLS = {
     CSRF: `${BASE_URL}/api/csrf/`,
     REGISTER: `${BASE_URL}/api/auth/register/`,
     LOGIN: `${BASE_URL}/api/auth/login/`,
-    GOOGLE_LOGIN: `${BASE_URL}/api/auth/google/login/`,
+    GOOGLE_LOGIN: `${BASE_URL}/api/auth/login/google/`,
     LOGOUT: `${BASE_URL}/api/auth/logout/`,
     REQUEST_OTP: `${BASE_URL}/api/auth/otp/request/`,
     VERIFY_OTP: `${BASE_URL}/api/auth/otp/verify/`,
