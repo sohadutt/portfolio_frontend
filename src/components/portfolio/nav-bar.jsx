@@ -85,7 +85,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
             
             {/* Desktop CTA */}
             <Button asChild className="hidden rounded-full px-6 font-medium shadow-none sm:inline-flex">
-              <a href="/login?mode=signup&source=portfolio-builder">Make your portfolio</a>
+              <a href="/home">Make your portfolio</a>
             </Button>
 
             {/* Mobile Navigation Sheet */}
@@ -120,7 +120,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                   {/* Mobile CTA properly aligned with margin-top instead of auto-bottom */}
                   <div className="mt-10 sm:hidden">
                     <Button asChild size="lg" className="w-full rounded-full shadow-none font-semibold">
-                      <a href="/login?mode=signup&source=portfolio-builder">Make your portfolio</a>
+                      <a href="/home">Make your portfolio</a>
                     </Button>
                   </div>
                 </div>

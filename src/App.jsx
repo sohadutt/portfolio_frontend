@@ -42,6 +42,7 @@ function GoogleProviderWrapper({ children }) {
 }
 
 const LoginPage = lazy(() => import("@/components/user/LoginPage"))
+const HomePage = lazy(() => import("@/components/home.jsx"))
 const Terms = lazy(() => import("@/components/docs/terms"))
 const Privacy = lazy(() => import("@/components/docs/privacy"))
 const DashboardLayout = lazy(() => import("@/components/dashboard/DashboardRoutes"))
@@ -284,6 +285,8 @@ function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<DefaultPortfolioRoute />} />
+        <Route path="/home" element={withPageSuspense(<HomePage />, "Loading home")} />
+        <Route path="/hpme" element={<Navigate to="/home" replace />} />
         <Route path="/preview/:index" element={<DefaultPortfolioRoute />} />
         <Route path="/portfolio/:token" element={<SharedPortfolioRoute />} />
         <Route path="/portfolio/:token/:index" element={<SharedPortfolioRoute />} />
