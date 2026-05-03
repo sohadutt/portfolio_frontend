@@ -19,14 +19,9 @@ export const URLS = {
     SHARE_TOGGLE: `${BASE_URL}/api/profile/share-toggle/`,
     GET_PUBLIC_TOKEN: `${BASE_URL}/api/profile/get-token/`,
 
-    // ---- Portfolio Viewing (Public) ----
-    PORTFOLIO_DEFAULT: (idx = 1) => idx === 1 
-        ? `${BASE_URL}/api/portfolio/default/` 
-        : `${BASE_URL}/api/portfolio/default/${idx}/`,
-
-    PORTFOLIO_SHARED: (token, idx = 1) => idx === 1 
-        ? `${BASE_URL}/api/portfolio/shared/${token}/` 
-        : `${BASE_URL}/api/portfolio/shared/${token}/${idx}/`,
+    // ---- Portfolio Viewing (Public - Query Params) ----
+    PORTFOLIO_DEFAULT: (idx = 1) => `${BASE_URL}/api/portfolio/default/?order_index=${idx}`,
+    PORTFOLIO_SHARED: (token, idx = 1) => `${BASE_URL}/api/portfolio/shared/${token}/?order_index=${idx}`,
 
     // ---- Portfolio Management (Authenticated) ----
     PORTFOLIO_SUBMIT: (idx = 1) => `${BASE_URL}/api/portfolio/submit/${idx}/`,

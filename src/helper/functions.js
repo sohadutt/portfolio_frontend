@@ -18,7 +18,6 @@ export const TIER_MAP = {
     2: 'Premium',
 };
 
-// --- ICON RESOLVER ---
 const normalizeIconName = (value = "") => value.replace(/[-_\s]/g, "").toLowerCase();
 const iconNameMap = new Map(iconNames.map((name) => [normalizeIconName(name), name]));
 
@@ -37,7 +36,6 @@ export const resolveIcon = (iconName, fallback = Component) => {
     };
 };
 
-// --- AXIOS SETUP ---
 const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
@@ -52,7 +50,6 @@ const clearAuthSession = () => {
     delete api.defaults.headers.common['Authorization'];
 };
 
-// --- INTERCEPTORS ---
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('access_token');
     if (token && !config.skipAuth) {
@@ -94,7 +91,6 @@ api.interceptors.response.use(
     }
 );
 
-// --- ERROR EXTRACTOR ---
 const extractError = (error) => {
     if (error.response?.data) {
         const data = error.response.data;
@@ -176,7 +172,6 @@ const normalizePortfolioDocument = (payload = {}) => {
     };
 };
 
-// --- BASE REQUEST HELPERS ---
 export const getRequest = async (url, params = {}, config = {}) => {
     try {
         const response = await api.get(url, { ...config, params });
@@ -216,7 +211,6 @@ export const patchRequest = async (url, data, isMultipart = false) => {
     }
 };
 
-// --- SPECIFIC API CALLS ---
 export const initializeCSRF = async () => getRequest(URLS.CSRF);
 
 export const registerUser = async (data) => {
@@ -237,7 +231,6 @@ export const registerUser = async (data) => {
 
 export const requestOTP = async (email) => postRequest(URLS.REQUEST_OTP, { email });
 
-// --- PASSWORD RECOVERY ---
 export const forgotPassword = async (email) => postRequest(URLS.FORGOT_PASSWORD, { email });
 export const resetPassword = async (data) => postRequest(URLS.RESET_PASSWORD, data);
 
@@ -269,7 +262,6 @@ const persistAuthSession = (responseData) => {
     return responseData;
 };
 
-// --- AUTHENTICATION ---
 export const loginUser = async (credentials) => {
     const data = await postRequest(URLS.LOGIN, credentials);
     return persistAuthSession(data);
@@ -294,7 +286,6 @@ export const logoutUser = async () => {
     }
 };
 
-// --- USER PROFILE ---
 export const getUserProfile = () => getRequest(URLS.USER_PROFILE);
 export const updateUserProfile = (formData) =>
     patchRequest(
@@ -307,7 +298,6 @@ export const toggleShareStatus = async (data = {}) => {
     return unwrapResponseData(response);
 };
 
-// --- PORTFOLIO MANAGEMENT (AUTHENTICATED) ---
 export const fetchPortfolioAuthenticated = (index = 1) => {
     return getRequest(URLS.PORTFOLIO_GET_AUTHENTICATED(index)).then(normalizePortfolioDocument);
 };
@@ -322,21 +312,18 @@ export const createNewPortfolio = async (data, index = 1) => {
     return normalizePortfolioDocument(response);
 };
 
-// --- PORTFOLIO DATA (PUBLIC) ---
 export const fetchPortfolio = (token = null, index = 1) => {
     const url = token ? URLS.PORTFOLIO_SHARED(token, index) : URLS.PORTFOLIO_DEFAULT(index);
     return getRequest(url, {}, { skipAuth: true, skipAuthRedirect: true }).then(normalizePortfolioDocument);
 };
 export const fetchPublicPortfolio = (token = null, index = 1) => fetchPortfolio(token, index);
 
-// --- DASHBOARD CONTROLS ---
 export const fetchDashboardPortfolios = () => getRequest(URLS.PORTFOLIOS_ALL);
 export const togglePortfolioVisibility = async (index) => {
     const response = await patchRequest(URLS.TOGGLE_PORTFOLIO(index));
     return unwrapResponseData(response);
 };
 
-// --- FORMS & SUBMISSIONS ---
 export const submitContactForm = (data, token = null, index = 1) => {
     const url = token ? URLS.SUBMIT_ENQUIRY_SHARED(token, index) : URLS.SUBMIT_FORM_DEFAULT(index);
     return postRequest(url, data);
