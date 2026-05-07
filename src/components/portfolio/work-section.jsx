@@ -3,7 +3,7 @@ import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/portfolio/section-header'
-import { resolveIcon } from '@/helper/functions' // Use the new icon resolver
+import { resolveIcon } from '@/helper/functions'
 
 const portfolioBuilderProject = {
   title: 'Portfolio Builder',
@@ -20,7 +20,6 @@ const portfolioBuilderProject = {
 export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false }) {
   const [activeProject, setActiveProject] = useState(null)
   
-  // Safely extract data from the API payload
   const sectionCopy = data.sectionCopy || data.section_copy || {}
   const projectsCopy = sectionCopy.projects || {}
   
@@ -41,15 +40,14 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
         description={projectsCopy.description || "A showcase of recent work focusing on secure configuration tooling, reliable deployments, and scalable UI architectures."}
       />
       
-      {/* Adjusted grid gap for tighter spacing on mobile */}
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         {projects.map((project, index) => {
           const isFeatured = index === 0 && activeProject === null
           const isActive = activeProject === index
           const safeStack = Array.isArray(project.stack) ? project.stack : []
           
-          // Dynamically resolve the icon (fallback to Globe if missing)
           const IconComponent = resolveIcon(project.icon || project.icon_name || "Globe")
+          const ctaText = project.ctaLabel || project.cta_label || 'Explore'
 
           return (
             <article
@@ -60,9 +58,8 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                   : `border-border/60 bg-background/95 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveProject(index)}
-              onMouseLeave={() => !isScrolling && setActiveProject(null)} // Added to reset state
+              onMouseLeave={() => !isScrolling && setActiveProject(null)}
             >
-              {/* Added flex-wrap so the badge and eyebrow don't collide on tiny screens */}
               <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
                 <div className={`flex items-center gap-2 transition-colors duration-300 min-w-0 ${
                     isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
@@ -85,12 +82,10 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                 </Badge>
               </div>
 
-              {/* Scaled down text for mobile */}
               <h3 className="mt-5 sm:mt-6 text-xl sm:text-2xl font-semibold tracking-tight">
                 {project.title}
               </h3>
 
-              {/* Added flex-1 to push footer down evenly, improved line-height for mobile */}
               <p
                 className={`mt-3 sm:mt-4 text-sm leading-relaxed sm:leading-7 flex-1 transition-colors duration-300 ${
                   isActive || isFeatured ? 'text-foreground/85' : 'text-muted-foreground'
@@ -123,7 +118,7 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                   className="rounded-full font-medium shadow-none transition-all duration-300 sm:h-10 sm:px-4"
                 >
                   <a href={project.href || '#contact'} target={project.href?.startsWith('http') ? '_blank' : '_self'}>
-                    {project.ctaLabel || 'Explore'}
+                    {ctaText}
                     <ChevronRight className="ml-1 size-3 sm:size-4" />
                   </a>
                 </Button>

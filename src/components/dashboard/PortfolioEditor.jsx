@@ -182,8 +182,12 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           skillGroups: extractList(apiData.skillGroups || apiData.skill_groups).map(item => ({ 
             ...item, icon: item.icon || item.iconName || item.icon_name || "Sparkles" 
           })),
+          // Updated Project Mapping
           projects: extractList(apiData.projects).map(item => ({ 
-            ...item, icon: item.icon || item.iconName || item.icon_name || "Globe" 
+            ...item, 
+            icon: item.icon || item.iconName || item.icon_name || "Globe",
+            ctaLabel: item.ctaLabel || item.cta_label || "",
+            href: item.href || ""
           })),
           experience: extractList(apiData.experience).map((item) => ({
             ...item,
@@ -310,7 +314,12 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         navigationLinks: formData.navigationLinks,
         heroMetrics: formData.heroMetrics,
         skillGroups: formData.skillGroups,
-        projects: formData.projects,
+        // Map UI Project fields back to Django formatting
+        projects: formData.projects.map(p => ({
+          ...p,
+          cta_label: p.ctaLabel,
+          icon_name: p.icon
+        })),
         showcaseCategories: formData.showcaseCategories,
         featuredModules: formData.featuredModules,
         contactMethods: formData.contactMethods,
@@ -683,6 +692,11 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
                     <Field className="sm:col-span-2"><FieldLabel>Description</FieldLabel><Textarea rows={4} value={project.description} onChange={(e) => handleArrayChange("projects", index, "description", e.target.value)} placeholder="e.g. A full-stack marketplace..." /></Field>
                     <Field className="sm:col-span-1"><FieldLabel>Stack</FieldLabel><Input value={joinList(project.stack)} onChange={(e) => handleArrayListChange("projects", index, "stack", e.target.value)} placeholder="React, Node.js, MongoDB" /></Field>
                     <Field className="sm:col-span-1"><FieldLabel>Stat</FieldLabel><Input value={project.stat} onChange={(e) => handleArrayChange("projects", index, "stat", e.target.value)} placeholder="e.g. 10k+ active users" /></Field>
+                    
+                    {/* Added Action URL and Button Text fields */}
+                    <Field className="sm:col-span-1"><FieldLabel>Action URL (Href)</FieldLabel><Input value={project.href || ""} onChange={(e) => handleArrayChange("projects", index, "href", e.target.value)} placeholder="e.g. https://github.com/..." /></Field>
+                    <Field className="sm:col-span-1"><FieldLabel>Button Text</FieldLabel><Input value={project.ctaLabel || ""} onChange={(e) => handleArrayChange("projects", index, "ctaLabel", e.target.value)} placeholder="e.g. View Code" /></Field>
+
                     <div className="sm:col-span-2 w-full">
                       <IconField label="Icon" value={project.icon} onChange={(nextIcon) => handleArrayChange("projects", index, "icon", nextIcon)} />
                     </div>
