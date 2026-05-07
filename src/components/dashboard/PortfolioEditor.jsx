@@ -28,12 +28,18 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 
-function joinList(list = []) {
-  return Array.isArray(list) ? list.join(", ") : ""
+// FIX: If it's already a string (user is typing), return it as-is. 
+// If it's an array (loaded from DB), join it with commas.
+function joinList(list) {
+  if (typeof list === "string") return list;
+  return Array.isArray(list) ? list.join(", ") : "";
 }
 
-function parseList(value = "") {
-  return value.split(",").map((item) => item.trim()).filter(Boolean)
+// FIX: Safely parse strings into arrays, filtering out empty gaps.
+function parseList(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string") return [];
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function ensureArray(value) {
@@ -182,7 +188,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           skillGroups: extractList(apiData.skillGroups || apiData.skill_groups).map(item => ({ 
             ...item, icon: item.icon || item.iconName || item.icon_name || "Sparkles" 
           })),
-          // Updated Project Mapping
           projects: extractList(apiData.projects).map(item => ({ 
             ...item, 
             icon: item.icon || item.iconName || item.icon_name || "Globe",
@@ -278,8 +283,9 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
     })
   }
 
+  // FIX: Store the raw string in state while typing so trailing commas aren't lost
   const handleArrayListChange = (arrayName, index, field, value) => {
-    handleArrayChange(arrayName, index, field, parseList(value))
+    handleArrayChange(arrayName, index, field, value)
   }
 
   const addItem = (arrayName) => {
@@ -313,14 +319,21 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         pageCopy: formData.pageCopy,
         navigationLinks: formData.navigationLinks,
         heroMetrics: formData.heroMetrics,
-        skillGroups: formData.skillGroups,
-        // Map UI Project fields back to Django formatting
+        // FIX: Parse strings back to arrays right before submitting
+        skillGroups: formData.skillGroups.map(group => ({
+          ...group,
+          items: parseList(group.items)
+        })),
         projects: formData.projects.map(p => ({
           ...p,
+          stack: parseList(p.stack),
           cta_label: p.ctaLabel,
           icon_name: p.icon
         })),
-        showcaseCategories: formData.showcaseCategories,
+        showcaseCategories: formData.showcaseCategories.map(cat => ({
+          ...cat,
+          items: parseList(cat.items)
+        })),
         featuredModules: formData.featuredModules,
         contactMethods: formData.contactMethods,
         footerLinks: formData.footerLinks,
@@ -328,11 +341,12 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         experience: formData.experience.map(exp => {
           const matchingItems = formData.showcaseCategories
             .filter(cat => cat.relation === exp.relation)
-            .flatMap(cat => Array.isArray(cat.items) ? cat.items : []);
+            .flatMap(cat => Array.isArray(cat.items) ? cat.items : parseList(cat.items));
           const autoComponents = Array.from(new Set(matchingItems)).slice(0, 4);
 
           return {
             ...exp,
+            highlights: parseList(exp.highlights),
             relatedComponents: autoComponents,
             related_components: autoComponents 
           }
