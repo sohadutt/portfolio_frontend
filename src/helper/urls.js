@@ -26,6 +26,7 @@ export const URLS = {
     // ---- Portfolio Management (Authenticated) ----
     PORTFOLIO_SUBMIT: (idx = 1) => `${BASE_URL}/api/portfolio/submit/${idx}/`,
     PORTFOLIO_UPDATE: (idx = 1) => `${BASE_URL}/api/portfolio/update/${idx}/`,
+    PORTFOLIO_UPLOAD_RESUME: (idx = 1) => `${BASE_URL}/api/portfolio/${idx}/upload-resume/`, // <-- New Resume Endpoint
 
     // ---- Contact Form Submissions (Public) ----
     SUBMIT_FORM_DEFAULT: (idx = 1) => `${BASE_URL}/api/forms/submit/default/${idx}/`,

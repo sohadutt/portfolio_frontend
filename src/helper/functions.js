@@ -2,7 +2,7 @@ import axios from 'axios';
 import { createElement } from 'react';
 import { Component } from 'lucide-react';
 import { DynamicIcon, iconNames } from 'lucide-react/dynamic';
-import { URLS } from './urls';
+import { URLS } from './urls'; // Ensure this matches your file structure
 
 export const THEME_MAP = {
     0: 'theme-ocean',
@@ -310,6 +310,17 @@ export const updatePortfolio = async (data, index = 1) => {
 export const createNewPortfolio = async (data, index = 1) => {
     const response = await postRequest(URLS.PORTFOLIO_SUBMIT(index), data);
     return normalizePortfolioDocument(response);
+};
+
+// --- ADDED THIS FUNCTION TO HANDLE THE RESUME UPLOAD ---
+export const uploadResumeFile = async (file, index = 1) => {
+    const formData = new FormData();
+    formData.append('resume', file);
+    
+    // Passing true as the third parameter tells postRequest to skip the JSON 'Content-Type'
+    // allowing Axios to let the browser automatically set 'multipart/form-data'
+    const response = await postRequest(URLS.PORTFOLIO_UPLOAD_RESUME(index), formData, true);
+    return unwrapResponseData(response);
 };
 
 export const fetchPortfolio = (token = null, index = 1) => {

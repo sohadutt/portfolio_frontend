@@ -16,7 +16,15 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 
-import { createNewPortfolio, fetchDashboardPortfolios, fetchPortfolio, fetchPortfolioAuthenticated, updatePortfolio, resolveIcon } from "@/helper/functions"
+import { 
+  createNewPortfolio, 
+  fetchDashboardPortfolios, 
+  fetchPortfolio, 
+  fetchPortfolioAuthenticated, 
+  updatePortfolio, 
+  resolveIcon,
+  uploadResumeFile // <-- IMPORTED THE NEW FUNCTION
+} from "@/helper/functions"
 import { initialFormState, templates } from "@/helper/dummy-portfolio" 
 import { LucideIconPicker } from "@/components/dashboard/LucideIconPicker"
 import { Badge } from "@/components/ui/badge"
@@ -29,14 +37,11 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 
-// FIX: If it's already a string (user is typing), return it as-is. 
-// If it's an array (loaded from DB), join it with commas.
 function joinList(list) {
   if (typeof list === "string") return list;
   return Array.isArray(list) ? list.join(", ") : "";
 }
 
-// FIX: Safely parse strings into arrays, filtering out empty gaps.
 function parseList(value) {
   if (Array.isArray(value)) return value;
   if (typeof value !== "string") return [];
@@ -311,6 +316,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
     setSaving(true)
     try {
       const payload = {
+        // STRICTLY JSON DATA ONLY
         is_enabled: formData.isEnabled,
         new_order_index: formData.orderIndex,
         personalInfo: formData.personalInfo,
@@ -357,11 +363,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         }),
       }
 
-      // Attach the resume file if a new one was selected
-      if (resumeFile) {
-        payload.resume = resumeFile;
-      }
-
+      // 1. SAVE THE JSON PAYLOAD
       if (isNewPortfolio) {
         const createdPortfolio = await createNewPortfolio(payload, portfolioIndex)
         setFormData((current) => ({
@@ -370,8 +372,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           isEnabled: createdPortfolio?.isEnabled ?? current.isEnabled,
         }))
         setIsNewPortfolio(false)
-        setResumeFile(null) // Clear file input state after successful save
-        toast.success("Portfolio created successfully")
       } else {
         const updatedPortfolio = await updatePortfolio(payload, portfolioIndex)
         setFormData((current) => ({
@@ -379,9 +379,20 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           orderIndex: updatedPortfolio?.orderIndex ?? current.orderIndex,
           isEnabled: updatedPortfolio?.isEnabled ?? current.isEnabled,
         }))
-        setResumeFile(null) // Clear file input state after successful save
-        toast.success("Portfolio updated successfully")
       }
+
+      // 2. UPLOAD THE RESUME SEPARATELY IF SELECTED
+      if (resumeFile) {
+        toast.loading("Uploading resume...", { id: "resume-upload" })
+        await uploadResumeFile(resumeFile, portfolioIndex)
+        toast.success("Resume uploaded securely!", { id: "resume-upload" })
+        setResumeFile(null)
+        // Refresh data so the UI reflects the newly uploaded URL
+        loadPortfolioData()
+      } else {
+        toast.success(isNewPortfolio ? "Portfolio created successfully" : "Portfolio updated successfully")
+      }
+
     } catch (error) {
       toast.error(error.message || (isNewPortfolio ? "Failed to create portfolio" : "Failed to update portfolio"))
     } finally {
@@ -491,7 +502,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               <Field><FieldLabel>GitHub/Portfolio URL</FieldLabel><Input value={formData.personalInfo.github} onChange={(e) => handleNestedChange("personalInfo", "github", e.target.value)} placeholder="e.g. https://github.com/username" /></Field>
               <Field><FieldLabel>LinkedIn URL</FieldLabel><Input value={formData.personalInfo.linkedin} onChange={(e) => handleNestedChange("personalInfo", "linkedin", e.target.value)} placeholder="e.g. https://linkedin.com/in/username" /></Field>
               
-              {/* Added Resume Upload Field spanning available columns */}
               <Field className="sm:col-span-2 xl:col-span-3">
                 <FieldLabel>Resume Upload (PDF)</FieldLabel>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full">
