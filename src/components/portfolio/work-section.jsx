@@ -52,10 +52,10 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
           return (
             <article
               key={project.title || index}
-              className={`group rounded-[1.5rem] sm:rounded-[2rem] border p-5 sm:p-6 transition-all duration-300 flex flex-col ${
+              className={`apple-panel-hover group rounded-[1.5rem] sm:rounded-[2rem] border p-5 sm:p-6 transition-all duration-300 flex flex-col ${
                 isActive || isFeatured
                   ? 'border-primary/30 bg-primary/6 shadow-sm'
-                  : `border-border/60 bg-background/95 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
+                  : `border-border/60 bg-card/75 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveProject(index)}
               onMouseLeave={() => !isScrolling && setActiveProject(null)}

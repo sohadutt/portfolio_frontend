@@ -16,7 +16,7 @@ export function AboutSection({ data = {}, isScrolling }) {
   const eyebrow = sectionCopy.about?.eyebrow || 'About'
 
   return (
-    <section id="about" className="grid gap-8 rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm lg:grid-cols-[0.9fr_1.1fr]">
+    <section id="about" className="apple-panel-strong grid gap-8 rounded-[2rem] p-6 sm:p-8 lg:grid-cols-[0.9fr_1.1fr]">
       {/* Wrap SectionHeader in a flex-col so it aligns properly with the grid layout.
         Fallbacks added just in case the API data is missing.
       */}
@@ -37,10 +37,10 @@ export function AboutSection({ data = {}, isScrolling }) {
           return (
             <article
               key={group.title || index}
-              className={`group rounded-[1.75rem] border p-5 transition-all duration-300 ${
+              className={`apple-panel-hover group rounded-[1.75rem] border p-5 transition-all duration-300 ${
                 isActive
                   ? 'border-primary/30 bg-primary/6'
-                  : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
+                  : `border-border/60 bg-card/65 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveGroup(index)}
             >

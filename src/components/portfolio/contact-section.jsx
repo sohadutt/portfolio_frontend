@@ -30,7 +30,6 @@ export function ContactSection({ data = {}, isScrolling }) {
   const [activeMethod, setActiveMethod] = useState(null)
   
   // Safely extract data from the API payload
-  const personalInfo = data.personalInfo || {}
   const sectionCopy = data.sectionCopy || data.section_copy || {}
   const contactCopy = sectionCopy.contact || {}
   
@@ -100,7 +99,7 @@ export function ContactSection({ data = {}, isScrolling }) {
 
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
+      <div className="apple-panel-strong rounded-[2rem] p-6 sm:p-8">
         <SectionHeader
           eyebrow={contactCopy.eyebrow || "Contact"}
           title={contactCopy.title || "Let's build reliable, product-focused systems."}
@@ -119,7 +118,7 @@ export function ContactSection({ data = {}, isScrolling }) {
                 className={`group flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
                   isActive
                     ? 'border-primary/30 bg-primary/6'
-                    : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
+                    : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMethod(index)}
               >
@@ -144,7 +143,7 @@ export function ContactSection({ data = {}, isScrolling }) {
         </div>
       </div>
 
-      <div className={`rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm transition-colors duration-300 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/30'}`}>
+      <div className={`apple-panel-strong rounded-[2rem] p-6 transition-colors duration-300 sm:p-8 ${isScrolling ? '' : 'hover:border-primary/20'}`}>
         <form onSubmit={handleSubmit} className="flex h-full flex-col justify-between">
           <FieldGroup className="grid gap-5 sm:grid-cols-2">
             <Field data-invalid={!!errors.name}>

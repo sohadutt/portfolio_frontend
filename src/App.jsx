@@ -196,8 +196,8 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-muted/30 text-foreground">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.9),transparent_42%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_42%)]" />
+    <div className="apple-ambient relative flex min-h-screen flex-col text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-foreground/10" />
       
       <NavBar
         data={data}
@@ -211,7 +211,7 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
         }}
       />
 
-      <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+      <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 pt-28 sm:px-6 lg:gap-12 lg:px-8">
         {memoizedHero}
         {memoizedAbout}
         {memoizedWork}

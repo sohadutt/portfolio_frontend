@@ -26,7 +26,7 @@ export function HeroSection({ data = {}, isScrolling }) {
 
   return (
     <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-      <div className="rounded-[2rem] border border-border/60 bg-background/95 p-8 shadow-sm">
+      <div className="apple-panel-strong rounded-[2rem] p-6 sm:p-8">
         <div className="mb-8 flex flex-wrap gap-2.5">
           {statusPills.map(({ label, icon, icon_name }, index) => {
             const IconComponent = resolveIcon(icon || icon_name)
@@ -37,9 +37,9 @@ export function HeroSection({ data = {}, isScrolling }) {
                 key={label}
                 className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.16em] transition-all ${
                   isActive
-                    ? 'border-primary/30 bg-primary/8 text-foreground'
-                    : `border-border/70 bg-background/80 text-muted-foreground ${
-                        isScrolling ? '' : 'hover:border-primary/25 hover:bg-muted/70'
+                  ? 'border-primary/30 bg-primary/8 text-foreground shadow-sm'
+                    : `border-border/70 bg-card/70 text-muted-foreground backdrop-blur ${
+                        isScrolling ? '' : 'hover:border-primary/25 hover:bg-foreground/5'
                       }`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(`pill-${index}`)}
@@ -88,7 +88,7 @@ export function HeroSection({ data = {}, isScrolling }) {
       </div>
 
       <div className="grid gap-4">
-        <div className="rounded-[2rem] border border-border/60 bg-background/95 p-6 shadow-sm">
+        <div className="apple-panel rounded-[2rem] p-6">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm text-muted-foreground">{heroFocus.eyebrow}</p>
@@ -97,7 +97,7 @@ export function HeroSection({ data = {}, isScrolling }) {
               </h3>
             </div>
 
-            <div className="rounded-2xl bg-muted p-3">
+            <div className="rounded-2xl bg-primary/10 p-3">
               <Sparkles className="size-6 text-primary" />
             </div>
           </div>
@@ -130,11 +130,11 @@ export function HeroSection({ data = {}, isScrolling }) {
             return (
               <article
                 key={metric.label}
-                className={`rounded-[1.5rem] border p-5 transition-all ${
+                className={`apple-panel-hover rounded-[1.5rem] border p-5 transition-all ${
                   isActive
                     ? 'border-primary/30 bg-primary/6'
-                    : `border-border/60 bg-card/80 ${
-                        isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/60'
+                    : `border-border/60 bg-card/70 ${
+                        isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'
                       }`
                 }`}
                 onMouseEnter={() => !isScrolling && setActiveMetric(index)}
@@ -153,7 +153,7 @@ export function HeroSection({ data = {}, isScrolling }) {
           })}
         </div>
 
-        <div className="rounded-[2rem] border border-border/60 bg-background/95 p-6 shadow-sm">
+        <div className="apple-panel rounded-[2rem] p-6">
           <div className="mb-6 flex items-center gap-4">
             <div className="flex -space-x-3">
               {subtitleTokens.map((token) => (
@@ -190,8 +190,8 @@ export function HeroSection({ data = {}, isScrolling }) {
                   className={`rounded-xl border p-4 transition-all ${
                     isActive
                       ? 'border-primary/30 bg-primary/6'
-                      : `border-border/60 bg-background/80 ${
-                          isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/60'
+                    : `border-border/60 bg-card/70 ${
+                          isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'
                         }`
                   }`}
                   onMouseEnter={() => !isScrolling && setActiveCapability(cardKey)}

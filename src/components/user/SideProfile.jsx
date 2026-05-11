@@ -206,8 +206,8 @@ export function SideProfile({ profileData }) {
 
   return (
     <>
-      <Sidebar variant="inset" collapsible="icon" className="border-r">
-        <SidebarHeader className="border-b border-sidebar-border p-4">
+      <Sidebar variant="inset" collapsible="icon" className="border-r bg-sidebar/78 backdrop-blur-2xl">
+        <SidebarHeader className="border-b border-sidebar-border/70 p-4">
           <div className="flex items-center gap-3">
             <div 
               className="group relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full focus-within:outline-none" 

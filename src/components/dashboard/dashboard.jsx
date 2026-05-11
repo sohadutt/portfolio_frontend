@@ -46,10 +46,10 @@ export default function Dashboard() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-muted/10 text-foreground">
+      <div className="apple-ambient flex min-h-screen w-full text-foreground">
         <SideProfile profileData={data} />
         <main className="relative flex-1 flex flex-col min-w-0">
-          <header className="flex h-16 items-center justify-between border-b border-border/60 px-6 bg-background/80 backdrop-blur-md sticky top-0 z-30">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-background/76 px-6 backdrop-blur-2xl">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="h-9 w-9 hover:bg-muted/50 rounded-xl" />
               <div className="h-4 w-[1px] bg-border/60 hidden sm:block" />
@@ -83,7 +83,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-sm transition-all hover:shadow-md hover:border-border">
+              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex size-12 items-center justify-center bg-blue-500/10 rounded-2xl text-blue-500">
                     <User className="size-5" />
@@ -96,7 +96,7 @@ export default function Dashboard() {
               </div>
 
               {/* Card 2 */}
-              <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-sm transition-all hover:shadow-md hover:border-border">
+              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex size-12 items-center justify-center bg-green-500/10 rounded-2xl text-green-500">
                     <Globe className="size-5" />
@@ -110,7 +110,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-3xl border border-border/60 bg-background p-6 shadow-sm transition-all hover:shadow-md hover:border-border">
+              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex size-12 items-center justify-center bg-purple-500/10 rounded-2xl text-purple-500">
                     <Paintbrush className="size-5" />
@@ -122,7 +122,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <div className="rounded-3xl border border-dashed border-border/60 bg-muted/20 h-[450px] flex flex-col items-center justify-center text-center group transition-colors hover:bg-muted/30">
+            <div className="apple-panel h-[450px] rounded-3xl border-dashed flex flex-col items-center justify-center text-center group transition-colors hover:bg-foreground/5">
                <div className="flex size-14 items-center justify-center rounded-full bg-background border border-border/50 shadow-sm mb-4 group-hover:scale-105 transition-transform">
                  <Sparkles className="size-6 text-muted-foreground" />
                </div>

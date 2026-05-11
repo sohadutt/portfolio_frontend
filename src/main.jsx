@@ -8,7 +8,7 @@ import { store } from './store/store'
 import App from './App.jsx'
 import './style/index.css'
 
-function GlobalFallback({ error }) {
+function renderGlobalFallback({ error }) {
   return (
     <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-950 text-white">
       <h2 className="text-2xl font-bold text-red-500 mb-2">Something went wrong!</h2>
@@ -22,7 +22,7 @@ function GlobalFallback({ error }) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ErrorBoundary FallbackComponent={GlobalFallback}>
+    <ErrorBoundary FallbackComponent={renderGlobalFallback}>
       <Provider store={store}>
         <App />
       </Provider>     

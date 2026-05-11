@@ -64,13 +64,13 @@ export default function LoginPage() {
   const isAuthFlow = ["login", "signup"].includes(view)
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/20 text-foreground md:flex-row">
+    <div className="apple-ambient flex min-h-screen flex-col text-foreground md:flex-row">
       
       {/* Left Panel */}
-      <div className="flex flex-col justify-between border-b border-border/50 bg-background p-6 md:w-1/2 md:border-b-0 md:border-r lg:w-2/3 lg:p-16">
+      <div className="flex flex-col justify-between border-b border-border/50 bg-background/58 p-6 backdrop-blur md:w-1/2 md:border-b-0 md:border-r lg:w-2/3 lg:p-16">
         <div className="space-y-6 md:space-y-12 max-w-2xl">
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="flex size-10 md:size-14 items-center justify-center rounded-xl md:rounded-2xl border border-border/60 bg-muted/35">
+            <div className="apple-panel flex size-10 items-center justify-center rounded-xl md:size-14 md:rounded-2xl">
               <BriefcaseBusiness className="size-5 md:size-7" />
             </div>
             <span className="text-lg md:text-xl font-semibold tracking-tight">
@@ -137,7 +137,7 @@ export default function LoginPage() {
           </button>
         )}
 
-        <div className="w-full max-w-sm space-y-6 rounded-[24px] md:rounded-[28px] border border-border/60 bg-background p-6 md:p-7 shadow-sm mt-8 md:mt-0">
+        <div className="apple-panel-strong mt-8 w-full max-w-sm space-y-6 rounded-[24px] p-6 md:mt-0 md:rounded-[28px] md:p-7">
           {/* HEADER */}
           <div className="space-y-2">
             <h2 className="text-xl md:text-2xl font-semibold tracking-tight">

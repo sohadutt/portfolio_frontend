@@ -158,10 +158,9 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div ref={pageRef} className="min-h-screen overflow-hidden bg-background text-foreground">
+    <div ref={pageRef} className="apple-ambient min-h-screen overflow-hidden text-foreground">
       <div className="relative min-h-screen">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:72px_72px] opacity-30" />
-        <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-primary/15 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-foreground/10" />
 
         <header data-home-nav className="relative z-20 mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:flex-nowrap sm:px-6 sm:py-5 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -182,8 +181,8 @@ export default function HomePage() {
                   type="button"
                   aria-label={`Use ${theme.label} theme`}
                   onClick={() => setSelectedTheme(theme.value)}
-                  className={`flex size-8 items-center justify-center rounded-full transition-all hover:bg-muted ${
-                    selectedTheme === theme.value ? "bg-muted ring-2 ring-primary/40" : ""
+                  className={`flex size-8 items-center justify-center rounded-full transition-all hover:bg-foreground/5 ${
+                    selectedTheme === theme.value ? "bg-foreground/5 ring-2 ring-primary/40" : ""
                   }`}
                 >
                   <span className={`size-3.5 rounded-full ${theme.swatch}`} />
@@ -216,7 +215,7 @@ export default function HomePage() {
 
         <main className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-7xl flex-col justify-center gap-10 px-4 pb-12 pt-6 sm:gap-12 sm:px-6 sm:pb-16 sm:pt-8 lg:grid lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8">
           <section className="max-w-3xl text-left">
-            <div data-home-kicker className="mb-5 inline-flex max-w-full items-center gap-2 rounded-full border border-border/70 bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur sm:mb-6">
+            <div data-home-kicker className="apple-panel mb-5 inline-flex max-w-full items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground sm:mb-6">
               <Zap className="size-3.5 text-primary" />
               <span className="truncate">Animated portfolio builder for modern makers</span>
             </div>
@@ -227,7 +226,7 @@ export default function HomePage() {
                   key={theme.value}
                   type="button"
                   onClick={() => setSelectedTheme(theme.value)}
-                  className={`flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-2 text-xs font-medium shadow-sm backdrop-blur transition-colors hover:bg-muted ${
+                  className={`flex items-center gap-2 rounded-full border border-border bg-card/75 px-3 py-2 text-xs font-medium shadow-sm backdrop-blur transition-colors hover:bg-foreground/5 ${
                     selectedTheme === theme.value ? "text-foreground ring-2 ring-primary/35" : "text-muted-foreground"
                   }`}
                 >
@@ -266,7 +265,7 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div data-home-cta className="mt-8 max-w-2xl rounded-2xl border border-border bg-background/80 p-4 shadow-sm backdrop-blur sm:mt-10 sm:p-5">
+            <div data-home-cta className="apple-panel mt-8 max-w-2xl rounded-2xl p-4 sm:mt-10 sm:p-5">
               <p className="text-sm font-semibold tracking-tight">How it works</p>
               <div className="mt-4 grid gap-3">
                 {builderSteps.map((step, index) => (
@@ -282,12 +281,12 @@ export default function HomePage() {
           </section>
 
           <section className="relative min-h-[390px] perspective-[1200px] sm:min-h-[560px] lg:min-h-[640px]">
-            <div data-home-float className="absolute left-2 top-4 z-20 hidden rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm font-medium shadow-sm backdrop-blur sm:flex">
+            <div data-home-float className="apple-panel absolute left-2 top-4 z-20 hidden rounded-full px-4 py-2 text-sm font-medium sm:flex">
               <Wand2 className="mr-2 size-4 text-primary" />
               Live theme controls
             </div>
 
-            <div data-home-float className="absolute bottom-8 right-2 z-20 hidden rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm font-medium shadow-sm backdrop-blur sm:flex">
+            <div data-home-float className="apple-panel absolute bottom-8 right-2 z-20 hidden rounded-full px-4 py-2 text-sm font-medium sm:flex">
               <LayoutDashboard className="mr-2 size-4 text-primary" />
               Dashboard ready
             </div>
@@ -295,7 +294,7 @@ export default function HomePage() {
             <div
               ref={previewRef}
               data-home-preview
-              className="relative mx-auto h-[380px] w-full max-w-[680px] rounded-2xl border border-border/70 bg-card/90 p-2 shadow-2xl shadow-primary/10 backdrop-blur [transform-style:preserve-3d] sm:h-[580px] sm:rounded-[28px] sm:p-3"
+              className="apple-panel-strong relative mx-auto h-[380px] w-full max-w-[680px] rounded-[28px] p-2 [transform-style:preserve-3d] sm:h-[580px] sm:rounded-[34px] sm:p-3"
             >
               <div className="relative h-full overflow-hidden rounded-xl border border-border bg-background sm:rounded-[20px]">
                 <div data-home-scan className="pointer-events-none absolute -left-1/2 top-0 z-20 h-full w-1/2 bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
@@ -372,13 +371,13 @@ export default function HomePage() {
         </main>
       </div>
 
-      <section className="relative z-10 border-y border-border/70 bg-muted/25 py-12 sm:py-16">
+      <section className="relative z-10 border-y border-border/50 bg-background/35 py-12 backdrop-blur sm:py-16">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
           {builderFeatures.map((feature) => {
             const Icon = feature.icon
 
             return (
-              <article key={feature.title} data-home-feature className="rounded-xl border border-border bg-background p-5 shadow-sm sm:rounded-2xl sm:p-6">
+              <article key={feature.title} data-home-feature className="apple-panel apple-panel-hover rounded-xl p-5 sm:rounded-2xl sm:p-6">
                 <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-primary/12 text-primary sm:mb-5 sm:size-11">
                   <Icon className="size-5" />
                 </div>
@@ -390,7 +389,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="relative z-10 border-t border-border/70 bg-background px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <footer className="relative z-10 border-t border-border/50 bg-background/70 px-4 py-8 backdrop-blur sm:px-6 sm:py-10 lg:px-8">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
           <div className="max-w-md">
             <Link to="/" className="inline-flex items-center gap-3">

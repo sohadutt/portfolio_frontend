@@ -6,7 +6,7 @@ import { resolveIcon } from '@/helper/functions' // Use the new icon resolver
 function getCardClasses(isActive, isScrolling) {
   return isActive
     ? 'border-primary/30 bg-primary/6 shadow-sm'
-    : `border-border/60 bg-background ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-muted/40'}`
+    : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
 }
 
 export function ExperienceSection({ data = {}, activeHover, onRelationChange, isScrolling }) {
@@ -31,7 +31,7 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
     // Reduced grid gap on mobile
     <section id="experience" className="grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
       {/* Reduced outer padding and border radius on small screens */}
-      <div className="rounded-[1.5rem] sm:rounded-[2rem] border border-border/60 bg-background/95 p-5 sm:p-8 shadow-sm">
+      <div className="apple-panel-strong rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8">
         <SectionHeader
           eyebrow={expCopy.eyebrow || "Experience"}
           title={expCopy.title || "Experience across backend automation, frontend delivery, and production workflows."}
@@ -53,7 +53,7 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
               <article
                 key={item.title || index}
                 // Scaled down inner padding, added cursor-pointer for mobile tap affordance
-                className={`cursor-pointer lg:cursor-default rounded-[1.25rem] sm:rounded-[1.6rem] border p-4 sm:p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
+                className={`apple-panel-hover cursor-pointer lg:cursor-default rounded-[1.25rem] sm:rounded-[1.6rem] border p-4 sm:p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
                 onMouseEnter={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
                 onFocus={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
                 onClick={() => onRelationChange({ relation: item.relation, source: 'experience' })}
@@ -128,7 +128,7 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
             <article
               key={title || index}
               // Added onClick for touch devices, reduced padding on mobile
-              className={`cursor-pointer lg:cursor-default group rounded-[1.5rem] sm:rounded-[1.75rem] border bg-background/95 p-5 sm:p-6 shadow-sm transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
+              className={`apple-panel-hover cursor-pointer lg:cursor-default group rounded-[1.5rem] sm:rounded-[1.75rem] border p-5 sm:p-6 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onFocus={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onClick={() => onRelationChange({ relation, source: 'module' })}
