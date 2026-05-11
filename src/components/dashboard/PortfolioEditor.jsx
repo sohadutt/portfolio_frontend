@@ -11,7 +11,8 @@ import {
   Sparkles,
   Trash2,
   User,
-  Eye
+  Eye,
+  Upload
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -129,6 +130,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [isNewPortfolio, setIsNewPortfolio] = useState(false)
+  const [resumeFile, setResumeFile] = useState(null)
   const [formData, setFormData] = useState(() => initialFormState(portfolioIndex))
 
   const loadPortfolioData = useCallback(async () => {
@@ -158,7 +160,11 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           isEnabled: apiData.isEnabled ?? apiData.is_enabled ?? current.isEnabled,
           orderIndex: apiData.orderIndex ?? apiData.order_index ?? apiData.new_order_index ?? current.orderIndex,
           
-          personalInfo: { ...current.personalInfo, ...(apiData.personalInfo || {}) },
+          personalInfo: { 
+            ...current.personalInfo, 
+            ...(apiData.personalInfo || {}),
+            resumeUrl: apiData.personalInfo?.resumeUrl || apiData.personalInfo?.resume_url || current.personalInfo?.resumeUrl || ""
+          },
           heroContent: { ...current.heroContent, ...(apiData.heroContent || {}) },
           aboutContent: { ...current.aboutContent, ...(apiData.aboutContent || {}) },
           
@@ -283,7 +289,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
     })
   }
 
-  // FIX: Store the raw string in state while typing so trailing commas aren't lost
   const handleArrayListChange = (arrayName, index, field, value) => {
     handleArrayChange(arrayName, index, field, value)
   }
@@ -319,7 +324,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         pageCopy: formData.pageCopy,
         navigationLinks: formData.navigationLinks,
         heroMetrics: formData.heroMetrics,
-        // FIX: Parse strings back to arrays right before submitting
         skillGroups: formData.skillGroups.map(group => ({
           ...group,
           items: parseList(group.items)
@@ -353,6 +357,11 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
         }),
       }
 
+      // Attach the resume file if a new one was selected
+      if (resumeFile) {
+        payload.resume = resumeFile;
+      }
+
       if (isNewPortfolio) {
         const createdPortfolio = await createNewPortfolio(payload, portfolioIndex)
         setFormData((current) => ({
@@ -361,6 +370,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           isEnabled: createdPortfolio?.isEnabled ?? current.isEnabled,
         }))
         setIsNewPortfolio(false)
+        setResumeFile(null) // Clear file input state after successful save
         toast.success("Portfolio created successfully")
       } else {
         const updatedPortfolio = await updatePortfolio(payload, portfolioIndex)
@@ -369,6 +379,7 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
           orderIndex: updatedPortfolio?.orderIndex ?? current.orderIndex,
           isEnabled: updatedPortfolio?.isEnabled ?? current.isEnabled,
         }))
+        setResumeFile(null) // Clear file input state after successful save
         toast.success("Portfolio updated successfully")
       }
     } catch (error) {
@@ -479,6 +490,35 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
               <Field><FieldLabel>Public email</FieldLabel><Input type="email" value={formData.personalInfo.email} onChange={(e) => handleNestedChange("personalInfo", "email", e.target.value)} placeholder="e.g. hello@example.com" /></Field>
               <Field><FieldLabel>GitHub/Portfolio URL</FieldLabel><Input value={formData.personalInfo.github} onChange={(e) => handleNestedChange("personalInfo", "github", e.target.value)} placeholder="e.g. https://github.com/username" /></Field>
               <Field><FieldLabel>LinkedIn URL</FieldLabel><Input value={formData.personalInfo.linkedin} onChange={(e) => handleNestedChange("personalInfo", "linkedin", e.target.value)} placeholder="e.g. https://linkedin.com/in/username" /></Field>
+              
+              {/* Added Resume Upload Field spanning available columns */}
+              <Field className="sm:col-span-2 xl:col-span-3">
+                <FieldLabel>Resume Upload (PDF)</FieldLabel>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full">
+                  <Input 
+                    type="file" 
+                    accept="application/pdf"
+                    onChange={(e) => setResumeFile(e.target.files[0] || null)} 
+                    className="w-full sm:max-w-md file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                  />
+                  {formData.personalInfo.resumeUrl && (
+                    <a 
+                      href={formData.personalInfo.resumeUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-[13px] font-medium text-primary hover:underline flex items-center gap-1.5 whitespace-nowrap mt-2 sm:mt-0"
+                    >
+                      <FileText className="size-4" />
+                      View Current Resume
+                    </a>
+                  )}
+                </div>
+                {resumeFile && (
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1.5">
+                    Selected file: <span className="font-medium text-foreground">{resumeFile.name}</span>
+                  </p>
+                )}
+              </Field>
             </FieldGroup>
           </EditorSection>
         </TabsContent>
@@ -707,7 +747,6 @@ export default function PortfolioEditor({ portfolioIndex = 1 }) {
                     <Field className="sm:col-span-1"><FieldLabel>Stack</FieldLabel><Input value={joinList(project.stack)} onChange={(e) => handleArrayListChange("projects", index, "stack", e.target.value)} placeholder="React, Node.js, MongoDB" /></Field>
                     <Field className="sm:col-span-1"><FieldLabel>Stat</FieldLabel><Input value={project.stat} onChange={(e) => handleArrayChange("projects", index, "stat", e.target.value)} placeholder="e.g. 10k+ active users" /></Field>
                     
-                    {/* Added Action URL and Button Text fields */}
                     <Field className="sm:col-span-1"><FieldLabel>Action URL (Href)</FieldLabel><Input value={project.href || ""} onChange={(e) => handleArrayChange("projects", index, "href", e.target.value)} placeholder="e.g. https://github.com/..." /></Field>
                     <Field className="sm:col-span-1"><FieldLabel>Button Text</FieldLabel><Input value={project.ctaLabel || ""} onChange={(e) => handleArrayChange("projects", index, "ctaLabel", e.target.value)} placeholder="e.g. View Code" /></Field>
 

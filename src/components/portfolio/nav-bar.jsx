@@ -24,6 +24,14 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
     personalInfo.profilePicture ||
     null
 
+  // Safely extract the resume URL (handles camelCase, snake_case, and nested structures)
+  const resumeUrl = 
+    data.resume_url ||
+    data.resumeUrl ||
+    personalInfo.resume_url ||
+    personalInfo.resumeUrl ||
+    null
+
   const rawLinks = data.navigationLinks || data.navigation_links || []
   const navigationLinks = Array.isArray(rawLinks) ? rawLinks : []
 
@@ -78,6 +86,18 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                 {link.label || "Link"}
               </a>
             ))}
+            
+            {/* Desktop Resume Link */}
+            {resumeUrl && (
+              <a
+                href={resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                Resume
+              </a>
+            )}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -115,8 +135,21 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                         {link.label || "Link"}
                       </a>
                     ))}
+                    
+                    {/* Mobile Resume Link */}
+                    {resumeUrl && (
+                      <a
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setIsOpen(false)}
+                        className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        Resume
+                      </a>
+                    )}
                   </nav>
-                  
+
                   {/* Mobile CTA properly aligned with margin-top instead of auto-bottom */}
                   <div className="mt-10 sm:hidden">
                     <Button asChild size="lg" className="w-full rounded-full shadow-none font-semibold">
