@@ -23,7 +23,7 @@ import {
 import { toast } from "sonner"
 
 import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP, THEME_MAP } from "@/helper/functions" 
-import { Save, User, Check, Camera, Copy, LogOut } from "lucide-react"
+import { Save, User, Check, Camera, Copy, LogOut, Loader2 } from "lucide-react"
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
