@@ -31,13 +31,17 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="cinematic-ambient flex min-h-screen items-center justify-center bg-background">
         <Empty className="size-8">
           <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Spinner className="text-primary" />
+            <EmptyMedia variant="icon" className="relative flex items-center justify-center">
+              {/* Cinematic Glow Behind Spinner */}
+              <div className="absolute h-16 w-16 rounded-full bg-primary/20 blur-[30px]" />
+              <Spinner className="relative text-primary" />
             </EmptyMedia>
-            <EmptyTitle>Loading workspace...</EmptyTitle>
+            <EmptyTitle className="mt-4 text-sm font-light tracking-wide text-muted-foreground">
+              Loading workspace...
+            </EmptyTitle>
           </EmptyHeader>
         </Empty>
       </div>
@@ -46,96 +50,113 @@ export default function Dashboard() {
 
   return (
     <SidebarProvider>
-      <div className="apple-ambient flex min-h-screen w-full text-foreground">
+      <div className="cinematic-ambient flex min-h-screen w-full text-foreground overflow-hidden">
+        
+        {/* Ambient Global Glow */}
+        <div className="absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+
         <SideProfile profileData={data} />
-        <main className="relative flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-background/76 px-6 backdrop-blur-2xl">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger className="h-9 w-9 hover:bg-muted/50 rounded-xl" />
-              <div className="h-4 w-[1px] bg-border/60 hidden sm:block" />
-              <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        
+        <main className="relative flex flex-1 flex-col min-w-0 z-10">
+          <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/30 bg-background/60 px-6 backdrop-blur-xl">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="h-10 w-10 transition-colors duration-300 hover:bg-primary/10 hover:text-primary rounded-xl" />
+              <div className="h-5 w-px bg-border/40 hidden sm:block" />
+              <div className="flex items-center gap-3">
+                <div className="flex size-8 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary shadow-[0_0_15px_rgba(var(--primary),0.2)]">
                   <LayoutDashboard className="size-4" />
                 </div>
-                <h1 className="text-sm font-semibold tracking-tight">
+                <h1 className="text-base font-medium tracking-tight text-foreground">
                   Dashboard
                 </h1>
               </div>
             </div>
             
             <div className="flex items-center gap-4">
-               <Badge variant="secondary" className="rounded-full px-3 py-1 text-xs uppercase tracking-wider font-medium">
+               <Badge variant="secondary" className="rounded-full border border-border/40 bg-card/40 px-4 py-1.5 text-[10px] uppercase tracking-widest font-medium text-muted-foreground backdrop-blur-md">
                   {TIER_MAP?.[data?.tier] || 'None'} Tier
                </Badge>
             </div>
           </header>
 
           {/* Scrollable Dashboard Body */}
-          <div className="flex-1 p-6 space-y-8 overflow-y-auto w-full max-w-7xl mx-auto">
+          <div className="flex-1 p-6 space-y-8 overflow-y-auto w-full max-w-7xl mx-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             
             {/* Welcome Section */}
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight">
+            <div className="space-y-2 mt-4">
+              <h2 className="text-3xl font-medium tracking-tight text-foreground">
                 Welcome back, {data?.first_name || data?.username || "Guest"}
               </h2>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-base font-light text-muted-foreground">
                 Here is an overview of your portfolio platform and current settings.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-12 items-center justify-center bg-blue-500/10 rounded-2xl text-blue-500">
-                    <User className="size-5" />
+
+            {/* Metrics/Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Card 1: Account */}
+              <div className="cinematic-panel cinematic-panel-hover rounded-[2rem] p-6 sm:p-8">
+                <div className="flex items-center gap-5">
+                  <div className="flex size-14 items-center justify-center bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-transform duration-500 group-hover:scale-110">
+                    <User className="size-6" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Account</p>
-                    <p className="text-lg font-bold tracking-tight">@{data?.username}</p>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest mb-1">Account</p>
+                    <p className="text-xl font-medium tracking-tight text-foreground">@{data?.username}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Card 2 */}
-              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-12 items-center justify-center bg-green-500/10 rounded-2xl text-green-500">
-                    <Globe className="size-5" />
+              {/* Card 2: Visibility */}
+              <div className="cinematic-panel cinematic-panel-hover rounded-[2rem] p-6 sm:p-8">
+                <div className="flex items-center gap-5">
+                  <div className="flex size-14 items-center justify-center bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-transform duration-500 group-hover:scale-110">
+                    <Globe className="size-6" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Visibility</p>
-                    <p className="text-lg font-bold tracking-tight flex items-center gap-2">
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest mb-1">Visibility</p>
+                    <p className="text-xl font-medium tracking-tight text-foreground flex items-center gap-2.5">
                       {data?.enable_share_token ? 'Public Live' : 'Private'}
-                      {data?.enable_share_token && <span className="flex size-2 rounded-full bg-green-500 animate-pulse" />}
+                      {data?.enable_share_token && <span className="flex size-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />}
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="apple-panel apple-panel-hover rounded-3xl p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex size-12 items-center justify-center bg-purple-500/10 rounded-2xl text-purple-500">
-                    <Paintbrush className="size-5" />
+
+              {/* Card 3: Active Theme */}
+              <div className="cinematic-panel cinematic-panel-hover rounded-[2rem] p-6 sm:p-8">
+                <div className="flex items-center gap-5">
+                  <div className="flex size-14 items-center justify-center bg-purple-500/10 border border-purple-500/20 rounded-2xl text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-transform duration-500 group-hover:scale-110">
+                    <Paintbrush className="size-6" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Active Theme</p>
-                    <p className="text-lg font-bold tracking-tight">Theme {data?.theme_mode || 0}</p>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest mb-1">Active Theme</p>
+                    <p className="text-xl font-medium tracking-tight text-foreground">Theme {data?.theme_mode || 0}</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="apple-panel h-[450px] rounded-3xl border-dashed flex flex-col items-center justify-center text-center group transition-colors hover:bg-foreground/5">
-               <div className="flex size-14 items-center justify-center rounded-full bg-background border border-border/50 shadow-sm mb-4 group-hover:scale-105 transition-transform">
-                 <Sparkles className="size-6 text-muted-foreground" />
+
+            {/* Editor Placeholder Area */}
+            <div className="cinematic-panel group relative h-[450px] rounded-[2.5rem] border-dashed border-2 border-border/40 flex flex-col items-center justify-center text-center transition-all duration-500 hover:border-primary/40 hover:bg-primary/5">
+               {/* Hover Glow Effect */}
+               <div className="absolute inset-0 rounded-[2.5rem] bg-primary/0 transition-colors duration-500 group-hover:bg-primary/5 pointer-events-none" />
+               
+               <div className="flex size-16 items-center justify-center rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm shadow-sm mb-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 group-hover:border-primary/30 group-hover:text-primary group-hover:shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+                 <Sparkles className="size-7 text-muted-foreground transition-colors duration-500 group-hover:text-primary" />
                </div>
-               <h3 className="text-lg font-semibold text-foreground">Ready to edit your portfolio?</h3>
-               <p className="text-muted-foreground text-sm font-medium mt-1 max-w-sm">
-                 Mount your new PortfolioEditor component here to start customizing your public site.
+               
+               <h3 className="text-xl font-medium text-foreground tracking-tight z-10">Ready to edit your portfolio?</h3>
+               <p className="text-muted-foreground text-sm font-light leading-relaxed mt-3 max-w-md z-10">
+                 Mount your new <code className="bg-muted/50 px-1.5 py-0.5 rounded text-primary border border-border/50">PortfolioEditor</code> component here to start customizing your public site.
                </p>
             </div>
 
           </div>
         </main>
 
-        <Toaster position="bottom-right" />
+        <Toaster position="bottom-right" className="z-[100]" />
       </div>
     </SidebarProvider>
   )

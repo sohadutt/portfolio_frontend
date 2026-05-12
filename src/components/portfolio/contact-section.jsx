@@ -1,6 +1,6 @@
 import { useState, createElement } from 'react'
 import { useParams } from 'react-router-dom'
-import { submitContactForm, resolveIcon } from '@/helper/functions' // Use resolveIcon from functions
+import { submitContactForm, resolveIcon } from '@/helper/functions'
 import { toast } from 'sonner'
 
 // UI Components
@@ -99,61 +99,70 @@ export function ContactSection({ data = {}, isScrolling }) {
 
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="apple-panel-strong rounded-[2rem] p-6 sm:p-8">
-        <SectionHeader
-          eyebrow={contactCopy.eyebrow || "Contact"}
-          title={contactCopy.title || "Let's build reliable, product-focused systems."}
-          description={contactCopy.description || "Reach out for backend automation, Django and API work, or frontend implementation with React and Tailwind CSS."}
-        />
-        <div className="mt-8 space-y-3">
-          {contactMethods.map(({ label, value, href, icon, icon_name }, index) => {
-            // Dynamically resolve the icon string from the backend
-            const IconComponent = resolveIcon(icon || icon_name || "Mail")
-            const isActive = activeMethod === index
+      {/* Left Panel: Contact Methods */}
+      <div className="cinematic-panel-strong relative overflow-hidden rounded-[2.5rem] p-8 shadow-xl shadow-background/50">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute -left-20 top-10 h-[300px] w-[300px] rounded-full bg-primary/10 blur-[100px] pointer-events-none" />
 
-            return (
-              <a
-                key={label || index}
-                href={href || '#contact'}
-                className={`group flex items-center justify-between rounded-[1.4rem] border px-5 py-4 transition-all duration-300 ${
-                  isActive
-                    ? 'border-primary/30 bg-primary/6'
-                    : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
-                }`}
-                onMouseEnter={() => !isScrolling && setActiveMethod(index)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`flex size-10 items-center justify-center rounded-2xl transition-transform duration-300 ${
-                    isActive ? "bg-primary/20 text-primary scale-110" : "bg-muted text-primary group-hover:scale-110"
-                  }`}>
-                    {createElement(IconComponent, { className: "size-4" })}
+        <div className="relative z-10">
+          <SectionHeader
+            eyebrow={contactCopy.eyebrow || "Contact"}
+            title={contactCopy.title || "Let's build reliable, product-focused systems."}
+            description={contactCopy.description || "Reach out for backend automation, Django and API work, or frontend implementation with React and Tailwind CSS."}
+          />
+          <div className="mt-10 space-y-4">
+            {contactMethods.map(({ label, value, href, icon, icon_name }, index) => {
+              const IconComponent = resolveIcon(icon || icon_name || "Mail")
+              const isActive = activeMethod === index
+
+              return (
+                <a
+                  key={label || index}
+                  href={href || '#contact'}
+                  className={`group flex items-center justify-between rounded-2xl border px-6 py-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    isActive
+                      ? 'border-primary/40 bg-primary/10 shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                      : `border-border/30 bg-card/20 backdrop-blur-sm ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
+                  }`}
+                  onMouseEnter={() => !isScrolling && setActiveMethod(index)}
+                  onMouseLeave={() => !isScrolling && setActiveMethod(null)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`flex size-12 items-center justify-center rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      isActive 
+                        ? "bg-primary text-primary-foreground border-primary scale-110 shadow-[0_0_15px_rgba(var(--primary),0.3)]" 
+                        : "bg-card/40 text-primary border-border/40 group-hover:scale-110"
+                    }`}>
+                      {createElement(IconComponent, { className: "size-5" })}
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                        {label}
+                      </p>
+                      <p className="mt-1.5 text-base font-medium tracking-tight text-foreground">
+                        {value}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                      {label}
-                    </p>
-                    <p className="mt-1.5 text-sm font-medium leading-none text-foreground">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              </a>
-            )
-          })}
+                </a>
+              )
+            })}
+          </div>
         </div>
       </div>
 
-      <div className={`apple-panel-strong rounded-[2rem] p-6 transition-colors duration-300 sm:p-8 ${isScrolling ? '' : 'hover:border-primary/20'}`}>
-        <form onSubmit={handleSubmit} className="flex h-full flex-col justify-between">
-          <FieldGroup className="grid gap-5 sm:grid-cols-2">
+      {/* Right Panel: Form */}
+      <div className={`cinematic-panel relative rounded-[2.5rem] p-8 shadow-xl transition-all duration-500 ${isScrolling ? '' : 'hover:border-primary/30 hover:shadow-[0_0_40px_0_color-mix(in_oklch,var(--primary)_5%,transparent)]'}`}>
+        <form onSubmit={handleSubmit} className="relative z-10 flex h-full flex-col justify-between">
+          <FieldGroup className="grid gap-6 sm:grid-cols-2">
             <Field data-invalid={!!errors.name}>
-              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <FieldLabel htmlFor="name" className="text-sm font-medium tracking-wide">Name</FieldLabel>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
                 placeholder={"Your name"}
                 required
               />
@@ -161,14 +170,14 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email" className="text-sm font-medium tracking-wide">Email</FieldLabel>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
                 placeholder={"hello@example.com"}
                 required
               />
@@ -176,26 +185,26 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field data-invalid={!!errors.phone}>
-              <FieldLabel htmlFor="phone">Phone (Optional)</FieldLabel>
+              <FieldLabel htmlFor="phone" className="text-sm font-medium tracking-wide">Phone (Optional)</FieldLabel>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
                 placeholder="+1 (555) 000-0000"
               />
               {errors.phone && <FieldError>{errors.phone}</FieldError>}
             </Field>
 
             <Field data-invalid={!!errors.priority}>
-              <FieldLabel htmlFor="priority">Urgency</FieldLabel>
+              <FieldLabel htmlFor="priority" className="text-sm font-medium tracking-wide">Urgency</FieldLabel>
               <Select value={formData.priority} onValueChange={handleSelectChange}>
-                <SelectTrigger id="priority" className="h-[42px] rounded-2xl border-border bg-background px-4 py-5 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10">
+                <SelectTrigger id="priority" className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus:border-primary focus:bg-card/50 focus:ring-1 focus:ring-primary/40 shadow-none">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="border-border/40 bg-background/95 backdrop-blur-md">
                   <SelectItem value="0">Low</SelectItem>
                   <SelectItem value="1">Medium</SelectItem>
                   <SelectItem value="2">High</SelectItem>
@@ -206,14 +215,14 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field className="sm:col-span-2" data-invalid={!!errors.message}>
-              <FieldLabel htmlFor="message">Message</FieldLabel>
+              <FieldLabel htmlFor="message" className="text-sm font-medium tracking-wide">Message</FieldLabel>
               <Textarea
                 id="message"
                 name="message"
                 rows="5"
                 value={formData.message}
                 onChange={handleChange}
-                className="resize-none rounded-[1.5rem] border-border bg-background px-4 py-3 text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/10"
+                className="resize-none rounded-2xl border-border/40 bg-card/30 px-4 py-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
                 placeholder="Share the details of your project or inquiry."
                 required
               />
@@ -225,11 +234,12 @@ export function ContactSection({ data = {}, isScrolling }) {
                 id="for_work" 
                 checked={formData.for_work} 
                 onCheckedChange={handleCheckboxChange} 
+                className="border-border/60 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               <FieldContent>
                 <FieldLabel 
                   htmlFor="for_work" 
-                  className="cursor-pointer text-sm font-medium leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="cursor-pointer text-sm font-light leading-relaxed text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   This inquiry is regarding a paid project, role, or collaboration.
                 </FieldLabel>
@@ -239,12 +249,13 @@ export function ContactSection({ data = {}, isScrolling }) {
 
           <Button 
             type="submit" 
+            size="lg"
             disabled={loading}
-            className="mt-8 w-full rounded-full px-6 font-medium shadow-none sm:w-auto"
+            className="mt-10 h-14 w-full rounded-full px-8 text-base font-medium shadow-none transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)] sm:w-auto"
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
+                <Loader2 className="mr-2 size-5 animate-spin" />
                 Sending...
               </>
             ) : (

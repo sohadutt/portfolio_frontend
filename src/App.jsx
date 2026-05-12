@@ -50,9 +50,9 @@ const DashboardLayout = lazy(() => import("@/components/dashboard/DashboardRoute
 function PageFallback({ label = "Loading" }) {
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">{label}</p>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <Loader2 className="size-6 animate-spin text-primary" />
+        <p className="text-sm font-light tracking-wide text-muted-foreground">{label}</p>
       </div>
     </div>
   )
@@ -85,16 +85,16 @@ const applyTheme = (themeMode) => {
 
 function GlobalFooter() {
   return (
-    <footer className="border-t py-6 bg-background text-foreground z-50">
+    <footer className="border-t border-border/20 py-6 bg-background/50 backdrop-blur-md text-foreground z-50">
       <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 md:h-16 md:flex-row md:py-0">
-        <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
+        <p className="text-center text-sm font-light tracking-wide text-muted-foreground md:text-left">
           © {new Date().getFullYear()} Portfolio Builder. All rights reserved.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground">
-          <Link to="/terms" className="hover:underline underline-offset-4 hover:text-foreground transition-colors">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-light tracking-wide text-muted-foreground">
+          <Link to="/terms" className="transition-colors hover:text-primary">
             Terms of Service
           </Link>
-          <Link to="/privacy" className="hover:underline underline-offset-4 hover:text-foreground transition-colors">
+          <Link to="/privacy" className="transition-colors hover:text-primary">
             Privacy Policy
           </Link>
         </div>
@@ -105,8 +105,8 @@ function GlobalFooter() {
 
 function BaseLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <main className="flex-1 flex flex-col">
+    <div className="cinematic-ambient flex min-h-screen flex-col text-foreground">
+      <main className="flex flex-1 flex-col">
         <Outlet />
       </main>
       <GlobalFooter />
@@ -196,8 +196,8 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
   }
 
   return (
-    <div className="apple-ambient relative flex min-h-screen flex-col text-foreground">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-foreground/10" />
+    <div className="cinematic-ambient relative flex min-h-screen flex-col text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-border/20" />
       
       <NavBar
         data={data}
@@ -231,7 +231,7 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
       </main>
 
       {memoizedFooter}
-      <Toaster position="bottom-right" />
+      <Toaster position="bottom-right" theme={theme === "dark" ? "dark" : "light"} />
     </div>
   )
 }
@@ -251,16 +251,19 @@ function PublicPortfolioView({ token, index = 1 }) {
 
   if (loading || !data) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-950 text-white px-4">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-primary/30 blur-2xl" />
-            <Loader2 className="relative size-8 animate-spin text-primary" />
+      <div className="cinematic-ambient flex h-screen w-full items-center justify-center text-foreground px-4">
+        <div className="flex flex-col items-center gap-6 text-center">
+          <div className="relative flex items-center justify-center">
+            {/* DeepMind Style Loader Glow */}
+            <div className="absolute h-24 w-24 rounded-full bg-primary/20 blur-[40px]" />
+            <Loader2 className="relative size-10 animate-spin text-primary" />
           </div>
-          <div className="space-y-1">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary/90">Loading portfolio</p>
-            <p className="text-sm text-slate-300">Preparing the showcase experience.</p>
-            <p className="text-sm text-slate-300">First load can take upto 30s due to server whine-down..</p>
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+              Loading Portfolio
+            </p>
+            <p className="text-sm font-light text-muted-foreground">Preparing the showcase experience.</p>
+            <p className="text-xs font-light text-muted-foreground/50">First load can take up to 30s due to server spin-up.</p>
           </div>
         </div>
       </div>

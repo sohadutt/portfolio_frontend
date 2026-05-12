@@ -5,8 +5,8 @@ import { resolveIcon } from '@/helper/functions' // Use the new icon resolver
 
 function getCardClasses(isActive, isScrolling) {
   return isActive
-    ? 'border-primary/30 bg-primary/6 shadow-sm'
-    : `border-border/60 bg-card/70 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
+    ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+    : `border-border/30 bg-card/20 backdrop-blur-md ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
 }
 
 export function ExperienceSection({ data = {}, activeHover, onRelationChange, isScrolling }) {
@@ -28,95 +28,100 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
     : (Array.isArray(rawModules.results) ? rawModules.results : [])
 
   return (
-    // Reduced grid gap on mobile
-    <section id="experience" className="grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-      {/* Reduced outer padding and border radius on small screens */}
-      <div className="apple-panel-strong rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-8">
-        <SectionHeader
-          eyebrow={expCopy.eyebrow || "Experience"}
-          title={expCopy.title || "Experience across backend automation, frontend delivery, and production workflows."}
-          description={expCopy.description || "Hover or tap a role to expand the story, pull its orange spotlight forward, and surface the component direction connected to that work."}
-        />
+    <section 
+      id="experience" 
+      className="relative grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]"
+      onMouseLeave={() => !isScrolling && onRelationChange(null)}
+    >
+      {/* Left Panel: Experience Timeline */}
+      <div className="cinematic-panel-strong relative overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 shadow-2xl shadow-background/50">
         
-        {/* Adjusted spacing between items */}
-        <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-5">
-          {experience.map((item, index) => {
-            const isHighlighted = resolvedRelation === item.relation
-            const isExpanded = isHighlighted && activeSource === 'experience'
-            
-            const safeHighlights = Array.isArray(item.highlights) ? item.highlights : []
-            const safeComponents = Array.isArray(item.relatedComponents || item.related_components) 
-              ? (item.relatedComponents || item.related_components) 
-              : []
+        {/* Subtle Ambient Glow */}
+        <div className="absolute -left-20 top-1/4 h-[400px] w-[400px] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
 
-            return (
-              <article
-                key={item.title || index}
-                // Scaled down inner padding, added cursor-pointer for mobile tap affordance
-                className={`apple-panel-hover cursor-pointer lg:cursor-default rounded-[1.25rem] sm:rounded-[1.6rem] border p-4 sm:p-5 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
-                onMouseEnter={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
-                onFocus={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
-                onClick={() => onRelationChange({ relation: item.relation, source: 'experience' })}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                  <p className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">{item.period}</p>
+        <div className="relative z-10">
+          <SectionHeader
+            eyebrow={expCopy.eyebrow || "Experience"}
+            title={expCopy.title || "Experience across backend automation, frontend delivery, and production workflows."}
+            description={expCopy.description || "Hover or tap a role to expand the story, pull its spotlight forward, and surface the component direction connected to that work."}
+          />
+          
+          <div className="mt-8 sm:mt-12 space-y-5 sm:space-y-6">
+            {experience.map((item, index) => {
+              const isHighlighted = resolvedRelation === item.relation
+              const isExpanded = isHighlighted && activeSource === 'experience'
+              
+              const safeHighlights = Array.isArray(item.highlights) ? item.highlights : []
+              const safeComponents = Array.isArray(item.relatedComponents || item.related_components) 
+                ? (item.relatedComponents || item.related_components) 
+                : []
 
-                  <Badge
-                    variant="secondary"
-                    // Scaled badge padding for mobile
-                    className="rounded-full px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium"
-                  >
-                    {item.company}
-                  </Badge>
-                </div>
-
-                <h3 className="mt-3 sm:mt-4 scroll-m-20 text-lg sm:text-xl font-semibold tracking-tight">
-                  {item.title}
-                </h3>
-
-                <p className="mt-2 sm:mt-3 text-sm leading-relaxed sm:leading-7 text-muted-foreground">
-                  {item.summary}
-                </p>
-
-                <div
-                  className={`grid transition-all duration-500 ease-in-out ${
-                    isExpanded ? 'mt-4 sm:mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-70'
-                  }`}
+              return (
+                <article
+                  key={item.title || index}
+                  className={`group relative cursor-pointer lg:cursor-default rounded-[1.5rem] sm:rounded-[2rem] border p-5 sm:p-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${getCardClasses(isHighlighted, isScrolling)}`}
+                  onMouseEnter={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
+                  onFocus={() => !isScrolling && onRelationChange({ relation: item.relation, source: 'experience' })}
+                  onClick={() => onRelationChange({ relation: item.relation, source: 'experience' })}
                 >
-                  <div className="overflow-hidden">
-                    {/* Adjusted expanded area padding */}
-                    <div className="rounded-[1rem] sm:rounded-[1.35rem] border border-border/60 bg-muted/35 p-3 sm:p-4">
-                      <p className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                        Expanded focus
-                      </p>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-[10px] sm:text-xs font-medium uppercase tracking-widest text-primary">{item.period}</p>
 
-                      <ul className="mt-2 sm:mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-                        {safeHighlights.map((highlight, hIdx) => (
-                          <li key={hIdx}>{highlight}</li>
-                        ))}
-                      </ul>
+                    <Badge
+                      variant="secondary"
+                      className="rounded-full border border-border/40 bg-card/40 px-3 py-1 text-[10px] sm:text-xs font-medium uppercase tracking-widest text-muted-foreground backdrop-blur-sm"
+                    >
+                      {item.company}
+                    </Badge>
+                  </div>
 
-                      <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
-                        {safeComponents.map((component, cIdx) => (
-                          <Badge
-                            key={cIdx}
-                            variant="outline"
-                            className="rounded-full border-primary/20 bg-background px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-medium text-primary hover:bg-primary/8 transition-colors"
-                          >
-                            {component}
-                          </Badge>
-                        ))}
+                  <h3 className="mt-4 text-xl sm:text-2xl font-medium tracking-tight text-foreground">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground sm:text-base sm:leading-8">
+                    {item.summary}
+                  </p>
+
+                  <div
+                    className={`grid transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      isExpanded ? 'mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="rounded-[1.25rem] sm:rounded-[1.5rem] border border-border/30 bg-card/30 p-4 sm:p-5 backdrop-blur-sm shadow-inner">
+                        <ul className="space-y-2.5 text-sm font-light leading-relaxed text-muted-foreground">
+                          {safeHighlights.map((highlight, hIdx) => (
+                            <li key={hIdx} className="flex items-start">
+                              <span className="mr-2.5 mt-1.5 flex size-1.5 shrink-0 rounded-full bg-primary/60" />
+                              <span>{highlight}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="mt-5 flex flex-wrap gap-2.5">
+                          {safeComponents.map((component, cIdx) => (
+                            <Badge
+                              key={cIdx}
+                              variant="outline"
+                              className="rounded-md border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-light text-primary transition-colors hover:bg-primary/15"
+                            >
+                              {component}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </article>
-            )
-          })}
+                </article>
+              )
+            })}
+          </div>
         </div>
       </div>
       
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Right Panel: Featured Modules */}
+      <div className="grid gap-5 sm:grid-cols-2">
         {featuredModules.map((module, index) => {
           const { title, body, icon, icon_name, relation, details } = module
           const IconComponent = resolveIcon(icon || icon_name || "Blocks")
@@ -127,36 +132,36 @@ export function ExperienceSection({ data = {}, activeHover, onRelationChange, is
           return (
             <article
               key={title || index}
-              // Added onClick for touch devices, reduced padding on mobile
-              className={`apple-panel-hover cursor-pointer lg:cursor-default group rounded-[1.5rem] sm:rounded-[1.75rem] border p-5 sm:p-6 transition-all duration-300 ${getCardClasses(isHighlighted, isScrolling)}`}
+              className={`cinematic-panel-hover group relative cursor-pointer lg:cursor-default rounded-[2rem] sm:rounded-[2.5rem] border p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${getCardClasses(isHighlighted, isScrolling)}`}
               onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onFocus={() => !isScrolling && onRelationChange({ relation, source: 'module' })}
               onClick={() => onRelationChange({ relation, source: 'module' })}
             >
               <div
-                // Scaled down icon background on mobile
-                className={`flex size-10 sm:size-12 items-center justify-center rounded-xl sm:rounded-2xl transition-transform duration-300 ${
-                  isHighlighted ? 'bg-primary text-primary-foreground scale-110' : 'bg-primary/10 text-primary group-hover:scale-110'
+                className={`flex size-12 sm:size-14 items-center justify-center rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  isHighlighted 
+                    ? 'scale-110 border border-primary bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.4)]' 
+                    : 'border border-primary/20 bg-primary/10 text-primary group-hover:scale-110'
                 }`}
               >
                 {createElement(IconComponent, { className: "size-5 sm:size-6" })}
               </div>
 
-              <h3 className="mt-5 sm:mt-6 scroll-m-20 text-lg sm:text-xl font-semibold tracking-tight">
+              <h3 className="mt-6 text-xl sm:text-2xl font-medium tracking-tight text-foreground">
                 {title}
               </h3>
 
-              <p className="mt-2 sm:mt-3 text-sm leading-relaxed sm:leading-7 text-muted-foreground">
+              <p className="mt-3 text-sm font-light leading-relaxed text-muted-foreground sm:text-base sm:leading-8">
                 {body}
               </p>
 
               <div
-                className={`grid transition-all duration-500 ease-in-out ${
-                  isExpanded ? 'mt-4 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                className={`grid transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  isExpanded ? 'mt-5 grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                 }`}
               >
                 <div className="overflow-hidden">
-                  <div className="border-t border-border/60 pt-3 sm:pt-4 text-sm leading-6 text-muted-foreground">
+                  <div className="border-t border-border/30 pt-4 text-sm font-light leading-relaxed text-muted-foreground">
                     {details}
                   </div>
                 </div>

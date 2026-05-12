@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-// Custom SVG that behaves exactly like a Lucide icon (inherits theme text color)
+// Custom SVG that behaves exactly like a Lucide icon
 const GoogleIcon = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -47,14 +47,14 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
       navigate(redirectTo, { replace: true })
     } catch (error) {
       if (error.status === 403 || (error.message && (error.message.toLowerCase().includes("verify") || error.message.toLowerCase().includes("inactive")))) {
-        toast.warning("Please verify your email to continue.")
+        toast.warning("Verification required to synchronize session.")
         if (onRequireVerification) {
           onRequireVerification(formData.email)
         }
       } else if (error.status === 401 || error.status === 400) {
-        toast.error("Incorrect email or password.")
+        toast.error("Invalid credentials buffer.")
       } else {
-        toast.error(error.message || "Failed to log in. Please check your credentials.")
+        toast.error(error.message || "Authentication sequence failed.")
       }
     } finally {
       setLoading(false)
@@ -66,29 +66,30 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
     onSuccess: async (tokenResponse) => {
       setGoogleLoading(true);
       try {
-        // useGoogleLogin returns an access_token instead of an ID token
         await loginWithGoogle(tokenResponse.access_token);
-        toast.success("Logged in with Google!");
+        toast.success("Cloud identity verified.");
         navigate(redirectTo, { replace: true });
       } catch (error) {
          console.error("Google Login Error:", error);
-         toast.error("Failed to log in with Google. Please try again.");
+         toast.error("Google authentication failed.");
       } finally {
         setGoogleLoading(false);
       }
     },
     onError: () => {
-      toast.error("Google Sign-In popup closed or failed.");
+      toast.error("Google Sign-In sequence aborted.");
     }
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       
-      {/* --- STANDARD FORM --- */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-2">
-          <Label htmlFor="login-email">Email</Label>
+      {/* --- CINEMATIC FORM --- */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2.5">
+          <Label htmlFor="login-email" className="text-sm font-medium tracking-wide text-foreground/90 ml-1">
+            Email Address
+          </Label>
           <Input 
             id="login-email" 
             name="email" 
@@ -97,18 +98,20 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
             required 
             value={formData.email}
             onChange={handleChange}
-            className="rounded-xl bg-muted/20 h-11"
+            className="h-12 rounded-xl border-border/40 bg-card/30 font-light backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
             disabled={loading || googleLoading}
           />
         </div>
         
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="login-password">Password</Label>
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between px-1">
+            <Label htmlFor="login-password" className="text-sm font-medium tracking-wide text-foreground/90">
+              Password
+            </Label>
             <button 
               type="button"
               onClick={onForgotPassword}
-              className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+              className="text-xs font-light tracking-wide text-muted-foreground transition-colors duration-300 hover:text-primary"
               disabled={loading || googleLoading}
             >
               Forgot password?
@@ -118,28 +121,29 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
             id="login-password" 
             name="password" 
             type="password" 
+            placeholder="••••••••"
             required 
             value={formData.password}
             onChange={handleChange}
-            className="rounded-xl bg-muted/20 h-11"
+            className="h-12 rounded-xl border-border/40 bg-card/30 font-light backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
             disabled={loading || googleLoading}
           />
         </div>
 
         <Button 
           type="submit" 
-          className="mt-6 w-full rounded-full font-medium shadow-none h-11" 
+          className="mt-4 h-12 w-full rounded-full font-medium transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.02] hover:shadow-[0_0_25px_0_color-mix(in_oklch,var(--primary)_40%,transparent)]" 
           disabled={loading || googleLoading}
         >
           {loading ? (
             <>
-              <Loader2 className="mr-2 size-4 animate-spin" />
-              Signing in...
+              <Loader2 className="mr-2 size-5 animate-spin" />
+              Authenticating...
             </>
           ) : (
             <>
               Sign In
-              <ArrowRight className="ml-2 size-4" />
+              <ArrowRight className="ml-2 size-5" />
             </>
           )}
         </Button>
@@ -148,29 +152,29 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
       {/* --- DIVIDER --- */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-border/20" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or sign in with
+        <div className="relative flex justify-center text-[10px] uppercase tracking-[0.2em] font-medium">
+          <span className="bg-background px-4 text-muted-foreground">
+            Or continue with
           </span>
         </div>
       </div>
 
-      {/* --- SHADCN NATIVE GOOGLE BUTTON --- */}
+      {/* --- CINEMATIC GOOGLE BUTTON --- */}
       <Button
         type="button"
         variant="outline"
-        className="w-full rounded-xl h-11 font-medium shadow-none"
+        className="h-12 w-full rounded-full border-border/40 bg-card/20 font-medium backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-card/40 hover:border-primary/30 hover:text-primary shadow-none"
         onClick={() => triggerGoogleLogin()}
         disabled={loading || googleLoading}
       >
         {googleLoading ? (
-          <Loader2 className="mr-2 size-4 animate-spin" />
+          <Loader2 className="mr-2 size-5 animate-spin" />
         ) : (
-          <GoogleIcon className="mr-2 size-4" />
+          <GoogleIcon className="mr-2 size-5" />
         )}
-        Google
+        Google Cloud
       </Button>
 
     </div>

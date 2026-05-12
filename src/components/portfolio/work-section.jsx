@@ -33,14 +33,14 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
     : apiProjects
 
   return (
-    <section id="projects" className="space-y-6 sm:space-y-8">
+    <section id="projects" className="space-y-8 sm:space-y-12">
       <SectionHeader
         eyebrow={projectsCopy.eyebrow || "Projects"}
         title={projectsCopy.title || "Selected technical projects and engineering outcomes."}
         description={projectsCopy.description || "A showcase of recent work focusing on secure configuration tooling, reliable deployments, and scalable UI architectures."}
       />
       
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
         {projects.map((project, index) => {
           const isFeatured = index === 0 && activeProject === null
           const isActive = activeProject === index
@@ -52,57 +52,57 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
           return (
             <article
               key={project.title || index}
-              className={`apple-panel-hover group rounded-[1.5rem] sm:rounded-[2rem] border p-5 sm:p-6 transition-all duration-300 flex flex-col ${
+              className={`cinematic-panel-hover group relative flex flex-col rounded-[2rem] border p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isActive || isFeatured
-                  ? 'border-primary/30 bg-primary/6 shadow-sm'
-                  : `border-border/60 bg-card/75 ${isScrolling ? '' : 'hover:border-primary/20 hover:bg-foreground/5'}`
+                  ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                  : `border-border/30 bg-card/20 backdrop-blur-md ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveProject(index)}
               onMouseLeave={() => !isScrolling && setActiveProject(null)}
             >
-              <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-                <div className={`flex items-center gap-2 transition-colors duration-300 min-w-0 ${
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className={`flex items-center gap-2.5 min-w-0 transition-colors duration-500 ${
                     isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
                   }`}>
-                  {createElement(IconComponent, { className: "size-4 shrink-0" })}
-                  <p className="truncate text-[10px] sm:text-xs font-medium uppercase tracking-[0.2em]">
+                  {createElement(IconComponent, { className: "size-5 shrink-0" })}
+                  <p className="truncate text-xs font-medium uppercase tracking-widest">
                     {project.eyebrow}
                   </p>
                 </div>
 
                 <Badge
                   variant="secondary"
-                  className={`rounded-full px-2.5 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium transition-colors duration-300 ${
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-500 border ${
                     isActive || isFeatured
-                      ? 'bg-primary/10 text-primary hover:bg-primary/15'
-                      : 'text-muted-foreground'
+                      ? 'border-primary/30 bg-primary/20 text-primary shadow-[0_0_15px_rgba(var(--primary),0.2)]'
+                      : 'border-border/40 bg-card/40 text-muted-foreground'
                   }`}
                 >
                   {project.stat}
                 </Badge>
               </div>
 
-              <h3 className="mt-5 sm:mt-6 text-xl sm:text-2xl font-semibold tracking-tight">
+              <h3 className="mt-6 text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
                 {project.title}
               </h3>
 
               <p
-                className={`mt-3 sm:mt-4 text-sm leading-relaxed sm:leading-7 flex-1 transition-colors duration-300 ${
-                  isActive || isFeatured ? 'text-foreground/85' : 'text-muted-foreground'
+                className={`mt-4 flex-1 text-sm font-light leading-relaxed transition-colors duration-500 sm:text-base sm:leading-8 ${
+                  isActive || isFeatured ? 'text-foreground/90' : 'text-muted-foreground'
                 }`}
               >
                 {project.description}
               </p>
 
-              <div className="mt-5 sm:mt-6 flex flex-wrap gap-2">
+              <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-8">
                 {safeStack.map((item, itemIdx) => (
                   <Badge
                     key={`${item}-${itemIdx}`}
                     variant="outline"
-                    className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-medium transition-colors duration-300 ${
+                    className={`rounded-md px-3 py-1 text-xs font-light transition-colors duration-500 border ${
                       isActive || isFeatured
-                        ? 'border-primary/20 bg-background text-foreground'
-                        : 'border-border/60 bg-background text-muted-foreground'
+                        ? 'border-primary/30 bg-primary/5 text-primary'
+                        : 'border-border/40 bg-card/30 text-muted-foreground'
                     }`}
                   >
                     {item}
@@ -110,26 +110,31 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                 ))}
               </div>
 
-              <div className="mt-6 sm:mt-8 flex items-center justify-between pt-4 sm:pt-0 border-t sm:border-t-0 border-border/40">
+              <div className="mt-8 flex items-center justify-between border-t border-border/30 pt-5">
                 <Button
                   asChild
-                  variant={isActive || isFeatured ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="rounded-full font-medium shadow-none transition-all duration-300 sm:h-10 sm:px-4"
+                  variant={isActive || isFeatured ? 'default' : 'outline'}
+                  size="lg"
+                  className={`rounded-full font-medium shadow-none transition-all duration-500 sm:h-11 sm:px-6 ${
+                    isActive || isFeatured 
+                      ? 'hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)]' 
+                      : 'border-border/50 bg-card/30 hover:bg-card/60'
+                  }`}
                 >
                   <a href={project.href || '#contact'} target={project.href?.startsWith('http') ? '_blank' : '_self'}>
                     {ctaText}
-                    <ChevronRight className="ml-1 size-3 sm:size-4" />
+                    <ChevronRight className="ml-1.5 size-4" />
                   </a>
                 </Button>
+                
                 <a 
                   href={project.href || '#contact'} 
                   target={project.href?.startsWith('http') ? '_blank' : '_self'}
                   aria-label={`Open ${project.title}`}
-                  className="p-2 sm:p-0"
+                  className="group-hover:scale-110 p-2 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:p-0"
                 >
                   <ArrowUpRight 
-                    className={`size-5 sm:size-6 transition-all duration-300 hover:scale-110 ${
+                    className={`size-6 transition-colors duration-500 ${
                       isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
                     }`} 
                   />

@@ -23,10 +23,13 @@ import {
 import { toast } from "sonner"
 
 import { updateUserProfile, logoutUser, toggleShareStatus, TIER_MAP, THEME_MAP } from "@/helper/functions" 
-import { Save, User, Check, Camera, Copy, LogOut, Moon, Sun } from "lucide-react"
+import { Save, User, Check, Camera, Copy, LogOut } from "lucide-react"
 
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop'
 import 'react-image-crop/dist/ReactCrop.css'
+
+// Shared Cinematic Input Style
+const sidebarInputClass = "h-10 rounded-xl border-border/40 bg-background/40 px-3 text-sm font-light backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/30 shadow-none"
 
 export function SideProfile({ profileData }) {
   const [formData, setFormData] = useState(profileData || {})
@@ -74,14 +77,14 @@ export function SideProfile({ profileData }) {
         enable_share_token: response.enable_share_token,
         share_token: response.share_token ?? prev?.share_token,
       }))
-      toast.success(response.enable_share_token ? "Share access enabled" : "Share access disabled")
+      toast.success(response.enable_share_token ? "Access protocol enabled" : "Access restricted")
     } catch (error) {
       setFormData((prev) => ({
         ...prev,
         enable_share_token: previousEnabled,
         share_token: previousEnabled ? prev?.share_token : null,
       }))
-      toast.error(error.message || "Could not update share access")
+      toast.error(error.message || "Protocol update failed")
     }
   }
 
@@ -89,7 +92,7 @@ export function SideProfile({ profileData }) {
     if (!formData?.share_token) return
     const link = `${window.location.origin}/portfolio/${formData.share_token}`
     await navigator.clipboard.writeText(link)
-    toast.success("Share link copied")
+    toast.success("Link indexed to clipboard")
   }
 
   const handleFileSelect = async (e) => {
@@ -98,14 +101,14 @@ export function SideProfile({ profileData }) {
       const fileExt = file.name.split('.').pop().toLowerCase()
 
       if (fileExt === 'heic' || fileExt === 'heif') {
-        toast.loading("Converting HEIC image...", { id: "heic-convert" })
+        toast.loading("Converting HEIC buffer...", { id: "heic-convert" })
         try {
           const { default: heic2any } = await import('heic2any')
           const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg" })
           file = new File([convertedBlob], "converted.jpg", { type: "image/jpeg" })
-          toast.success("Converted successfully!", { id: "heic-convert" })
+          toast.success("Conversion successful", { id: "heic-convert" })
         } catch {
-          toast.error("Failed to process HEIC image.", { id: "heic-convert" })
+          toast.error("Process interrupted", { id: "heic-convert" })
           return
         }
       }
@@ -185,10 +188,10 @@ export function SideProfile({ profileData }) {
         profile_picture: updatedProfile?.profile_picture ?? prev.profile_picture,
         theme_mode: updatedProfile?.theme_mode ?? prev.theme_mode,
       }))
-      toast.success("Profile saved")
+      toast.success("Profile sync complete")
       setNewImageFile(null) 
     } catch (error) {
-      toast.error(error.message || "Update failed")
+      toast.error(error.message || "Sync failed")
     } finally {
       setLoading(false)
     }
@@ -197,36 +200,35 @@ export function SideProfile({ profileData }) {
   const handleLogout = async () => {
     try {
       await logoutUser()
-      toast.success("Logged out successfully")
+      toast.success("Terminal session ended")
       window.location.href = "/login"
     } catch {
-      toast.error("Failed to log out")
+      toast.error("Termination failed")
     }
   }
 
   return (
     <>
-      <Sidebar variant="inset" collapsible="icon" className="border-r bg-sidebar/78 backdrop-blur-2xl">
-        <SidebarHeader className="border-b border-sidebar-border/70 p-4">
-          <div className="flex items-center gap-3">
+      <Sidebar variant="inset" collapsible="icon" className="border-r border-border/30 bg-background/40 backdrop-blur-3xl">
+        <SidebarHeader className="border-b border-border/20 p-5">
+          <div className="flex items-center gap-4">
             <div 
-              className="group relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full focus-within:outline-none" 
+              className="group relative flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-border/40 bg-card/40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/40 focus-within:outline-none" 
               onClick={() => fileInputRef.current?.click()}
-              title="Update profile picture"
             >
-              <Avatar className="h-full w-full border shadow-sm transition-opacity group-hover:opacity-75">
+              <Avatar className="h-full w-full rounded-[inherit] transition-opacity group-hover:opacity-40">
                 <AvatarImage src={previewImage || formData?.profile_picture} alt={formData?.username} className="object-cover" />
-                <AvatarFallback className="bg-muted font-medium text-muted-foreground">
+                <AvatarFallback className="bg-primary/10 font-medium text-primary">
                   {initials}
                 </AvatarFallback>
                 {formData?.is_verified && (
-                  <AvatarBadge className="flex h-4 w-4 items-center justify-center border-2 border-background bg-blue-500 p-0">
-                    <Check className="h-2.5 w-2.5 text-white" strokeWidth={4} />
+                  <AvatarBadge className="flex h-4.5 w-4.5 items-center justify-center border-2 border-background bg-primary p-0 shadow-[0_0_10px_rgba(var(--primary),0.5)]">
+                    <Check className="h-3 w-3 text-primary-foreground" strokeWidth={4} />
                   </AvatarBadge>
                 )}
               </Avatar>
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-                <Camera className="h-4 w-4 text-white" />
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-500 group-hover:opacity-100">
+                <Camera className="h-5 w-5 text-primary" />
               </div>
               <input
                 type="file"
@@ -239,48 +241,50 @@ export function SideProfile({ profileData }) {
 
             <div className="flex min-w-0 flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="truncate text-sm font-semibold leading-none">
+                <span className="truncate text-base font-medium tracking-tight text-foreground">
                   {formData?.username || "Guest"}
                 </span>
-                <Badge variant="secondary" className="h-5 rounded-full px-2 py-0 text-[10px] uppercase tracking-wider">
+                <Badge variant="secondary" className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0 text-[9px] font-bold uppercase tracking-[0.1em] text-primary">
                   {TIER_MAP?.[formData?.tier] || "Premium"}
                 </Badge>
               </div>
-              <span className="truncate text-xs leading-none text-muted-foreground">
+              <span className="truncate text-xs font-light tracking-wide text-muted-foreground">
                 {formData?.email}
               </span>
             </div>
           </div>
         </SidebarHeader>
-        <SidebarContent className="gap-0">
+
+        <SidebarContent className="gap-0 py-2">
           <SidebarGroup>
-            <SidebarGroupLabel>Personal Info</SidebarGroupLabel>
-            <SidebarGroupContent className="p-2 space-y-4">
+            <SidebarGroupLabel className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Identity</SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-4 p-4">
               <div className="space-y-1.5">
-                <Label htmlFor="first_name">First Name</Label>
-                <Input id="first_name" name="first_name" value={formData?.first_name || ""} onChange={handleChange} />
+                <Label htmlFor="first_name" className="text-xs font-medium tracking-wide text-muted-foreground">First Name</Label>
+                <Input id="first_name" name="first_name" className={sidebarInputClass} value={formData?.first_name || ""} onChange={handleChange} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="last_name">Last Name</Label>
-                <Input id="last_name" name="last_name" value={formData?.last_name || ""} onChange={handleChange} />
+                <Label htmlFor="last_name" className="text-xs font-medium tracking-wide text-muted-foreground">Last Name</Label>
+                <Input id="last_name" name="last_name" className={sidebarInputClass} value={formData?.last_name || ""} onChange={handleChange} />
               </div>
             </SidebarGroupContent>
           </SidebarGroup>
+
           <SidebarGroup>
-            <SidebarGroupLabel>Preferences</SidebarGroupLabel>
-            <SidebarGroupContent className="p-2 space-y-4">             
-              <div className="space-y-1.5 px-1">
-                <Label htmlFor="theme_mode" className="text-xs text-muted-foreground tracking-wider">Portfolio Theme</Label>
+            <SidebarGroupLabel className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Preferences</SidebarGroupLabel>
+            <SidebarGroupContent className="p-4">             
+              <div className="space-y-1.5">
+                <Label htmlFor="theme_mode" className="text-xs font-medium tracking-wide text-muted-foreground">Visual Theme</Label>
                 <Select 
                   value={String(formData?.theme_mode ?? "0")} 
                   onValueChange={(val) => setFormData(prev => ({ ...prev, theme_mode: val }))}
                 >
-                  <SelectTrigger id="theme_mode" className="w-full bg-background shadow-sm">
-                    <SelectValue placeholder="Select a theme" />
+                  <SelectTrigger id="theme_mode" className="h-10 rounded-xl border-border/40 bg-background/40 font-light backdrop-blur-sm transition-all focus:border-primary/50 focus:ring-0">
+                    <SelectValue placeholder="Select variant" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="border-border/30 bg-background/80 backdrop-blur-2xl">
                     {Object.entries(THEME_MAP).map(([key, val]) => (
-                      <SelectItem key={key} value={key}>
+                      <SelectItem key={key} value={key} className="text-sm font-light">
                         {val.replace("theme-", "").charAt(0).toUpperCase() + val.replace("theme-", "").slice(1)}
                       </SelectItem>
                     ))}
@@ -289,67 +293,70 @@ export function SideProfile({ profileData }) {
               </div>
             </SidebarGroupContent>
           </SidebarGroup>
+
           <SidebarGroup>
-            <SidebarGroupLabel>Visibility</SidebarGroupLabel>
-            <SidebarGroupContent className="p-2 space-y-4">  
-              <Field orientation="horizontal" className="rounded-2xl border border-border/60 bg-background p-3 shadow-sm w-full">
-                <FieldContent>
-                  <FieldLabel htmlFor="sidebar-share-toggle">
-                    Share access
-                  </FieldLabel>
-                  <FieldDescription>
-                    {formData?.enable_share_token ? "Portfolio is Public" : "Portfolio is Private"}
-                  </FieldDescription>
-                </FieldContent>
-                <div className="flex gap-2">
+            <SidebarGroupLabel className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">Deployment</SidebarGroupLabel>
+            <SidebarGroupContent className="p-4">  
+              <div className="group relative flex items-center justify-between gap-4 rounded-2xl border border-border/30 bg-card/20 p-4 transition-all duration-500 hover:border-primary/30">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium tracking-tight text-foreground">Visibility</p>
+                  <p className="text-[11px] font-light text-muted-foreground">
+                    {formData?.enable_share_token ? "Public Live" : "Private Node"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
                   {formData?.enable_share_token && formData?.share_token && (
                     <Button
                       type="button"
                       variant="ghost"
-                      size="icon-sm"
-                      className="rounded-full"
+                      size="icon"
+                      className="size-8 rounded-lg text-primary hover:bg-primary/10"
                       onClick={copyShareLink}
+                      title="Copy indexed link"
                     >
-                      <Copy className="size-4" />
+                      <Copy className="size-3.5" />
                     </Button>
                   )}
                   <Switch
                     id="sidebar-share-toggle"
                     checked={formData?.enable_share_token || false}
                     onCheckedChange={handleShareToggle}
+                    className="data-[state=checked]:bg-primary"
                   />
                 </div>
-              </Field>
+              </div>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="border-t border-sidebar-border p-4 space-y-2">
+
+        <SidebarFooter className="border-t border-border/20 p-5 space-y-3">
           {isDirty && (
             <Button 
-              className="w-full rounded-full shadow-none" 
+              className="h-11 w-full rounded-xl font-medium shadow-[0_0_20px_rgba(var(--primary),0.2)] transition-all duration-500 hover:scale-[1.02]" 
               onClick={handleSave}
               disabled={loading}
             >
-              <Save className="mr-2 h-4 w-4" />
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {loading ? "Syncing..." : "Commit Changes"}
             </Button>
           )}
           <Button 
             variant="ghost" 
-            className="w-full justify-start rounded-full text-muted-foreground hover:text-foreground" 
+            className="h-11 w-full justify-start rounded-xl text-sm font-light text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive" 
             onClick={handleLogout}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            Log out
+            <LogOut className="mr-3 h-4 w-4" />
+            End Session
           </Button>
         </SidebarFooter>
       </Sidebar>
+
       <Dialog open={isCropModalOpen} onOpenChange={setIsCropModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md border-border/30 bg-background/80 backdrop-blur-2xl">
           <DialogHeader>
-            <DialogTitle>Crop Profile Picture</DialogTitle>
+            <DialogTitle className="text-xl font-medium tracking-tight">Adjust Frame</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center rounded-md bg-muted/30 p-4">
+          <div className="flex items-center justify-center overflow-hidden rounded-2xl border border-border/40 bg-card/20 p-4">
             {imgSrc && (
               <ReactCrop
                 crop={crop}
@@ -358,13 +365,13 @@ export function SideProfile({ profileData }) {
                 aspect={1}
                 circularCrop
               >
-                <img ref={imgRef} src={imgSrc} alt="Upload" onLoad={onImageLoad} className="max-h-[50vh] object-contain" />
+                <img ref={imgRef} src={imgSrc} alt="Buffer" onLoad={onImageLoad} className="max-h-[50vh] object-contain" />
               </ReactCrop>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCropModalOpen(false)}>Cancel</Button>
-            <Button onClick={generateCroppedImage}>Apply Crop</Button>
+          <DialogFooter className="gap-3 sm:gap-0">
+            <Button variant="outline" className="rounded-full border-border/50 bg-card/30" onClick={() => setIsCropModalOpen(false)}>Cancel</Button>
+            <Button className="rounded-full px-6 shadow-none" onClick={generateCroppedImage}>Apply Protocol</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

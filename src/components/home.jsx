@@ -158,21 +158,25 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div ref={pageRef} className="apple-ambient min-h-screen overflow-hidden text-foreground">
+    <div ref={pageRef} className="cinematic-ambient min-h-screen overflow-hidden text-foreground">
       <div className="relative min-h-screen">
-        <div className="absolute inset-x-0 top-0 h-px bg-foreground/10" />
+        <div className="absolute inset-x-0 top-0 h-px bg-border/20" />
+        
+        {/* Cinematic Ambient Glows - Added overflow-hidden to prevent corner bleed */}
+        <div className="pointer-events-none absolute -left-40 top-0 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute right-0 top-1/4 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
 
         <header data-home-nav className="relative z-20 mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:flex-nowrap sm:px-6 sm:py-5 lg:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-background/80 shadow-sm backdrop-blur sm:size-10">
+          <Link to="/" className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">
+            <span className="cinematic-panel flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-10">
               <Sparkles className="size-4 text-primary sm:size-5" />
             </span>
-            <span className="truncate text-sm font-semibold tracking-tight sm:text-base">MyPortfolio</span>
+            <span className="truncate text-sm font-medium tracking-wide sm:text-base">MyPortfolio</span>
           </Link>
 
           <nav className="flex min-w-0 items-center gap-1.5 sm:gap-3">
-            <div className="hidden items-center gap-1 rounded-full border border-border/70 bg-background/80 p-1 shadow-sm backdrop-blur md:flex">
-              <span className="flex size-8 items-center justify-center text-muted-foreground">
+            <div className="cinematic-panel hidden items-center gap-1 rounded-full p-1 md:flex">
+              <span className="flex size-8 items-center justify-center text-muted-foreground/70">
                 <Palette className="size-4" />
               </span>
               {themeOptions.map((theme) => (
@@ -181,8 +185,8 @@ export default function HomePage() {
                   type="button"
                   aria-label={`Use ${theme.label} theme`}
                   onClick={() => setSelectedTheme(theme.value)}
-                  className={`flex size-8 items-center justify-center rounded-full transition-all hover:bg-foreground/5 ${
-                    selectedTheme === theme.value ? "bg-foreground/5 ring-2 ring-primary/40" : ""
+                  className={`flex size-8 items-center justify-center rounded-full transition-all duration-300 hover:bg-card/60 ${
+                    selectedTheme === theme.value ? "bg-card border border-border/50 shadow-sm" : ""
                   }`}
                 >
                   <span className={`size-3.5 rounded-full ${theme.swatch}`} />
@@ -195,16 +199,16 @@ export default function HomePage() {
               variant="outline"
               size="icon"
               onClick={() => setColorMode((current) => (current === "dark" ? "light" : "dark"))}
-              className="size-9 rounded-full bg-background/80 backdrop-blur sm:size-10"
+              className="cinematic-panel size-9 rounded-full border-transparent shadow-none sm:size-10 hover:border-border/50 hover:bg-card/40"
               aria-label="Toggle light and dark theme"
             >
-              {colorMode === "dark" ? <Moon className="size-4" /> : <Sun className="size-4" />}
+              {colorMode === "dark" ? <Moon className="size-4 text-foreground/80" /> : <Sun className="size-4 text-foreground/80" />}
             </Button>
 
-            <Button asChild variant="ghost" className="h-9 rounded-full px-2.5 text-xs sm:h-10 sm:px-3 sm:text-sm">
+            <Button asChild variant="ghost" className="h-9 rounded-full px-4 text-xs font-medium sm:h-10 sm:px-5 sm:text-sm hover:bg-primary/10 hover:text-primary transition-colors duration-300">
               <Link to="/login">Login</Link>
             </Button>
-            <Button asChild className="h-9 rounded-full px-3 text-xs shadow-none sm:h-10 sm:px-4 sm:text-sm">
+            <Button asChild className="h-9 rounded-full px-5 text-xs shadow-none sm:h-10 sm:px-6 sm:text-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)]">
               <Link to="/login?mode=signup&source=portfolio-builder">
                 <span className="sm:hidden">Join</span>
                 <span className="hidden sm:inline">Sign up</span>
@@ -215,65 +219,51 @@ export default function HomePage() {
 
         <main className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-7xl flex-col justify-center gap-10 px-4 pb-12 pt-6 sm:gap-12 sm:px-6 sm:pb-16 sm:pt-8 lg:grid lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:px-8">
           <section className="max-w-3xl text-left">
-            <div data-home-kicker className="apple-panel mb-5 inline-flex max-w-full items-center gap-2 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground sm:mb-6">
+            <div data-home-kicker className="cinematic-panel mb-6 inline-flex max-w-full items-center gap-2.5 rounded-full px-4 py-1.5 text-xs font-medium text-muted-foreground sm:mb-8">
               <Zap className="size-3.5 text-primary" />
-              <span className="truncate">Animated portfolio builder for modern makers</span>
+              <span className="truncate uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                Animated portfolio builder
+              </span>
             </div>
 
-            <div className="mb-6 flex flex-wrap items-center gap-2 md:hidden">
-              {themeOptions.map((theme) => (
-                <button
-                  key={theme.value}
-                  type="button"
-                  onClick={() => setSelectedTheme(theme.value)}
-                  className={`flex items-center gap-2 rounded-full border border-border bg-card/75 px-3 py-2 text-xs font-medium shadow-sm backdrop-blur transition-colors hover:bg-foreground/5 ${
-                    selectedTheme === theme.value ? "text-foreground ring-2 ring-primary/35" : "text-muted-foreground"
-                  }`}
-                >
-                  <span className={`size-3 rounded-full ${theme.swatch}`} />
-                  {theme.label}
-                </button>
-              ))}
-            </div>
-
-            <h1 data-home-title className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-tight min-[420px]:text-5xl sm:text-6xl sm:leading-[0.98] lg:text-7xl">
+            <h1 data-home-title className="max-w-4xl text-5xl font-medium leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
               Build a portfolio that moves like your work matters.
             </h1>
 
-            <p data-home-copy className="mt-5 max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-6 sm:text-lg sm:leading-7">
+            <p data-home-copy className="mt-6 max-w-2xl text-base font-light leading-relaxed text-muted-foreground sm:mt-8 sm:text-xl sm:leading-8">
               Create, manage, and publish a polished portfolio with themed sections, smooth motion, and a dashboard built for real updates.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button data-home-cta asChild size="lg" className="h-12 w-full rounded-full px-6 text-sm shadow-none sm:w-auto">
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <Button data-home-cta asChild size="lg" className="h-14 w-full rounded-full px-8 text-base font-medium shadow-none sm:w-auto transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)]">
                 <Link to="/login?mode=signup&source=portfolio-builder">
                   Make your portfolio
-                  <ArrowRight className="size-4" />
+                  <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
-              <Button data-home-cta asChild size="lg" variant="outline" className="h-12 w-full rounded-full px-6 text-sm sm:w-auto">
+              <Button data-home-cta asChild variant="outline" size="lg" className="h-14 w-full rounded-full border-border/50 bg-card/30 backdrop-blur-sm px-8 text-base font-medium sm:w-auto transition-all duration-300 hover:bg-card/60 hover:text-primary hover:border-primary/30">
                 <Link to="/preview/1">View demo</Link>
               </Button>
             </div>
 
-            <div className="mt-8 grid max-w-xl gap-3 text-sm min-[420px]:grid-cols-3 sm:mt-10">
+            <div className="mt-10 grid max-w-xl gap-4 text-sm font-medium min-[420px]:grid-cols-3 sm:mt-12">
               {["Fast setup", "Theme aware", "Share ready"].map((item) => (
-                <div key={item} data-home-cta className="flex items-center gap-2 text-muted-foreground">
-                  <BadgeCheck className="size-4 text-primary" />
-                  <span>{item}</span>
+                <div key={item} data-home-cta className="flex items-center gap-2.5 text-muted-foreground">
+                  <BadgeCheck className="size-4.5 text-primary" />
+                  <span className="tracking-wide">{item}</span>
                 </div>
               ))}
             </div>
 
-            <div data-home-cta className="apple-panel mt-8 max-w-2xl rounded-2xl p-4 sm:mt-10 sm:p-5">
-              <p className="text-sm font-semibold tracking-tight">How it works</p>
-              <div className="mt-4 grid gap-3">
+            <div data-home-cta className="cinematic-panel mt-10 max-w-2xl rounded-[2rem] p-6 sm:mt-12 sm:p-8 overflow-hidden">
+              <p className="text-sm font-medium tracking-wide text-primary">How it works</p>
+              <div className="mt-5 grid gap-4">
                 {builderSteps.map((step, index) => (
-                  <div key={step} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/12 text-xs font-semibold text-primary">
+                  <div key={step} className="flex items-start gap-4 text-sm font-light text-muted-foreground sm:text-base">
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary border border-primary/20">
                       {index + 1}
                     </span>
-                    <span>{step}</span>
+                    <span className="leading-relaxed">{step}</span>
                   </div>
                 ))}
               </div>
@@ -281,83 +271,88 @@ export default function HomePage() {
           </section>
 
           <section className="relative min-h-[390px] perspective-[1200px] sm:min-h-[560px] lg:min-h-[640px]">
-            <div data-home-float className="apple-panel absolute left-2 top-4 z-20 hidden rounded-full px-4 py-2 text-sm font-medium sm:flex">
-              <Wand2 className="mr-2 size-4 text-primary" />
+            {/* Cinematic Glow Behind Preview */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[350px] w-[350px] rounded-full bg-primary/20 blur-[100px] pointer-events-none" />
+
+            <div data-home-float className="cinematic-panel absolute left-2 top-4 z-20 hidden rounded-full px-5 py-2.5 text-sm font-medium tracking-wide sm:flex">
+              <Wand2 className="mr-2.5 size-4 text-primary" />
               Live theme controls
             </div>
 
-            <div data-home-float className="apple-panel absolute bottom-8 right-2 z-20 hidden rounded-full px-4 py-2 text-sm font-medium sm:flex">
-              <LayoutDashboard className="mr-2 size-4 text-primary" />
+            <div data-home-float className="cinematic-panel absolute bottom-8 right-2 z-20 hidden rounded-full px-5 py-2.5 text-sm font-medium tracking-wide sm:flex">
+              <LayoutDashboard className="mr-2.5 size-4 text-primary" />
               Dashboard ready
             </div>
 
+            {/* 3D Preview Wrapper - Added overflow-hidden to clip internal gradients */}
             <div
               ref={previewRef}
               data-home-preview
-              className="apple-panel-strong relative mx-auto h-[380px] w-full max-w-[680px] rounded-[28px] p-2 [transform-style:preserve-3d] sm:h-[580px] sm:rounded-[34px] sm:p-3"
+              className="cinematic-panel-strong relative mx-auto h-[380px] w-full max-w-[680px] rounded-[2.5rem] p-2 sm:h-[580px] sm:rounded-[3rem] sm:p-3 shadow-2xl shadow-background/80 overflow-hidden"
             >
-              <div className="relative h-full overflow-hidden rounded-xl border border-border bg-background sm:rounded-[20px]">
+              <div className="relative h-full overflow-hidden rounded-[1.8rem] border border-border/40 bg-card/20 backdrop-blur-xl sm:rounded-[2.2rem]">
                 <div data-home-scan className="pointer-events-none absolute -left-1/2 top-0 z-20 h-full w-1/2 bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
 
-                <div className="flex h-10 items-center justify-between border-b border-border/70 px-3 sm:h-12 sm:px-4">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2.5 rounded-full bg-destructive/70" />
-                    <span className="size-2.5 rounded-full bg-chart-1/80" />
-                    <span className="size-2.5 rounded-full bg-chart-2/80" />
+                <div className="flex h-12 items-center justify-between border-b border-border/40 bg-card/40 px-4 sm:h-14 sm:px-6">
+                  <div className="flex items-center gap-2.5">
+                    <span className="size-3 rounded-full bg-destructive/80" />
+                    <span className="size-3 rounded-full bg-amber-500/80" />
+                    <span className="size-3 rounded-full bg-emerald-500/80" />
                   </div>
-                  <div className="h-2 w-20 rounded-full bg-muted sm:w-28" />
+                  <div className="h-2 w-20 rounded-full bg-muted/60 sm:w-28" />
                 </div>
 
-                <div className="grid h-[calc(100%-2.5rem)] grid-cols-[64px_1fr] sm:h-[calc(100%-3rem)] sm:grid-cols-[132px_1fr]">
-                  <aside className="border-r border-border/70 bg-muted/25 p-2 sm:p-3">
-                    <div className="mb-3 h-7 rounded-lg bg-primary/20 sm:mb-5 sm:h-8" />
-                    <div className="space-y-2 sm:space-y-3">
+                <div className="grid h-[calc(100%-3rem)] grid-cols-[64px_1fr] sm:h-[calc(100%-3.5rem)] sm:grid-cols-[140px_1fr]">
+                  <aside className="border-r border-border/40 bg-card/20 p-3 sm:p-4">
+                    <div className="mb-4 h-8 rounded-lg bg-primary/20 sm:mb-6 sm:h-10" />
+                    <div className="space-y-3 sm:space-y-4">
                       {showcaseItems.map((item, index) => (
                         <div
                           key={item}
-                          className={`h-6 rounded-md sm:h-8 sm:rounded-lg ${index === 1 ? "bg-primary text-primary-foreground" : "bg-background"}`}
+                          className={`h-7 rounded-md sm:h-9 sm:rounded-lg ${index === 1 ? "bg-primary text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]" : "bg-card/40 border border-border/30"}`}
                         />
                       ))}
                     </div>
                   </aside>
 
-                  <div className="overflow-hidden p-3 sm:p-6">
-                    <div className="mb-3 flex items-center justify-between gap-3 sm:mb-5 sm:gap-4">
+                  <div className="overflow-hidden p-4 sm:p-8">
+                    <div className="mb-5 flex items-center justify-between gap-4 sm:mb-8">
                       <div>
-                        <div className="mb-2 h-2.5 w-20 rounded-full bg-primary/30 sm:h-3 sm:w-24" />
-                        <div className="h-5 w-32 rounded-lg bg-foreground/85 dark:bg-foreground/75 sm:h-7 sm:w-44" />
+                        <div className="mb-3 h-2.5 w-20 rounded-full bg-primary/40 sm:h-3 sm:w-24" />
+                        <div className="h-6 w-32 rounded-lg bg-foreground/90 sm:h-8 sm:w-48" />
                       </div>
-                      <div className="hidden h-10 w-24 rounded-full bg-primary sm:block" />
+                      <div className="hidden h-10 w-28 rounded-full bg-primary sm:block shadow-[0_0_20px_rgba(var(--primary),0.3)]" />
                     </div>
 
-                    <div className="grid gap-3 sm:gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                      <div className="min-h-36 rounded-xl border border-border bg-card p-3 sm:min-h-52 sm:rounded-2xl sm:p-4">
-                        <div className="mb-3 h-24 rounded-lg bg-gradient-to-br from-primary/75 via-chart-2/60 to-chart-1/60 sm:mb-4 sm:h-32 sm:rounded-xl" />
-                        <div className="space-y-2">
-                          <div className="h-3 w-3/4 rounded-full bg-foreground/70" />
-                          <div className="h-3 w-1/2 rounded-full bg-muted-foreground/35" />
+                    <div className="grid gap-4 sm:gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                      <div className="cinematic-panel relative min-h-36 rounded-2xl p-4 sm:min-h-52 sm:rounded-[2rem] sm:p-5 overflow-hidden">
+                        {/* Gradient Box - Increased rounding and added overflow-hidden to parent */}
+                        <div className="mb-4 h-24 w-full rounded-xl bg-gradient-to-br from-primary/60 via-accent/40 to-chart-1/30 sm:mb-5 sm:h-32 sm:rounded-2xl" />
+                        <div className="space-y-3">
+                          <div className="h-3.5 w-3/4 rounded-full bg-foreground/80" />
+                          <div className="h-3 w-1/2 rounded-full bg-muted-foreground/40" />
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-2 sm:block sm:space-y-4">
+                      <div className="grid grid-cols-3 gap-3 sm:block sm:space-y-5">
                         {["Profile", "Projects", "Publish"].map((item, index) => (
-                          <div key={item} data-home-float className="rounded-xl border border-border bg-card p-2 sm:rounded-2xl sm:p-4">
-                            <div className="mb-2 flex items-center gap-2 sm:mb-3 sm:gap-3">
-                              <div className="flex size-7 items-center justify-center rounded-lg bg-primary/15 text-xs font-semibold text-primary sm:size-9 sm:rounded-xl sm:text-sm">
+                          <div key={item} data-home-float className="cinematic-panel rounded-xl p-3 sm:rounded-[1.5rem] sm:p-5 overflow-hidden">
+                            <div className="mb-3 flex items-center gap-3 sm:mb-4">
+                              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-xs font-medium text-primary sm:size-10 sm:rounded-xl sm:text-sm">
                                 {index + 1}
                               </div>
-                              <div className="hidden h-3 w-24 rounded-full bg-foreground/70 min-[480px]:block" />
+                              <div className="hidden h-3 w-24 rounded-full bg-foreground/60 min-[480px]:block" />
                             </div>
-                            <div className="h-2 w-full rounded-full bg-muted" />
+                            <div className="h-2 w-full rounded-full bg-border/60" />
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="mt-3 overflow-hidden rounded-xl border border-border bg-muted/30 py-2 sm:mt-4 sm:rounded-2xl sm:py-3">
-                      <div data-home-marquee className="flex w-max gap-3 px-3">
+                    <div className="mt-4 overflow-hidden rounded-xl border border-border/40 bg-card/30 py-3 sm:mt-6 sm:rounded-2xl sm:py-4">
+                      <div data-home-marquee className="flex w-max gap-4 px-4">
                         {[...showcaseItems, ...showcaseItems].map((item, index) => (
-                          <span key={`${item}-${index}`} className="rounded-full border border-border bg-background px-4 py-2 text-xs font-medium text-muted-foreground">
+                          <span key={`${item}-${index}`} className="rounded-full border border-border/50 bg-card/50 px-5 py-2 text-xs font-medium tracking-wide text-muted-foreground">
                             {item}
                           </span>
                         ))}
@@ -371,54 +366,54 @@ export default function HomePage() {
         </main>
       </div>
 
-      <section className="relative z-10 border-y border-border/50 bg-background/35 py-12 backdrop-blur sm:py-16">
-        <div className="mx-auto grid w-full max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
+      <section className="relative z-10 border-y border-border/30 bg-background/50 py-16 backdrop-blur-xl sm:py-24">
+        <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
           {builderFeatures.map((feature) => {
             const Icon = feature.icon
 
             return (
-              <article key={feature.title} data-home-feature className="apple-panel apple-panel-hover rounded-xl p-5 sm:rounded-2xl sm:p-6">
-                <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-primary/12 text-primary sm:mb-5 sm:size-11">
-                  <Icon className="size-5" />
+              <article key={feature.title} data-home-feature className="cinematic-panel cinematic-panel-hover overflow-hidden rounded-[2rem] p-6 sm:p-8">
+                <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-primary/10 border border-primary/20 text-primary sm:mb-6 sm:size-14">
+                  <Icon className="size-6" />
                 </div>
-                <h2 className="text-lg font-semibold tracking-tight">{feature.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{feature.text}</p>
+                <h2 className="text-xl font-medium tracking-tight text-foreground">{feature.title}</h2>
+                <p className="mt-3 text-base font-light leading-relaxed text-muted-foreground">{feature.text}</p>
               </article>
             )
           })}
         </div>
       </section>
 
-      <footer className="relative z-10 border-t border-border/50 bg-background/70 px-4 py-8 backdrop-blur sm:px-6 sm:py-10 lg:px-8">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
+      <footer className="relative z-10 bg-background/80 px-4 py-10 backdrop-blur-lg sm:px-6 sm:py-12 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 md:flex-row md:items-center md:justify-between">
           <div className="max-w-md">
-            <Link to="/" className="inline-flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-xl border border-border bg-muted/40">
+            <Link to="/" className="inline-flex items-center gap-3 transition-opacity hover:opacity-80">
+              <span className="cinematic-panel flex size-10 items-center justify-center rounded-xl">
                 <Sparkles className="size-5 text-primary" />
               </span>
-              <span className="text-base font-semibold tracking-tight">MyPortfolio</span>
+              <span className="text-lg font-medium tracking-wide">MyPortfolio</span>
             </Link>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            <p className="mt-4 text-sm font-light leading-relaxed text-muted-foreground">
               Build a themed portfolio, manage it from your dashboard, and share a polished public page.
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 sm:items-end">
-            <div className="grid w-full grid-cols-2 gap-2 min-[480px]:flex min-[480px]:flex-wrap min-[480px]:gap-3 sm:w-auto">
+          <div className="flex flex-col gap-6 sm:items-end">
+            <div className="grid w-full grid-cols-2 gap-3 min-[480px]:flex min-[480px]:flex-wrap min-[480px]:gap-4 sm:w-auto">
               {footerLinks.map((link) => (
-                <Button key={link.label} asChild variant="outline" size="sm" className="w-full rounded-full bg-background shadow-none min-[480px]:w-auto">
+                <Button key={link.label} asChild variant="outline" size="sm" className="w-full rounded-full border-border/50 bg-card/30 font-medium tracking-wide shadow-none min-[480px]:w-auto transition-colors hover:bg-card/60 hover:text-primary">
                   <a
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
                   >
                     {link.label}
-                    {link.external && <ExternalLink className="size-3.5" />}
+                    {link.external && <ExternalLink className="ml-1.5 size-3.5" />}
                   </a>
                 </Button>
               ))}
             </div>
-            <p className="text-sm leading-6 text-muted-foreground sm:text-right">
+            <p className="text-sm font-light tracking-wide text-muted-foreground sm:text-right">
               © {new Date().getFullYear()} Portfolio Builder. All rights reserved.
             </p>
           </div>

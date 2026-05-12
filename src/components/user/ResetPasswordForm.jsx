@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { resetPassword } from "@/helper/functions" // Adjust import to where your api functions are
+import { resetPassword } from "@/helper/functions"
 import { toast } from "sonner"
 import { Loader2, CheckCircle2 } from "lucide-react"
 
@@ -25,61 +25,69 @@ export default function ResetPasswordForm({ email, onSuccess }) {
         otp: formData.otp, 
         new_password: formData.new_password 
       })
-      toast.success("Password reset successfully! You can now log in.")
+      toast.success("Security credentials updated successfully.")
       onSuccess() // Shifts the view back to login
     } catch (error) {
-      toast.error(error.message || "Invalid OTP or request failed.")
+      toast.error(error.message || "Invalid verification code or request expired.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="reset-otp">6-Digit Reset Code</Label>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2.5">
+        <Label htmlFor="reset-otp" className="text-sm font-medium tracking-wide text-foreground/90">
+          6-Digit Verification Code
+        </Label>
         <Input 
           id="reset-otp" 
           name="otp" 
           type="text" 
-          placeholder="123456" 
+          placeholder="000000" 
           required 
           maxLength={6}
           value={formData.otp}
           onChange={handleChange}
-          className="rounded-xl bg-muted/20 h-11 text-center tracking-widest text-lg"
+          className="h-12 rounded-xl border-border/40 bg-card/40 text-center text-xl font-light tracking-[0.5em] backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary focus-visible:bg-card/60 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="new-password">New Password</Label>
+      <div className="space-y-2.5">
+        <Label htmlFor="new-password" className="text-sm font-medium tracking-wide text-foreground/90">
+          New Security Password
+        </Label>
         <Input 
           id="new-password" 
           name="new_password" 
           type="password" 
-          placeholder="Enter new password" 
+          placeholder="••••••••" 
           required 
           minLength={8}
           value={formData.new_password}
           onChange={handleChange}
-          className="rounded-xl bg-muted/20 h-11"
+          className="h-12 rounded-xl border-border/40 bg-card/40 font-light backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary focus-visible:bg-card/60 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
         />
+        <p className="px-1 text-[11px] font-light leading-relaxed text-muted-foreground">
+          Minimum 8 characters required. Ensure your new password is distinct from previous versions.
+        </p>
       </div>
 
       <Button 
         type="submit" 
-        className="mt-4 w-full rounded-full font-medium shadow-none h-11" 
+        size="lg"
+        className="mt-2 h-12 w-full rounded-full font-medium transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)] shadow-none" 
         disabled={loading}
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 size-4 animate-spin" />
-            Resetting...
+            <Loader2 className="mr-2 size-5 animate-spin" />
+            Updating...
           </>
         ) : (
           <>
-            Confirm New Password
-            <CheckCircle2 className="ml-2 size-4" />
+            Confirm Update
+            <CheckCircle2 className="ml-2 size-5" />
           </>
         )}
       </Button>

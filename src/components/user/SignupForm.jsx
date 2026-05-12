@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Loader2, ArrowRight } from "lucide-react"
+import { Loader2, ArrowRight, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 
 // 1. Import the custom hook
@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Label } from "@/components/ui/label"
 
-// Custom SVG that behaves exactly like a Lucide icon (inherits theme text color)
+// Custom SVG that behaves exactly like a Lucide icon
 const GoogleIcon = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -49,28 +49,25 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  // --- CUSTOM SHADCN GOOGLE SIGN-UP ---
   const triggerGoogleSignup = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setGoogleLoading(true);
       try {
-        // useGoogleLogin returns an access_token
         await loginWithGoogle(tokenResponse.access_token);
-        toast.success("Account created and verified with Google!");
+        toast.success("Account verified via Google Cloud.");
         navigate(redirectTo, { replace: true });
       } catch (error) {
          console.error("Google Signup Error:", error);
-         toast.error("Failed to sign up with Google. Please try again.");
+         toast.error("Cloud verification failed. Please retry.");
       } finally {
         setGoogleLoading(false);
       }
     },
     onError: () => {
-      toast.error("Google Sign-Up popup closed or failed.");
+      toast.error("Verification sequence aborted.");
     }
   });
 
-  // --- STANDARD EMAIL/PASSWORD REGISTRATION ---
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -79,14 +76,14 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
       await registerUser(formData)
       setOtpValue("")
       setOtpOpen(true)
-      toast.success("Account created. Enter the OTP sent to your email.")
+      toast.success("Identity profile created. Verification required.");
     } catch (err) {
       if (err.status === 400) {
         setOtpValue("")
         setOtpOpen(true)
-        toast.info("Account requires verification. Please check your email for the code.")
+        toast.info("Pending verification. Check your secure inbox.");
       } else {
-        toast.error(err.message || "Failed to create account.")
+        toast.error(err.message || "Initialization failed.");
       }
     } finally {
       setLoading(false)
@@ -95,21 +92,16 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault()
-
-    if (otpValue.length !== 6) {
-      toast.error("Enter the 6-digit OTP to continue.")
-      return
-    }
-
+    if (otpValue.length !== 6) return
     setOtpLoading(true)
 
     try {
       await verifyOTP(formData.email, otpValue)
       setOtpOpen(false)
-      toast.success("Account verified successfully.")
+      toast.success("Authentication sequence complete.");
       navigate(redirectTo, { replace: true })
     } catch (err) {
-      toast.error(err.message || "Failed to verify OTP.")
+      toast.error(err.message || "Invalid credentials buffer.");
     } finally {
       setOtpLoading(false)
     }
@@ -117,12 +109,11 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
 
   const handleResendOtp = async () => {
     setResendLoading(true)
-
     try {
       await requestOTP(formData.email)
-      toast.success("A fresh OTP has been sent.")
+      toast.success("New verification buffer transmitted.");
     } catch (err) {
-      toast.error(err.message || "Could not resend OTP.")
+      toast.error(err.message || "Transmission failed.");
     } finally {
       setResendLoading(false)
     }
@@ -130,12 +121,14 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-7">
         
-        {/* --- STANDARD FORM --- */}
+        {/* --- CINEMATIC FORM --- */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="signup-email">Email</Label>
+            <Label htmlFor="signup-email" className="text-sm font-medium tracking-wide text-foreground/90">
+              Email Address
+            </Label>
             <Input
               id="signup-email"
               name="email"
@@ -144,95 +137,100 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
               required
               value={formData.email}
               onChange={handleChange}
-              className="rounded-xl h-11 bg-muted/20"
+              className="h-12 rounded-xl border-border/40 bg-card/40 font-light backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary focus-visible:bg-card/60 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
               disabled={loading || googleLoading}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="signup-password">Create Password</Label>
+            <Label htmlFor="signup-password" className="text-sm font-medium tracking-wide text-foreground/90">
+              Secure Password
+            </Label>
             <Input
               id="signup-password"
               name="password"
               type="password"
+              placeholder="••••••••"
               required
               value={formData.password}
               onChange={handleChange}
-              className="rounded-xl h-11 bg-muted/20"
+              className="h-12 rounded-xl border-border/40 bg-card/40 font-light backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary focus-visible:bg-card/60 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
               disabled={loading || googleLoading}
             />
           </div>
           
           <Button 
             type="submit" 
-            className="mt-6 w-full rounded-full font-medium shadow-none h-11" 
+            className="mt-6 h-12 w-full rounded-full font-medium transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)] shadow-none" 
             disabled={loading || googleLoading}
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                Creating account...
+                <Loader2 className="mr-2 size-5 animate-spin" />
+                Initializing...
               </>
             ) : (
               <>
                 Create Account
-                <ArrowRight className="ml-2 size-4" />
+                <ArrowRight className="ml-2 size-5" />
               </>
             )}
           </Button>
 
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            By clicking create account, you agree to our{" "}
-            <a href="/terms" className="underline underline-offset-4 hover:text-foreground">
-              Terms of Service
+          <p className="mt-4 text-center text-[11px] font-light leading-relaxed text-muted-foreground">
+            By initializing account creation, you consent to our{" "}
+            <a href="/terms" className="text-foreground underline underline-offset-4 hover:text-primary transition-colors">
+              Terms of Protocol
             </a>{" "}
             and{" "}
-            <a href="/privacy" className="underline underline-offset-4 hover:text-foreground">
-              Privacy Policy
+            <a href="/privacy" className="text-foreground underline underline-offset-4 hover:text-primary transition-colors">
+              Privacy Framework
             </a>
             .
           </p>
         </form>
 
-        {/* --- DIVIDER --- */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-border/40" />
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or register with
+          <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-medium">
+            <span className="bg-background px-3 text-muted-foreground">
+              Secondary Auth
             </span>
           </div>
         </div>
 
-        {/* --- SHADCN NATIVE GOOGLE BUTTON --- */}
         <Button
           type="button"
           variant="outline"
-          className="w-full rounded-xl h-11 font-medium shadow-none"
+          className="h-12 w-full rounded-full border border-border/50 bg-card/30 font-medium backdrop-blur-sm transition-all duration-500 hover:border-primary/40 hover:bg-primary/10 hover:text-primary shadow-none"
           onClick={() => triggerGoogleSignup()}
           disabled={loading || googleLoading}
         >
           {googleLoading ? (
-            <Loader2 className="mr-2 size-4 animate-spin" />
+            <Loader2 className="mr-2 size-5 animate-spin" />
           ) : (
-            <GoogleIcon className="mr-2 size-4" />
+            <GoogleIcon className="mr-2 size-5" />
           )}
-          Google
+          Google Cloud
         </Button>
 
       </div>
 
+      {/* --- CINEMATIC OTP DIALOG --- */}
       <Dialog open={otpOpen} onOpenChange={(open) => !otpLoading && setOtpOpen(open)}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Verify your account</DialogTitle>
-            <DialogDescription>
-              Enter the 6-digit OTP sent to {formData.email} to finish setup and continue to the dashboard.
+        <DialogContent className="sm:max-w-md border-border/30 bg-background/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl p-8">
+          <DialogHeader className="space-y-3">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary mb-2">
+              <ShieldCheck className="size-7" />
+            </div>
+            <DialogTitle className="text-center text-2xl font-medium tracking-tight">Verify Protocol</DialogTitle>
+            <DialogDescription className="text-center font-light leading-relaxed">
+              Enter the 6-digit buffer sent to <span className="text-foreground font-medium">{formData.email}</span> to synchronize your account.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleVerifyOtp} className="space-y-6">
+          <form onSubmit={handleVerifyOtp} className="mt-4 space-y-8">
             <div className="flex justify-center">
               <InputOTP
                 maxLength={6}
@@ -240,42 +238,41 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
                 onChange={setOtpValue}
                 containerClassName="justify-center"
               >
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
+                <InputOTPGroup className="gap-2 sm:gap-3">
+                  {[0, 1, 2, 3, 4, 5].map((idx) => (
+                    <InputOTPSlot 
+                      key={idx} 
+                      index={idx} 
+                      className="size-11 sm:size-12 rounded-xl border-border/40 bg-card/30 text-xl font-light backdrop-blur-md focus:border-primary focus:ring-1 focus:ring-primary/40" 
+                    />
+                  ))}
                 </InputOTPGroup>
               </InputOTP>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col gap-3 sm:flex-row sm:justify-between">
               <Button
                 type="button"
                 variant="outline"
-                className="w-full rounded-full sm:w-auto h-11"
+                className="h-11 w-full rounded-full border-border/50 bg-card/30 font-medium transition-all duration-300 hover:bg-card/50 sm:w-auto"
                 disabled={otpLoading || resendLoading}
                 onClick={handleResendOtp}
               >
                 {resendLoading ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Resending...
-                  </>
+                  <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  "Resend OTP"
+                  "Resend Buffer"
                 )}
               </Button>
-              <Button type="submit" className="w-full rounded-full font-medium shadow-none sm:w-auto h-11" disabled={otpLoading}>
+              <Button 
+                type="submit" 
+                className="h-11 w-full rounded-full font-medium transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(var(--primary),0.3)] shadow-none sm:w-auto px-8" 
+                disabled={otpLoading}
+              >
                 {otpLoading ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Verifying...
-                  </>
+                  <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  "Verify OTP"
+                  "Verify Access"
                 )}
               </Button>
             </DialogFooter>

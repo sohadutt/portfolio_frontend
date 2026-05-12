@@ -18,7 +18,7 @@ export default function ForgotPasswordForm({ onOtpSent }) {
     setLoading(true)
     try {
       await forgotPassword(email)
-      toast.success("If an account exists, a reset code has been sent.")
+      toast.success("Recovery protocol initiated. Check your inbox.")
       onOtpSent(email) // Shift the view to the reset password form
     } catch (error) {
       toast.error(error.message || "Something went wrong. Please try again.")
@@ -28,9 +28,11 @@ export default function ForgotPasswordForm({ onOtpSent }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="space-y-2">
-        <Label htmlFor="reset-email">Email Address</Label>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-2.5">
+        <Label htmlFor="reset-email" className="text-sm font-medium tracking-wide text-foreground/90">
+          Email Address
+        </Label>
         <Input 
           id="reset-email" 
           name="email" 
@@ -39,24 +41,29 @@ export default function ForgotPasswordForm({ onOtpSent }) {
           required 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded-xl bg-muted/20 h-11"
+          className="h-12 rounded-xl border-border/40 bg-card/40 font-light backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus-visible:border-primary focus-visible:bg-card/60 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
+          disabled={loading}
         />
+        <p className="px-1 text-[11px] font-light leading-relaxed text-muted-foreground">
+          We will send a unique 6-digit verification code to this address if it is indexed in our system.
+        </p>
       </div>
 
       <Button 
         type="submit" 
-        className="mt-4 w-full rounded-full font-medium shadow-none h-11" 
+        size="lg"
+        className="mt-2 h-12 w-full rounded-full font-medium transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)] shadow-none" 
         disabled={loading}
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 size-4 animate-spin" />
-            Sending code...
+            <Loader2 className="mr-2 size-5 animate-spin" />
+            Transmitting...
           </>
         ) : (
           <>
             Send Reset Code
-            <ArrowRight className="ml-2 size-4" />
+            <ArrowRight className="ml-2 size-5" />
           </>
         )}
       </Button>

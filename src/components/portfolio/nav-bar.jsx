@@ -42,7 +42,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         isVisible
           ? 'translate-y-0 opacity-100'
           : 'pointer-events-none -translate-y-[calc(100%-1rem)] opacity-0'
@@ -51,25 +51,28 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
       onMouseLeave={onHide}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="apple-panel-strong flex w-full items-center justify-between rounded-full px-3 py-2">
-          <a href="#" className="flex items-center gap-3 rounded-full px-2.5 py-2 transition-colors hover:bg-foreground/5">
+        
+        {/* Cinematic Panel Wrapper */}
+        <div className="cinematic-panel flex w-full items-center justify-between rounded-full px-3 py-2">
+          
+          <a href="#" className="flex items-center gap-3 rounded-full px-2.5 py-2 transition-colors duration-300 hover:bg-card/40">
             <Avatar
               className={
                 isDefaultPortfolio
-                  ? 'size-12 border border-border shadow-sm'
-                  : 'size-10 border border-border shadow-sm'
+                  ? 'size-12 border border-border/50'
+                  : 'size-10 border border-border/50'
               }
             >
               <AvatarImage src={profileImage || undefined} alt={personalInfo.name || "Portfolio Owner"} />
-              <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
+              <AvatarFallback className="bg-primary text-sm font-medium text-primary-foreground">
                 {fallbackInitials}
               </AvatarFallback>
             </Avatar>
-            <div className="hidden sm:grid sm:gap-1.5">
-              <p className="text-sm font-semibold leading-none text-foreground">
+            <div className="hidden sm:grid sm:gap-1">
+              <p className="text-sm font-medium leading-none tracking-tight text-foreground">
                 {personalInfo.name || "Your Name"}
               </p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-xs font-light leading-none text-muted-foreground">
                 {personalInfo.title || "Your Title"}
               </p>
             </div>
@@ -81,7 +84,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
               <a
                 key={`${link.label || 'link'}-${index}`}
                 href={link.href || '#'}
-                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                className="rounded-full px-5 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-primary/10 hover:text-primary"
               >
                 {link.label || "Link"}
               </a>
@@ -93,7 +96,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                 href={resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                className="rounded-full px-5 py-2 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-primary/10 hover:text-primary"
               >
                 Resume
               </a>
@@ -104,33 +107,33 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
             
             {/* Desktop CTA */}
-            <Button asChild className="hidden rounded-full px-6 font-medium shadow-none sm:inline-flex">
+            <Button asChild className="hidden rounded-full px-7 font-medium transition-all hover:scale-[1.02] sm:inline-flex">
               <a href="/home">Make your portfolio</a>
             </Button>
 
             {/* Mobile Navigation Sheet */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full lg:hidden">
+                <Button variant="ghost" size="icon" className="rounded-full transition-colors hover:bg-primary/10 hover:text-primary lg:hidden">
                   <Menu className="size-5" />
                   <span className="sr-only">Toggle navigation menu</span>
                 </Button>
               </SheetTrigger>
               
-              {/* Refined Mobile Drawer Styling */}
-              <SheetContent side="right" className="flex w-[85vw] flex-col px-6 py-8 sm:w-[400px]">
-                <SheetTitle className="text-left text-lg font-semibold tracking-tight text-foreground">
+              {/* DeepMind Styled Mobile Drawer */}
+              <SheetContent side="right" className="flex w-[85vw] flex-col border-l border-border/30 bg-background/80 px-6 py-8 backdrop-blur-2xl sm:w-[400px]">
+                <SheetTitle className="text-left text-lg font-medium tracking-tight text-foreground">
                   Menu
                 </SheetTitle>
                 
-                <div className="mt-8 flex flex-col h-full">
+                <div className="mt-8 flex h-full flex-col">
                   <nav className="flex flex-col gap-6">
                     {navigationLinks.map((link, index) => (
                       <a
                         key={`mobile-${link.label || 'link'}-${index}`}
                         href={link.href || '#'}
                         onClick={() => setIsOpen(false)}
-                        className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-lg font-light tracking-wide text-muted-foreground transition-colors hover:text-primary"
                       >
                         {link.label || "Link"}
                       </a>
@@ -143,16 +146,16 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setIsOpen(false)}
-                        className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-lg font-light tracking-wide text-muted-foreground transition-colors hover:text-primary"
                       >
                         Resume
                       </a>
                     )}
                   </nav>
 
-                  {/* Mobile CTA properly aligned with margin-top instead of auto-bottom */}
+                  {/* Mobile CTA */}
                   <div className="mt-10 sm:hidden">
-                    <Button asChild size="lg" className="w-full rounded-full shadow-none font-semibold">
+                    <Button asChild size="lg" className="w-full rounded-full font-medium transition-all hover:scale-[1.02]">
                       <a href="/home">Make your portfolio</a>
                     </Button>
                   </div>
