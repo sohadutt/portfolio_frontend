@@ -174,7 +174,7 @@ export default function LoginForm({ redirectTo = "/dashboard", onRequireVerifica
         ) : (
           <GoogleIcon className="mr-2 size-5" />
         )}
-        Google Cloud
+        Google Login
       </Button>
 
     </div>

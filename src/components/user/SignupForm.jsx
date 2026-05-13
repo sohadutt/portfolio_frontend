@@ -212,7 +212,7 @@ export default function SignupForm({ redirectTo = "/dashboard" }) {
           ) : (
             <GoogleIcon className="mr-2 size-5" />
           )}
-          Google Cloud
+          Google Sign-up
         </Button>
 
       </div>
