@@ -85,16 +85,16 @@ const applyTheme = (themeMode) => {
 
 function GlobalFooter() {
   return (
-    <footer className="border-t border-border/20 py-6 bg-background/50 backdrop-blur-md text-foreground z-50">
-      <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 md:h-16 md:flex-row md:py-0">
+    <footer className="border-t border-border/20 py-8 bg-background/50 backdrop-blur-md text-foreground z-50">
+      <div className="container mx-auto flex flex-col items-center justify-between gap-6 px-4 sm:px-6 lg:px-8 md:h-16 md:flex-row md:gap-4 md:py-0">
         <p className="text-center text-sm font-light tracking-wide text-muted-foreground md:text-left">
           © {new Date().getFullYear()} Portfolio Builder. All rights reserved.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm font-light tracking-wide text-muted-foreground">
-          <Link to="/terms" className="transition-colors hover:text-primary">
+        <div className="flex flex-wrap items-center justify-center gap-8 text-sm font-light tracking-wide text-muted-foreground md:gap-6">
+          <Link to="/terms" className="transition-colors duration-300 hover:text-primary">
             Terms of Service
           </Link>
-          <Link to="/privacy" className="transition-colors hover:text-primary">
+          <Link to="/privacy" className="transition-colors duration-300 hover:text-primary">
             Privacy Policy
           </Link>
         </div>
@@ -211,7 +211,7 @@ function PortfolioShell({ data, isDefaultPortfolio = false }) {
         }}
       />
 
-      <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-16 pt-28 sm:px-6 lg:gap-12 lg:px-8">
+      <main className="relative mx-auto flex w-full max-w-7xl flex-col gap-12 px-4 pb-20 pt-32 sm:px-6 lg:gap-16 lg:px-8">
         {memoizedHero}
         {memoizedAbout}
         {memoizedWork}

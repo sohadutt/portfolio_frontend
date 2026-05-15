@@ -51,25 +51,25 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
       onMouseLeave={onHide}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-4 sm:px-6 lg:px-8">
-        
+
         {/* Cinematic Panel Wrapper */}
-        <div className="cinematic-panel flex w-full items-center justify-between rounded-full px-3 py-2">
-          
+        <div className="cinematic-panel flex w-full items-center justify-between rounded-full px-3 py-2 shadow-lg">
+
           <a href="#" className="flex items-center gap-3 rounded-full px-2.5 py-2 transition-colors duration-300 hover:bg-card/40">
             <Avatar
               className={
                 isDefaultPortfolio
-                  ? 'size-12 border border-border/50'
-                  : 'size-10 border border-border/50'
+                  ? 'size-12 border-2 border-border/50'
+                  : 'size-10 border-2 border-border/50'
               }
             >
               <AvatarImage src={profileImage || undefined} alt={personalInfo.name || "Portfolio Owner"} />
-              <AvatarFallback className="bg-primary text-sm font-medium text-primary-foreground">
+              <AvatarFallback className="bg-primary text-sm font-bold text-primary-foreground">
                 {fallbackInitials}
               </AvatarFallback>
             </Avatar>
             <div className="hidden sm:grid sm:gap-1">
-              <p className="text-sm font-medium leading-none tracking-tight text-foreground">
+              <p className="text-sm font-semibold leading-none tracking-tight text-foreground">
                 {personalInfo.name || "Your Name"}
               </p>
               <p className="text-xs font-light leading-none text-muted-foreground">
@@ -89,7 +89,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                 {link.label || "Link"}
               </a>
             ))}
-            
+
             {/* Desktop Resume Link */}
             {resumeUrl && (
               <a
@@ -105,9 +105,9 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
 
           <div className="flex items-center gap-2">
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-            
+
             {/* Desktop CTA */}
-            <Button asChild className="hidden rounded-full px-7 font-medium transition-all hover:scale-[1.02] sm:inline-flex">
+            <Button asChild className="hidden rounded-full px-7 font-semibold transition-all hover:scale-[1.02] sm:inline-flex shadow-md">
               <a href="/home">Make your portfolio</a>
             </Button>
 
@@ -119,13 +119,13 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                   <span className="sr-only">Toggle navigation menu</span>
                 </Button>
               </SheetTrigger>
-              
+
               {/* DeepMind Styled Mobile Drawer */}
               <SheetContent side="right" className="flex w-[85vw] flex-col border-l border-border/30 bg-background/80 px-6 py-8 backdrop-blur-2xl sm:w-[400px]">
-                <SheetTitle className="text-left text-lg font-medium tracking-tight text-foreground">
+                <SheetTitle className="text-left text-lg font-semibold tracking-tight text-foreground">
                   Menu
                 </SheetTitle>
-                
+
                 <div className="mt-8 flex h-full flex-col">
                   <nav className="flex flex-col gap-6">
                     {navigationLinks.map((link, index) => (
@@ -138,7 +138,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
                         {link.label || "Link"}
                       </a>
                     ))}
-                    
+
                     {/* Mobile Resume Link */}
                     {resumeUrl && (
                       <a
@@ -155,7 +155,7 @@ export function NavBar({ data = {}, theme, onToggleTheme, isVisible, onShow, onH
 
                   {/* Mobile CTA */}
                   <div className="mt-10 sm:hidden">
-                    <Button asChild size="lg" className="w-full rounded-full font-medium transition-all hover:scale-[1.02]">
+                    <Button asChild size="lg" className="w-full rounded-full font-semibold transition-all hover:scale-[1.02] shadow-md">
                       <a href="/home">Make your portfolio</a>
                     </Button>
                   </div>

@@ -100,7 +100,7 @@ export function ContactSection({ data = {}, isScrolling }) {
   return (
     <section id="contact" className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
       {/* Left Panel: Contact Methods */}
-      <div className="cinematic-panel-strong relative overflow-hidden rounded-[2.5rem] p-8 shadow-xl shadow-background/50">
+      <div className="cinematic-panel-strong relative overflow-hidden rounded-[2.5rem] p-8 shadow-lg">
         {/* Subtle Ambient Glow */}
         <div className="absolute -left-20 top-10 h-[300px] w-[300px] rounded-full bg-primary/10 blur-[100px] pointer-events-none" />
 
@@ -121,7 +121,7 @@ export function ContactSection({ data = {}, isScrolling }) {
                   href={href || '#contact'}
                   className={`group flex items-center justify-between rounded-2xl border px-6 py-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     isActive
-                      ? 'border-primary/40 bg-primary/10 shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                      ? 'border-primary/40 bg-primary/10 shadow-lg'
                       : `border-border/30 bg-card/20 backdrop-blur-sm ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
                   }`}
                   onMouseEnter={() => !isScrolling && setActiveMethod(index)}
@@ -129,17 +129,17 @@ export function ContactSection({ data = {}, isScrolling }) {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`flex size-12 items-center justify-center rounded-2xl border transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      isActive 
-                        ? "bg-primary text-primary-foreground border-primary scale-110 shadow-[0_0_15px_rgba(var(--primary),0.3)]" 
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary scale-110 shadow-lg"
                         : "bg-card/40 text-primary border-border/40 group-hover:scale-110"
                     }`}>
                       {createElement(IconComponent, { className: "size-5" })}
                     </div>
                     <div>
-                      <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         {label}
                       </p>
-                      <p className="mt-1.5 text-base font-medium tracking-tight text-foreground">
+                      <p className="mt-1.5 text-base font-semibold tracking-tight text-foreground">
                         {value}
                       </p>
                     </div>
@@ -152,17 +152,17 @@ export function ContactSection({ data = {}, isScrolling }) {
       </div>
 
       {/* Right Panel: Form */}
-      <div className={`cinematic-panel relative rounded-[2.5rem] p-8 shadow-xl transition-all duration-500 ${isScrolling ? '' : 'hover:border-primary/30 hover:shadow-[0_0_40px_0_color-mix(in_oklch,var(--primary)_5%,transparent)]'}`}>
+      <div className={`cinematic-panel relative rounded-[2.5rem] p-8 shadow-lg transition-all duration-500 ${isScrolling ? '' : 'hover:border-primary/30 hover:shadow-xl'}`}>
         <form onSubmit={handleSubmit} className="relative z-10 flex h-full flex-col justify-between">
           <FieldGroup className="grid gap-6 sm:grid-cols-2">
             <Field data-invalid={!!errors.name}>
-              <FieldLabel htmlFor="name" className="text-sm font-medium tracking-wide">Name</FieldLabel>
+              <FieldLabel htmlFor="name" className="text-sm font-semibold tracking-wide">Name</FieldLabel>
               <Input
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-2 focus-visible:ring-primary/40 shadow-md"
                 placeholder={"Your name"}
                 required
               />
@@ -170,14 +170,14 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field data-invalid={!!errors.email}>
-              <FieldLabel htmlFor="email" className="text-sm font-medium tracking-wide">Email</FieldLabel>
+              <FieldLabel htmlFor="email" className="text-sm font-semibold tracking-wide">Email</FieldLabel>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-2 focus-visible:ring-primary/40 shadow-md"
                 placeholder={"hello@example.com"}
                 required
               />
@@ -185,23 +185,23 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field data-invalid={!!errors.phone}>
-              <FieldLabel htmlFor="phone" className="text-sm font-medium tracking-wide">Phone (Optional)</FieldLabel>
+              <FieldLabel htmlFor="phone" className="text-sm font-semibold tracking-wide">Phone (Optional)</FieldLabel>
               <Input
                 id="phone"
                 name="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
+                className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-2 focus-visible:ring-primary/40 shadow-md"
                 placeholder="+1 (555) 000-0000"
               />
               {errors.phone && <FieldError>{errors.phone}</FieldError>}
             </Field>
 
             <Field data-invalid={!!errors.priority}>
-              <FieldLabel htmlFor="priority" className="text-sm font-medium tracking-wide">Urgency</FieldLabel>
+              <FieldLabel htmlFor="priority" className="text-sm font-semibold tracking-wide">Urgency</FieldLabel>
               <Select value={formData.priority} onValueChange={handleSelectChange}>
-                <SelectTrigger id="priority" className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus:border-primary focus:bg-card/50 focus:ring-1 focus:ring-primary/40 shadow-none">
+                <SelectTrigger id="priority" className="h-12 rounded-xl border-border/40 bg-card/30 px-4 text-base backdrop-blur-sm transition-all duration-500 focus:border-primary focus:bg-card/50 focus:ring-2 focus:ring-primary/40 shadow-md">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent className="border-border/40 bg-background/95 backdrop-blur-md">
@@ -215,14 +215,14 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field className="sm:col-span-2" data-invalid={!!errors.message}>
-              <FieldLabel htmlFor="message" className="text-sm font-medium tracking-wide">Message</FieldLabel>
+              <FieldLabel htmlFor="message" className="text-sm font-semibold tracking-wide">Message</FieldLabel>
               <Textarea
                 id="message"
                 name="message"
                 rows="5"
                 value={formData.message}
                 onChange={handleChange}
-                className="resize-none rounded-2xl border-border/40 bg-card/30 px-4 py-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-1 focus-visible:ring-primary/40 shadow-none"
+                className="resize-none rounded-2xl border-border/40 bg-card/30 px-4 py-4 text-base backdrop-blur-sm transition-all duration-500 focus-visible:border-primary focus-visible:bg-card/50 focus-visible:ring-2 focus-visible:ring-primary/40 shadow-md"
                 placeholder="Share the details of your project or inquiry."
                 required
               />
@@ -230,15 +230,15 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
 
             <Field orientation="horizontal" className="mt-2 sm:col-span-2">
-              <Checkbox 
-                id="for_work" 
-                checked={formData.for_work} 
-                onCheckedChange={handleCheckboxChange} 
+              <Checkbox
+                id="for_work"
+                checked={formData.for_work}
+                onCheckedChange={handleCheckboxChange}
                 className="border-border/60 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               <FieldContent>
-                <FieldLabel 
-                  htmlFor="for_work" 
+                <FieldLabel
+                  htmlFor="for_work"
                   className="cursor-pointer text-sm font-light leading-relaxed text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   This inquiry is regarding a paid project, role, or collaboration.
@@ -247,11 +247,11 @@ export function ContactSection({ data = {}, isScrolling }) {
             </Field>
           </FieldGroup>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="lg"
             disabled={loading}
-            className="mt-10 h-14 w-full rounded-full px-8 text-base font-medium shadow-none transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)] sm:w-auto"
+            className="mt-10 h-14 w-full rounded-full px-8 text-base font-semibold shadow-lg transition-all duration-500 hover:scale-[1.02] hover:shadow-xl sm:w-auto"
           >
             {loading ? (
               <>

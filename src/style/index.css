@@ -302,14 +302,14 @@
 
   /* DeepMind Ambient Background Gradient */
   .cinematic-ambient {
-    background: 
+    background:
       radial-gradient(circle at 0% 0%, color-mix(in oklch, var(--primary) 12%, transparent) 0%, transparent 40%),
       radial-gradient(circle at 100% 100%, color-mix(in oklch, var(--accent) 8%, transparent) 0%, transparent 40%),
       var(--background);
   }
 
   .dark .cinematic-ambient {
-    background: 
+    background:
       radial-gradient(circle at 10% -10%, color-mix(in oklch, var(--primary) 15%, transparent) 0%, transparent 45%),
       radial-gradient(circle at 90% 110%, color-mix(in oklch, var(--accent) 10%, transparent) 0%, transparent 45%),
       var(--background);
@@ -319,7 +319,7 @@
   .cinematic-panel {
     border: 1px solid var(--surface-border);
     background: var(--surface-base);
-    box-shadow: var(--surface-glow);
+    box-shadow: 0 2px 8px 0 color-mix(in oklch, var(--primary) 2%, transparent);
     backdrop-filter: blur(12px);
   }
 
@@ -327,21 +327,21 @@
   .cinematic-panel-strong {
     border: 1px solid var(--surface-border);
     background: var(--card);
-    box-shadow: var(--surface-glow);
+    box-shadow: 0 4px 12px 0 color-mix(in oklch, var(--primary) 3%, transparent);
   }
 
   /* Hover state for panels (replaces .apple-panel-hover) */
   .cinematic-panel-hover {
-    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 500ms cubic-bezier(0.16, 1, 0.3, 1), 
+    transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
                 background-color 500ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .cinematic-panel-hover:hover {
     transform: translateY(-2px);
     border-color: color-mix(in oklch, var(--primary) 40%, var(--surface-border));
-    box-shadow: var(--surface-glow-hover);
+    box-shadow: 0 12px 32px 0 color-mix(in oklch, var(--primary) 12%, transparent);
     background: var(--surface-glass);
   }
 
@@ -350,30 +350,42 @@
     border-radius: 9999px;
     letter-spacing: 0.02em;
     font-weight: 500;
-    box-shadow: none; /* Removed Apple inner shadows */
+    box-shadow: none;
+    transition-property: background-color, border-color, color, box-shadow, transform;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   [data-slot="button"][data-variant="default"] {
     background: var(--primary);
     color: var(--primary-foreground);
+    box-shadow: 0 4px 12px 0 color-mix(in oklch, var(--primary) 20%, transparent);
   }
 
   [data-slot="button"][data-variant="default"]:hover {
     background: color-mix(in oklch, var(--primary) 85%, white);
-    box-shadow: 0 0 20px 0 color-mix(in oklch, var(--primary) 40%, transparent);
+    box-shadow: 0 8px 20px 0 color-mix(in oklch, var(--primary) 35%, transparent);
+    transform: translateY(-1px);
+  }
+
+  [data-slot="button"][data-variant="default"]:active {
+    transform: translateY(0px);
   }
 
   [data-slot="button"][data-variant="outline"],
   [data-slot="button"][data-variant="secondary"] {
     border: 1px solid var(--surface-border);
-    background: transparent;
+    background: color-mix(in oklch, var(--card) 50%, transparent);
     color: var(--foreground);
+    backdrop-filter: blur(4px);
   }
 
   [data-slot="button"][data-variant="outline"]:hover,
   [data-slot="button"][data-variant="secondary"]:hover {
-    background: color-mix(in oklch, var(--foreground) 5%, transparent);
-    border-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+    background: color-mix(in oklch, var(--primary) 8%, transparent);
+    border-color: color-mix(in oklch, var(--primary) 30%, var(--surface-border));
+    box-shadow: 0 4px 12px 0 color-mix(in oklch, var(--primary) 8%, transparent);
+    transform: translateY(-1px);
   }
 
   /* Inputs and Selects */
@@ -381,24 +393,35 @@
   [data-slot="textarea"],
   [data-slot="select-trigger"] {
     border: 1px solid var(--surface-border);
-    background: color-mix(in oklch, var(--card) 40%, transparent);
-    box-shadow: none;
+    background: color-mix(in oklch, var(--card) 50%, transparent);
+    box-shadow: 0 1px 3px 0 color-mix(in oklch, var(--primary) 1%, transparent);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-md);
+    transition-property: border-color, background-color, box-shadow;
+    transition-duration: 300ms;
+  }
+
+  [data-slot="input"]:hover,
+  [data-slot="textarea"]:hover,
+  [data-slot="select-trigger"]:hover {
+    border-color: color-mix(in oklch, var(--primary) 20%, var(--surface-border));
+    background: color-mix(in oklch, var(--card) 60%, transparent);
   }
 
   [data-slot="input"]:focus-visible,
   [data-slot="textarea"]:focus-visible,
   [data-slot="select-trigger"]:focus-visible {
     border-color: var(--primary);
-    box-shadow: 0 0 0 1px var(--primary), 0 0 15px 0 color-mix(in oklch, var(--primary) 20%, transparent);
+    background: color-mix(in oklch, var(--card) 70%, transparent);
+    box-shadow: 0 0 0 2px var(--primary), 0 0 20px 0 color-mix(in oklch, var(--primary) 25%, transparent);
+    outline: none;
   }
 
   /* Base Cards */
   [data-slot="card"] {
     border: 1px solid var(--surface-border);
     background: var(--surface-base);
-    box-shadow: none;
+    box-shadow: 0 2px 8px 0 color-mix(in oklch, var(--primary) 2%, transparent);
   }
 
   [data-slot="badge"] {
@@ -407,5 +430,28 @@
     text-transform: uppercase;
     border-radius: 9999px;
     border: 1px solid transparent;
+    transition-property: background-color, border-color, color;
+    transition-duration: 300ms;
+  }
+
+  /* Smooth scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--primary) 30%, transparent);
+    border-radius: 4px;
+    transition-property: background-color;
+    transition-duration: 300ms;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--primary) 50%, transparent);
   }
 }

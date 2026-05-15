@@ -19,7 +19,7 @@ export function ComponentShowcase({ data = {}, activeHover, onRelationChange, is
   return (
     <section
       id="components"
-      className="cinematic-panel relative overflow-hidden rounded-[2.5rem] p-8 sm:p-12 shadow-2xl shadow-background/50"
+      className="cinematic-panel relative overflow-hidden rounded-[2.5rem] p-8 sm:p-12 shadow-lg"
       onMouseLeave={() => !isScrolling && onRelationChange(null)}
     >
       {/* Subtle Background Glow for the Section */}
@@ -31,10 +31,9 @@ export function ComponentShowcase({ data = {}, activeHover, onRelationChange, is
           title={componentsCopy.title || "Related components now respond to the same hover story."}
           description={componentsCopy.description || "The spotlight moves between engineering tracks and the UI patterns they influence, so the page feels connected instead of sectioned off."}
         />
-        
+
         <div className="mt-8 grid gap-5 sm:mt-12 lg:grid-cols-3">
           {showcaseCategories.map(({ title, items, icon, icon_name, relation, preview }, index) => {
-            // Dynamically resolve the icon from the backend string
             const IconComponent = resolveIcon(icon || icon_name || "Component")
             const isHighlighted = resolvedRelation === relation
             const isExpanded = isHighlighted && activeSource === 'showcase'
@@ -45,7 +44,7 @@ export function ComponentShowcase({ data = {}, activeHover, onRelationChange, is
                 key={title || index}
                 className={`cinematic-panel-hover group relative rounded-[2rem] border p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   isHighlighted
-                    ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                    ? 'border-primary/40 bg-primary/10 shadow-lg'
                     : `border-border/30 bg-card/20 backdrop-blur-md ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
                 }`}
                 onMouseEnter={() => !isScrolling && onRelationChange({ relation, source: 'showcase' })}
@@ -55,18 +54,18 @@ export function ComponentShowcase({ data = {}, activeHover, onRelationChange, is
                   <div>
                     <div
                       className={`mb-5 flex size-12 items-center justify-center rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                        isHighlighted 
-                          ? 'scale-110 border border-primary bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.4)]' 
+                        isHighlighted
+                          ? 'scale-110 border border-primary bg-primary text-primary-foreground shadow-lg'
                           : 'border border-primary/20 bg-primary/10 text-primary group-hover:scale-110'
                       }`}
                     >
                       {createElement(IconComponent, { className: "size-6" })}
                     </div>
-                    <h3 className="text-2xl font-medium tracking-tight text-foreground">{title}</h3>
+                    <h3 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h3>
                     <p className="mt-1.5 text-sm font-light text-muted-foreground">{safeItems.length} planned patterns</p>
                   </div>
                 </div>
-                
+
                 {/* Smoothly expand the description on hover */}
                 <div
                   className={`grid text-sm font-light leading-relaxed text-muted-foreground transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
@@ -77,7 +76,7 @@ export function ComponentShowcase({ data = {}, activeHover, onRelationChange, is
                     <p className="pb-2">{preview}</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 flex flex-wrap gap-2.5">
                   {safeItems.map((item, itemIdx) => (
                     <span

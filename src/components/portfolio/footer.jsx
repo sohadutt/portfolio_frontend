@@ -16,14 +16,14 @@ export function Footer({ data = {}, isScrolling }) {
   const infoString = infoParts.length > 0 ? infoParts.join(" • ") : "Portfolio"
 
   return (
-    <footer className="relative z-10 mx-auto mt-12 flex w-full max-w-7xl flex-col items-center justify-between gap-6 border-t border-border/30 px-4 py-10 sm:mt-16 sm:flex-row sm:px-6 lg:px-8">
-      
+    <footer className="relative z-10 mx-auto mt-16 flex w-full max-w-7xl flex-col items-center justify-between gap-8 border-t border-border/30 px-4 py-12 sm:mt-20 sm:flex-row sm:px-6 lg:px-8">
+
       <p className="text-center text-sm font-light tracking-wide text-muted-foreground sm:text-left">
         © {new Date().getFullYear()} {infoString}
       </p>
-      
+
       {footerLinks.length > 0 && (
-        <div className="flex flex-wrap items-center justify-center gap-6 sm:justify-end">
+        <div className="flex flex-wrap items-center justify-center gap-8 sm:justify-end">
           {footerLinks.map((link, index) => {
             const IconComponent = link.icon || link.icon_name ? resolveIcon(link.icon || link.icon_name) : null
 
@@ -44,7 +44,7 @@ export function Footer({ data = {}, isScrolling }) {
           })}
         </div>
       )}
-      
+
     </footer>
   )
 }

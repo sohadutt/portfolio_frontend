@@ -33,19 +33,19 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
     : apiProjects
 
   return (
-    <section id="projects" className="space-y-8 sm:space-y-12">
+    <section id="projects" className="space-y-10 sm:space-y-12">
       <SectionHeader
         eyebrow={projectsCopy.eyebrow || "Projects"}
         title={projectsCopy.title || "Selected technical projects and engineering outcomes."}
         description={projectsCopy.description || "A showcase of recent work focusing on secure configuration tooling, reliable deployments, and scalable UI architectures."}
       />
-      
+
       <div className="grid gap-6 sm:gap-8 lg:grid-cols-3">
         {projects.map((project, index) => {
           const isFeatured = index === 0 && activeProject === null
           const isActive = activeProject === index
           const safeStack = Array.isArray(project.stack) ? project.stack : []
-          
+
           const IconComponent = resolveIcon(project.icon || project.icon_name || "Globe")
           const ctaText = project.ctaLabel || project.cta_label || 'Explore'
 
@@ -54,7 +54,7 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
               key={project.title || index}
               className={`cinematic-panel-hover group relative flex flex-col rounded-[2rem] border p-6 sm:p-8 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 isActive || isFeatured
-                  ? 'border-primary/40 bg-primary/10 shadow-[0_0_30px_0_color-mix(in_oklch,var(--primary)_15%,transparent)]'
+                  ? 'border-primary/40 bg-primary/10 shadow-lg'
                   : `border-border/30 bg-card/20 backdrop-blur-md ${isScrolling ? '' : 'hover:border-primary/30 hover:bg-card/40'}`
               }`}
               onMouseEnter={() => !isScrolling && setActiveProject(index)}
@@ -65,29 +65,28 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                     isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
                   }`}>
                   {createElement(IconComponent, { className: "size-5 shrink-0" })}
-                  <p className="truncate text-xs font-medium uppercase tracking-widest">
+                  <p className="truncate text-xs font-semibold uppercase tracking-wider">
                     {project.eyebrow}
                   </p>
                 </div>
 
-                <Badge
-                  variant="secondary"
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-500 border ${
+                <span
+                  className={`inline-flex rounded-full px-3 py-1.5 text-xs font-semibold transition-all duration-500 border ${
                     isActive || isFeatured
-                      ? 'border-primary/30 bg-primary/20 text-primary shadow-[0_0_15px_rgba(var(--primary),0.2)]'
+                      ? 'border-primary/30 bg-primary/20 text-primary shadow-lg'
                       : 'border-border/40 bg-card/40 text-muted-foreground'
                   }`}
                 >
                   {project.stat}
-                </Badge>
+                </span>
               </div>
 
-              <h3 className="mt-6 text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              <h3 className="mt-6 text-2xl sm:text-3xl font-semibold tracking-tight text-foreground">
                 {project.title}
               </h3>
 
               <p
-                className={`mt-4 flex-1 text-sm font-light leading-relaxed transition-colors duration-500 sm:text-base sm:leading-8 ${
+                className={`mt-4 flex-1 text-base font-light leading-[1.7] transition-colors duration-500 ${
                   isActive || isFeatured ? 'text-foreground/90' : 'text-muted-foreground'
                 }`}
               >
@@ -96,29 +95,28 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
 
               <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-8">
                 {safeStack.map((item, itemIdx) => (
-                  <Badge
+                  <span
                     key={`${item}-${itemIdx}`}
-                    variant="outline"
-                    className={`rounded-md px-3 py-1 text-xs font-light transition-colors duration-500 border ${
+                    className={`inline-flex rounded-md px-3 py-1.5 text-xs font-light transition-colors duration-500 border ${
                       isActive || isFeatured
                         ? 'border-primary/30 bg-primary/5 text-primary'
                         : 'border-border/40 bg-card/30 text-muted-foreground'
                     }`}
                   >
                     {item}
-                  </Badge>
+                  </span>
                 ))}
               </div>
 
-              <div className="mt-8 flex items-center justify-between border-t border-border/30 pt-5">
+              <div className="mt-8 flex items-center justify-between border-t border-border/30 pt-6">
                 <Button
                   asChild
                   variant={isActive || isFeatured ? 'default' : 'outline'}
                   size="lg"
-                  className={`rounded-full font-medium shadow-none transition-all duration-500 sm:h-11 sm:px-6 ${
-                    isActive || isFeatured 
-                      ? 'hover:scale-[1.02] hover:shadow-[0_0_20px_0_color-mix(in_oklch,var(--primary)_40%,transparent)]' 
-                      : 'border-border/50 bg-card/30 hover:bg-card/60'
+                  className={`rounded-full font-semibold shadow-md transition-all duration-500 sm:h-11 sm:px-6 ${
+                    isActive || isFeatured
+                      ? 'hover:scale-[1.02] hover:shadow-lg'
+                      : 'border-border/50 bg-card/30 hover:bg-card/60 hover:shadow-md'
                   }`}
                 >
                   <a href={project.href || '#contact'} target={project.href?.startsWith('http') ? '_blank' : '_self'}>
@@ -126,17 +124,17 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                     <ChevronRight className="ml-1.5 size-4" />
                   </a>
                 </Button>
-                
-                <a 
-                  href={project.href || '#contact'} 
+
+                <a
+                  href={project.href || '#contact'}
                   target={project.href?.startsWith('http') ? '_blank' : '_self'}
                   aria-label={`Open ${project.title}`}
                   className="group-hover:scale-110 p-2 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:p-0"
                 >
-                  <ArrowUpRight 
+                  <ArrowUpRight
                     className={`size-6 transition-colors duration-500 ${
                       isActive || isFeatured ? 'text-primary' : 'text-muted-foreground'
-                    }`} 
+                    }`}
                   />
                 </a>
               </div>
