@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Navigate, NavLink, Route, Routes, useNavigate, useParams } from "react-router-dom"
-import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Sun } from "lucide-react"
+import { BriefcaseBusiness, FolderKanban, LayoutDashboard, Loader2, Mail, Moon, Sun, Zap } from "lucide-react"
 
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { SideProfile } from "@/components/user/SideProfile"
@@ -9,6 +9,7 @@ import PortfolioManager from "@/components/dashboard/PortfolioManager"
 import PortfolioEditor from "@/components/dashboard/PortfolioEditor"
 import SubmissionInbox from "@/components/dashboard/SubmissionInbox"
 import LucideIconBrowser from "@/components/dashboard/LucideIconBrowser"
+import Jobby from "@/components/dashboard/jobby" 
 import { getUserProfile, THEME_MAP } from "@/helper/functions"
 import { useTheme } from "@/hooks/use-theme"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,7 @@ const dashboardLinks = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/dashboard/portfolios", label: "Portfolios", icon: FolderKanban },
   { to: "/dashboard/submissions", label: "Submissions", icon: Mail },
+  { to: "/dashboard/jobby", label: "Jobby AI", icon: Zap }, // <-- New Tab
 ]
 
 const applyTheme = (themeMode) => {
@@ -70,7 +72,7 @@ export function DashboardOverview({ profile }) {
           <div>
             <h2 className="text-xl font-medium tracking-tight text-foreground">Workspace</h2>
             <p className="mt-2 text-sm sm:text-base font-light leading-relaxed text-muted-foreground max-w-2xl">
-              Use the unified Control Center to manage multi-portfolio instances, update site-wide configurations, and review secure contact submissions.
+              Use the unified Control Center to manage multi-portfolio instances, update site-wide configurations, review secure contact submissions, and find your next role with Jobby AI.
             </p>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function EditPortfolioRoute() {
   return <PortfolioEditor portfolioIndex={Number(index || 1)} />
 }
 
-export { PortfolioManager, SubmissionInbox, LucideIconBrowser }
+export { PortfolioManager, SubmissionInbox, LucideIconBrowser, Jobby }
 
 export default function DashboardLayout() {
   const { theme, setTheme } = useTheme()
@@ -210,6 +212,10 @@ export default function DashboardLayout() {
               <Route path="portfolios/:index/edit" element={<EditPortfolioRoute />} />
               <Route path="submissions" element={<SubmissionInbox />} />
               <Route path="icons" element={<LucideIconBrowser />} />
+              
+              {/* Added Jobby Route */}
+              <Route path="jobby" element={<Jobby />} />
+              
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </main>

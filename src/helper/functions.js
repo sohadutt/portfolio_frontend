@@ -347,4 +347,16 @@ export const updateSubmission = async (id, data) => {
 };
 export const reorderSubmissions = (order) => postRequest(URLS.REORDER_SUBMISSIONS, { order });
 
+// --- JOBBY FUNCTIONS ---
+export const fetchJobbyCredits = () => getRequest(URLS.JOBBY_CREDITS);
+
+export const fetchAllJobs = (params = { page: 1 }) => 
+    getRequest(URLS.JOBBY_ALL, params);
+
+export const fetchMatchedJobs = (params = { page: 1, order_index: 1 }) => 
+    getRequest(URLS.JOBBY_MATCHED, params);
+
+export const startJobbyPipeline = (siteName, params = {}) => 
+    postRequest(URLS.JOBBY_START_SIGNAL(siteName), {}, { params }); // Pass query params for match_only, etc.
+
 export default api;

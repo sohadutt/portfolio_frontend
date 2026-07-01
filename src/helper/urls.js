@@ -45,4 +45,10 @@ export const URLS = {
     
     // Fetch all portfolios for the manager table
     PORTFOLIOS_ALL: `${BASE_URL}/api/dashboard/portfolios/all/`, 
+
+    // ---- Jobby (Job Scraping & Matching) ----
+    JOBBY_ALL: `${BASE_URL}/api/jobs/all/`,
+    JOBBY_MATCHED: `${BASE_URL}/api/jobs/matched/`,
+    JOBBY_CREDITS: `${BASE_URL}/api/jobs/credits/`,
+    JOBBY_START_SIGNAL: (siteName) => `${BASE_URL}/api/jobs/signals/start/${siteName}/`,
 };
