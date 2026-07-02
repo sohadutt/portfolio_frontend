@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Star, Lock, Zap, Search, Play, Filter, ExternalLink, Loader2, X, MapPin, Building2, Calendar, LayoutTemplate, GraduationCap } from 'lucide-react';
+import { 
+    Briefcase, Star, Lock, Zap, Search, Play, Filter, 
+    ExternalLink, Loader2, X, MapPin, Building2, Calendar, 
+    LayoutTemplate, GraduationCap, Globe // <-- Globe imported here
+} from 'lucide-react';
 import { 
     fetchJobbyCredits, 
     fetchAllJobs, 
@@ -113,9 +117,9 @@ const Jobby = () => {
     };
 
     const filteredJobs = jobs.filter(item => {
-        const company = activeTab === 'matched' ? item.job?.company : item.company;
+        const company = item?.job?.company || item?.company || '';
         if (!companyFilter) return true;
-        return company?.toLowerCase().includes(companyFilter.toLowerCase());
+        return company.toLowerCase().includes(companyFilter.toLowerCase());
     });
 
     // Helper to format tools list from either array or comma-separated string
@@ -130,10 +134,11 @@ const Jobby = () => {
     const renderJobModal = () => {
         if (!selectedJob) return null;
 
-        const isMatchTab = activeTab === 'matched';
-        const jobData = isMatchTab ? selectedJob.job : selectedJob;
-        const aiMeta = jobData.ai_metadata || {};
-        const tools = formatTools(aiMeta.tools);
+        // Bulletproof data resolution based on object shape, not tab state
+        const jobData = selectedJob?.job || selectedJob || {};
+        const isMatchRecord = selectedJob?.match_score !== undefined;
+        const aiMeta = jobData?.ai_metadata || {};
+        const tools = formatTools(aiMeta?.tools);
 
         return (
             <div 
@@ -151,7 +156,7 @@ const Jobby = () => {
                                 <span className="inline-flex rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
                                     {jobData.platform_name}
                                 </span>
-                                {isMatchTab && (
+                                {isMatchRecord && (
                                     <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${
                                         selectedJob.match_score >= 80 ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 
                                         selectedJob.match_score >= 50 ? 'border-amber-500/20 bg-amber-500/10 text-amber-500' : 
@@ -446,8 +451,8 @@ const Jobby = () => {
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {!loading && filteredJobs.map((item, idx) => {
-                        const isMatchTab = activeTab === 'matched';
-                        const jobData = isMatchTab ? item.job : item;
+                        const jobData = item?.job || item || {};
+                        const isMatchRecord = item?.match_score !== undefined;
                         
                         return (
                             <div 
@@ -461,7 +466,7 @@ const Jobby = () => {
                                             {jobData.platform_name}
                                         </div>
                                         
-                                        {isMatchTab && (
+                                        {isMatchRecord && (
                                             <div className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${
                                                 item.match_score >= 80 ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 
                                                 item.match_score >= 50 ? 'border-amber-500/20 bg-amber-500/10 text-amber-500' : 
@@ -482,7 +487,7 @@ const Jobby = () => {
                                 </div>
                                 
                                 <div>
-                                    {isMatchTab && item.tags && item.tags.length > 0 && (
+                                    {isMatchRecord && item.tags && item.tags.length > 0 && (
                                         <div className="mb-5 flex flex-wrap gap-2 border-t border-border/30 pt-4">
                                             {item.tags.slice(0, 4).map((tag, i) => (
                                                 <span key={i} className="rounded-md border border-border/50 bg-card/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
