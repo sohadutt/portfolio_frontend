@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Star, Lock, Zap, Search, Play, Filter, ExternalLink, Loader2 } from 'lucide-react';
+import { Briefcase, Star, Lock, Zap, Search, Play, Filter, ExternalLink, Loader2, X, MapPin, Building2, Calendar, LayoutTemplate, GraduationCap } from 'lucide-react';
 import { 
     fetchJobbyCredits, 
     fetchAllJobs, 
@@ -23,6 +23,9 @@ const Jobby = () => {
     const [minScore, setMinScore] = useState(0);
     const [isStarting, setIsStarting] = useState(false);
 
+    // Modal State
+    const [selectedJob, setSelectedJob] = useState(null);
+
     useEffect(() => {
         checkUserStatus();
     }, []);
@@ -33,6 +36,18 @@ const Jobby = () => {
         }
     }, [isPremium, activeTab, pagination.page, siteName, minScore]);
 
+    // Prevent body scroll when modal is open
+    useEffect(() => {
+        if (selectedJob) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [selectedJob]);
+
     const checkUserStatus = async () => {
         try {
             setLoading(true);
@@ -40,7 +55,6 @@ const Jobby = () => {
             const creditData = await fetchJobbyCredits();
             
             setCredits(creditData.job_analysis_limit || 0);
-            // Check premium status based on tier or specific flag
             setIsPremium(userProfile?.tier > 0 || userProfile?.is_premium === true); 
         } catch (error) {
             console.error("Failed to fetch user status", error);
@@ -65,7 +79,6 @@ const Jobby = () => {
             
             setJobs(data.results || []);
             
-            // Calculate total pages based on DRF count (assuming 20 items per page as set in backend)
             const PAGE_SIZE = 20;
             const calculatedTotalPages = data.count ? Math.ceil(data.count / PAGE_SIZE) : 1;
 
@@ -105,6 +118,160 @@ const Jobby = () => {
         return company?.toLowerCase().includes(companyFilter.toLowerCase());
     });
 
+    // Helper to format tools list from either array or comma-separated string
+    const formatTools = (tools) => {
+        if (!tools) return [];
+        if (Array.isArray(tools)) return tools;
+        if (typeof tools === 'string') return tools.split(',').map(t => t.trim());
+        return [];
+    };
+
+    // --- MODAL RENDERER ---
+    const renderJobModal = () => {
+        if (!selectedJob) return null;
+
+        const isMatchTab = activeTab === 'matched';
+        const jobData = isMatchTab ? selectedJob.job : selectedJob;
+        const aiMeta = jobData.ai_metadata || {};
+        const tools = formatTools(aiMeta.tools);
+
+        return (
+            <div 
+                className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm sm:p-6 transition-opacity"
+                onClick={() => setSelectedJob(null)}
+            >
+                <div 
+                    className="cinematic-panel relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[2rem] shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Modal Header */}
+                    <div className="flex items-start justify-between border-b border-border/40 bg-card/40 p-6 sm:p-8">
+                        <div className="pr-4">
+                            <div className="mb-3 flex items-center gap-3">
+                                <span className="inline-flex rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                                    {jobData.platform_name}
+                                </span>
+                                {isMatchTab && (
+                                    <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${
+                                        selectedJob.match_score >= 80 ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 
+                                        selectedJob.match_score >= 50 ? 'border-amber-500/20 bg-amber-500/10 text-amber-500' : 
+                                        'border-border/50 bg-card/50 text-muted-foreground'
+                                    }`}>
+                                        <Star className={`size-3.5 ${selectedJob.match_score >= 80 ? 'fill-current' : ''}`} /> 
+                                        {selectedJob.match_score}% Match
+                                    </span>
+                                )}
+                            </div>
+                            <h2 className="text-2xl font-medium tracking-tight text-foreground sm:text-3xl leading-tight">
+                                {jobData.title}
+                            </h2>
+                            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm font-light text-muted-foreground">
+                                <div className="flex items-center gap-1.5"><Building2 className="size-4" /> {jobData.company}</div>
+                                <div className="flex items-center gap-1.5"><MapPin className="size-4" /> {aiMeta.location_type || jobData.location || 'Remote'}</div>
+                                {jobData.date_posted && (
+                                    <div className="flex items-center gap-1.5"><Calendar className="size-4" /> {jobData.date_posted}</div>
+                                )}
+                            </div>
+                        </div>
+                        <button 
+                            onClick={() => setSelectedJob(null)}
+                            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card/50 text-muted-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
+                        >
+                            <X className="size-5" />
+                        </button>
+                    </div>
+
+                    {/* Modal Scrollable Body */}
+                    <div className="flex-1 overflow-y-auto p-6 sm:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/50 [&::-webkit-scrollbar-track]:bg-transparent">
+                        
+                        {/* AI Metadata Grid */}
+                        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {aiMeta.seniority && (
+                                <div className="rounded-2xl border border-border/40 bg-card/20 p-4">
+                                    <div className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                                        <GraduationCap className="size-3.5" /> Seniority
+                                    </div>
+                                    <p className="font-medium text-foreground">{aiMeta.seniority}</p>
+                                </div>
+                            )}
+                            {aiMeta.domain && (
+                                <div className="rounded-2xl border border-border/40 bg-card/20 p-4">
+                                    <div className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                                        <Globe className="size-3.5" /> Domain
+                                    </div>
+                                    <p className="font-medium text-foreground truncate" title={aiMeta.domain}>{aiMeta.domain}</p>
+                                </div>
+                            )}
+                            {aiMeta.role_family && (
+                                <div className="rounded-2xl border border-border/40 bg-card/20 p-4">
+                                    <div className="mb-1 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                                        <LayoutTemplate className="size-3.5" /> Role Family
+                                    </div>
+                                    <p className="font-medium text-foreground truncate" title={aiMeta.role_family}>{aiMeta.role_family}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Description */}
+                        <div className="mb-8">
+                            <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">Job Description</h3>
+                            {jobData.description ? (
+                                <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed whitespace-pre-wrap font-light">
+                                    {jobData.description}
+                                </div>
+                            ) : (
+                                <p className="text-sm italic text-muted-foreground/60">No full description available in the database.</p>
+                            )}
+                        </div>
+
+                        {/* Extracted Tools & Skills */}
+                        {(tools.length > 0 || (aiMeta.primary_skills && aiMeta.primary_skills.length > 0)) && (
+                            <div className="mb-8 space-y-6">
+                                {tools.length > 0 && (
+                                    <div>
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">Tools & Tech Stack</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {tools.map((tool, i) => (
+                                                <span key={i} className="rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-500 dark:text-indigo-400">
+                                                    {tool}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                {aiMeta.primary_skills && aiMeta.primary_skills.length > 0 && (
+                                    <div>
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">Core Skills</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {aiMeta.primary_skills.map((skill, i) => (
+                                                <span key={i} className="rounded-lg border border-border/50 bg-card/40 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="border-t border-border/40 bg-card/40 p-4 sm:p-6 flex justify-end">
+                        <a 
+                            href={jobData.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-primary px-8 text-sm font-medium tracking-wide text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all hover:scale-[1.02] hover:bg-primary/90"
+                        >
+                            Open on {jobData.platform_name} <ExternalLink className="size-4" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     if (loading && !jobs.length) {
         return (
             <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-6 text-center">
@@ -124,10 +291,8 @@ const Jobby = () => {
         return (
             <div className="mx-auto mt-10 max-w-4xl p-4 sm:p-6">
                 <div className="cinematic-panel cinematic-panel-strong relative overflow-hidden rounded-[3rem] p-10 text-center shadow-2xl sm:p-16">
-                    {/* Cinematic ambient glows inside the paywall */}
                     <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/10 blur-[90px]" />
                     <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-accent/10 blur-[90px]" />
-                    
                     <div className="pointer-events-none absolute -right-4 top-10 text-primary/5">
                         <Lock size={280} />
                     </div>
@@ -136,14 +301,12 @@ const Jobby = () => {
                         <div className="flex size-24 items-center justify-center rounded-[2rem] border border-primary/20 bg-primary/10 text-primary shadow-[0_0_30px_rgba(var(--primary),0.2)]">
                             <Zap className="size-12" />
                         </div>
-                        
                         <div className="space-y-4">
                             <h2 className="text-4xl font-medium tracking-tight text-foreground sm:text-5xl">Unlock AI Job Matching</h2>
                             <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-muted-foreground">
                                 Stop scrolling through hundreds of irrelevant job postings. Upgrade to Premium and let our AI scrape, analyze, and match open positions directly to your portfolio skills.
                             </p>
                         </div>
-                        
                         <div className="mb-8 mt-4 grid w-full grid-cols-1 gap-6 text-left sm:grid-cols-3 sm:gap-8">
                             <div className="cinematic-panel rounded-2xl p-6">
                                 <Briefcase className="mb-4 size-6 text-primary" />
@@ -161,7 +324,6 @@ const Jobby = () => {
                                 <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">Instantly see which of your skills perfectly align with the job.</p>
                             </div>
                         </div>
-
                         <button className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-10 text-base font-medium tracking-wide text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90">
                             Upgrade to Premium Now
                         </button>
@@ -174,6 +336,7 @@ const Jobby = () => {
     // --- PREMIUM VIEW ---
     return (
         <div className="mx-auto max-w-7xl space-y-8">
+            {renderJobModal()}
             
             {/* Header Section */}
             <div className="cinematic-panel flex flex-col justify-between gap-6 rounded-[2rem] p-6 sm:flex-row sm:items-center sm:p-8">
@@ -205,8 +368,6 @@ const Jobby = () => {
 
             {/* Controls & Filters */}
             <div className="cinematic-panel flex flex-col items-center justify-between gap-5 rounded-3xl p-3 sm:flex-row sm:p-4">
-                
-                {/* Tabs */}
                 <div className="flex w-full rounded-2xl border border-border/40 bg-card/30 p-1 sm:w-auto">
                     <button 
                         onClick={() => { setActiveTab('matched'); setPagination({ ...pagination, page: 1 }); }}
@@ -230,7 +391,6 @@ const Jobby = () => {
                     </button>
                 </div>
 
-                {/* Filters */}
                 <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
                     <div className="relative flex-1 sm:flex-none">
                         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -242,7 +402,6 @@ const Jobby = () => {
                             className="w-full rounded-xl border border-border/40 bg-card/40 py-2.5 pl-10 pr-4 text-sm font-light text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card/60 focus:ring-1 focus:ring-primary/50 sm:w-48"
                         />
                     </div>
-
                     <input 
                         type="text" 
                         placeholder="Site Name (e.g. deloitte)" 
@@ -250,7 +409,6 @@ const Jobby = () => {
                         onChange={(e) => setSiteName(e.target.value)}
                         className="w-full flex-1 rounded-xl border border-border/40 bg-card/40 px-4 py-2.5 text-sm font-light text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card/60 focus:ring-1 focus:ring-primary/50 sm:w-48 sm:flex-none"
                     />
-
                     {activeTab === 'matched' && (
                         <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-card/40 px-3 py-1.5 transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
                             <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Min Score</span>
@@ -292,7 +450,11 @@ const Jobby = () => {
                         const jobData = isMatchTab ? item.job : item;
                         
                         return (
-                            <div key={idx} className="cinematic-panel cinematic-panel-hover flex flex-col justify-between rounded-[2rem] p-6 sm:p-7">
+                            <div 
+                                key={idx} 
+                                onClick={() => setSelectedJob(item)}
+                                className="cinematic-panel cinematic-panel-hover flex cursor-pointer flex-col justify-between rounded-[2rem] p-6 sm:p-7"
+                            >
                                 <div>
                                     <div className="mb-4 flex items-start justify-between">
                                         <div className="inline-flex rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
@@ -339,6 +501,7 @@ const Jobby = () => {
                                         href={jobData.url} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
+                                        onClick={(e) => e.stopPropagation()}
                                         className="group inline-flex items-center gap-2 text-sm font-medium tracking-wide text-primary transition-colors hover:text-primary/80"
                                     >
                                         View Original Post 
