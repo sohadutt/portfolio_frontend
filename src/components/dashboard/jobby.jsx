@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Star, Lock, Zap, Search, Play, Filter, ExternalLink } from 'lucide-react';
+import { Briefcase, Star, Lock, Zap, Search, Play, Filter, ExternalLink, Loader2 } from 'lucide-react';
 import { 
     fetchJobbyCredits, 
     fetchAllJobs, 
@@ -40,7 +40,7 @@ const Jobby = () => {
             const creditData = await fetchJobbyCredits();
             
             setCredits(creditData.job_analysis_limit || 0);
-            // Define your premium logic here. E.g., userProfile.tier > 0 or based on subscription flag
+            // Check premium status based on tier or specific flag
             setIsPremium(userProfile?.tier > 0 || userProfile?.is_premium === true); 
         } catch (error) {
             console.error("Failed to fetch user status", error);
@@ -68,7 +68,6 @@ const Jobby = () => {
                 ...prev,
                 next: data.next,
                 prev: data.previous,
-                // Optional: calculate total pages if count is provided by DRF
             }));
         } catch (error) {
             console.error("Failed to load jobs", error);
@@ -82,11 +81,9 @@ const Jobby = () => {
         
         try {
             setIsStarting(true);
-            // Triggers Celery task in backend
             await startJobbyPipeline(siteName, { scraper: true, processor: true });
             alert(`Pipeline started for ${siteName}! This runs in the background. Check back in a few minutes.`);
             
-            // Refresh credits
             const creditData = await fetchJobbyCredits();
             setCredits(creditData.job_analysis_limit || 0);
         } catch (error) {
@@ -96,7 +93,6 @@ const Jobby = () => {
         }
     };
 
-    // Local filter for company name (since DRF endpoint doesn't natively filter by company in the provided code)
     const filteredJobs = jobs.filter(item => {
         const company = activeTab === 'matched' ? item.job?.company : item.company;
         if (!companyFilter) return true;
@@ -104,47 +100,63 @@ const Jobby = () => {
     });
 
     if (loading && !jobs.length) {
-        return <div className="p-8 text-center animate-pulse">Loading Jobby workspace...</div>;
+        return (
+            <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-6 text-center">
+                <div className="relative flex items-center justify-center">
+                    <div className="absolute h-24 w-24 rounded-full bg-primary/20 blur-[40px]" />
+                    <Loader2 className="relative size-10 animate-spin text-primary" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                    Loading Jobby Workspace
+                </p>
+            </div>
+        );
     }
 
     // --- NON-PREMIUM ADVERTISEMENT VIEW ---
     if (!isPremium) {
         return (
-            <div className="max-w-4xl mx-auto p-6 mt-10">
-                <div className="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl p-10 text-center text-white shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                        <Lock size={200} />
+            <div className="mx-auto mt-10 max-w-4xl p-4 sm:p-6">
+                <div className="cinematic-panel cinematic-panel-strong relative overflow-hidden rounded-[3rem] p-10 text-center shadow-2xl sm:p-16">
+                    {/* Cinematic ambient glows inside the paywall */}
+                    <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-primary/10 blur-[90px]" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-accent/10 blur-[90px]" />
+                    
+                    <div className="pointer-events-none absolute -right-4 top-10 text-primary/5">
+                        <Lock size={280} />
                     </div>
                     
-                    <div className="relative z-10 space-y-6">
-                        <div className="mx-auto bg-indigo-500/20 w-20 h-20 rounded-full flex items-center justify-center mb-6 ring-4 ring-indigo-500/50">
-                            <Zap className="text-yellow-400 w-10 h-10" />
+                    <div className="relative z-10 flex flex-col items-center space-y-8">
+                        <div className="flex size-24 items-center justify-center rounded-[2rem] border border-primary/20 bg-primary/10 text-primary shadow-[0_0_30px_rgba(var(--primary),0.2)]">
+                            <Zap className="size-12" />
                         </div>
                         
-                        <h2 className="text-4xl font-extrabold tracking-tight">Unlock AI Job Matching</h2>
-                        <p className="text-lg text-indigo-200 max-w-2xl mx-auto">
-                            Stop scrolling through hundreds of irrelevant job postings. Upgrade to Premium and let our AI scrape, analyze, and match open positions directly to your portfolio skills.
-                        </p>
+                        <div className="space-y-4">
+                            <h2 className="text-4xl font-medium tracking-tight text-foreground sm:text-5xl">Unlock AI Job Matching</h2>
+                            <p className="mx-auto max-w-2xl text-lg font-light leading-relaxed text-muted-foreground">
+                                Stop scrolling through hundreds of irrelevant job postings. Upgrade to Premium and let our AI scrape, analyze, and match open positions directly to your portfolio skills.
+                            </p>
+                        </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 mb-10 text-left">
-                            <div className="bg-white/10 p-5 rounded-xl backdrop-blur-sm">
-                                <Briefcase className="text-indigo-400 mb-3" />
-                                <h3 className="font-bold text-lg">Automated Scraping</h3>
-                                <p className="text-sm text-gray-300 mt-1">Pull jobs directly from top company career portals.</p>
+                        <div className="mb-8 mt-4 grid w-full grid-cols-1 gap-6 text-left sm:grid-cols-3 sm:gap-8">
+                            <div className="cinematic-panel rounded-2xl p-6">
+                                <Briefcase className="mb-4 size-6 text-primary" />
+                                <h3 className="text-lg font-medium tracking-tight text-foreground">Automated Scraping</h3>
+                                <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">Pull jobs directly from top company career portals.</p>
                             </div>
-                            <div className="bg-white/10 p-5 rounded-xl backdrop-blur-sm">
-                                <Star className="text-yellow-400 mb-3" />
-                                <h3 className="font-bold text-lg">Smart Scoring</h3>
-                                <p className="text-sm text-gray-300 mt-1">Gemini AI reads your portfolio and scores your match percentage.</p>
+                            <div className="cinematic-panel rounded-2xl p-6">
+                                <Star className="mb-4 size-6 text-amber-500" />
+                                <h3 className="text-lg font-medium tracking-tight text-foreground">Smart Scoring</h3>
+                                <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">Gemini AI reads your portfolio and scores your match percentage.</p>
                             </div>
-                            <div className="bg-white/10 p-5 rounded-xl backdrop-blur-sm">
-                                <Search className="text-green-400 mb-3" />
-                                <h3 className="font-bold text-lg">Tag Extraction</h3>
-                                <p className="text-sm text-gray-300 mt-1">Instantly see which of your skills perfectly align with the job description.</p>
+                            <div className="cinematic-panel rounded-2xl p-6">
+                                <Search className="mb-4 size-6 text-emerald-500" />
+                                <h3 className="text-lg font-medium tracking-tight text-foreground">Tag Extraction</h3>
+                                <p className="mt-2 text-sm font-light leading-relaxed text-muted-foreground">Instantly see which of your skills perfectly align with the job.</p>
                             </div>
                         </div>
 
-                        <button className="bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-4 px-10 rounded-full shadow-lg transition-all transform hover:scale-105">
+                        <button className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-10 text-base font-medium tracking-wide text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90">
                             Upgrade to Premium Now
                         </button>
                     </div>
@@ -155,61 +167,73 @@ const Jobby = () => {
 
     // --- PREMIUM VIEW ---
     return (
-        <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="mx-auto max-w-7xl space-y-8">
+            
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-3 text-slate-900 dark:text-white">
-                        <Zap className="text-indigo-500" /> Jobby AI Matcher
-                    </h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-1">Review scraped jobs and AI portfolio matches.</p>
+            <div className="cinematic-panel flex flex-col justify-between gap-6 rounded-[2rem] p-6 sm:flex-row sm:items-center sm:p-8">
+                <div className="flex items-center gap-5">
+                    <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-[0_0_15px_rgba(var(--primary),0.2)]">
+                        <Zap className="size-6" />
+                    </div>
+                    <div>
+                        <h1 className="text-2xl font-medium tracking-tight text-foreground">Jobby AI Matcher</h1>
+                        <p className="mt-1 text-sm font-light leading-relaxed text-muted-foreground">Review scraped jobs and AI portfolio matches.</p>
+                    </div>
                 </div>
                 
-                <div className="flex items-center gap-4">
-                    <div className="bg-slate-100 dark:bg-slate-900 px-4 py-2 rounded-lg font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                        Credits remaining: <span className="text-indigo-500 font-bold ml-1">{credits}</span>
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="inline-flex items-center rounded-full border border-border/40 bg-card/40 px-5 py-2.5 text-xs font-medium uppercase tracking-widest text-muted-foreground backdrop-blur-md">
+                        Credits: <span className="ml-2 font-bold text-primary">{credits}</span>
                     </div>
                     
                     <button 
                         onClick={handleRunPipeline}
                         disabled={isStarting || credits <= 0}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
+                        className="inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-2.5 text-sm font-medium tracking-wide text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)] transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
                     >
-                        <Play size={18} />
-                        {isStarting ? "Triggering..." : "Run Pipeline"}
+                        {isStarting ? <Loader2 className="size-4 animate-spin" /> : <Play className="size-4" />}
+                        {isStarting ? "Processing..." : "Run Pipeline"}
                     </button>
                 </div>
             </div>
 
             {/* Controls & Filters */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="cinematic-panel flex flex-col items-center justify-between gap-5 rounded-3xl p-3 sm:flex-row sm:p-4">
                 
                 {/* Tabs */}
-                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
+                <div className="flex w-full rounded-2xl border border-border/40 bg-card/30 p-1 sm:w-auto">
                     <button 
                         onClick={() => { setActiveTab('matched'); setPagination({ ...pagination, page: 1 }); }}
-                        className={`px-6 py-2 rounded-md font-medium text-sm transition-colors ${activeTab === 'matched' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}`}
+                        className={`flex-1 rounded-xl px-6 py-2.5 text-sm font-medium transition-all duration-300 sm:flex-none ${
+                            activeTab === 'matched' 
+                            ? 'bg-primary text-primary-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:bg-card/50 hover:text-foreground'
+                        }`}
                     >
-                        Matches
+                        AI Matches
                     </button>
                     <button 
                         onClick={() => { setActiveTab('all'); setPagination({ ...pagination, page: 1 }); }}
-                        className={`px-6 py-2 rounded-md font-medium text-sm transition-colors ${activeTab === 'all' ? 'bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}`}
+                        className={`flex-1 rounded-xl px-6 py-2.5 text-sm font-medium transition-all duration-300 sm:flex-none ${
+                            activeTab === 'all' 
+                            ? 'bg-primary text-primary-foreground shadow-sm' 
+                            : 'text-muted-foreground hover:bg-card/50 hover:text-foreground'
+                        }`}
                     >
-                        All Raw Jobs
+                        Raw Jobs
                     </button>
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
+                    <div className="relative flex-1 sm:flex-none">
+                        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                         <input 
                             type="text" 
                             placeholder="Filter company..." 
                             value={companyFilter}
                             onChange={(e) => setCompanyFilter(e.target.value)}
-                            className="pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-40"
+                            className="w-full rounded-xl border border-border/40 bg-card/40 py-2.5 pl-10 pr-4 text-sm font-light text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card/60 focus:ring-1 focus:ring-primary/50 sm:w-48"
                         />
                     </div>
 
@@ -218,18 +242,18 @@ const Jobby = () => {
                         placeholder="Site Name (e.g. deloitte)" 
                         value={siteName}
                         onChange={(e) => setSiteName(e.target.value)}
-                        className="px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-48"
+                        className="w-full flex-1 rounded-xl border border-border/40 bg-card/40 px-4 py-2.5 text-sm font-light text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/50 focus:bg-card/60 focus:ring-1 focus:ring-primary/50 sm:w-48 sm:flex-none"
                     />
 
                     {activeTab === 'matched' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-slate-500">Min Score:</span>
+                        <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-card/40 px-3 py-1.5 transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50">
+                            <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Min Score</span>
                             <input 
                                 type="number" 
                                 min="0" max="100" 
                                 value={minScore}
                                 onChange={(e) => setMinScore(e.target.value)}
-                                className="w-20 px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-12 bg-transparent text-center text-sm font-medium text-foreground outline-none"
                             />
                         </div>
                     )}
@@ -237,72 +261,82 @@ const Jobby = () => {
             </div>
 
             {/* Data Display */}
-            <div className="space-y-4">
-                {loading && <div className="text-center py-10 text-slate-500">Loading data...</div>}
+            <div className="space-y-6">
+                {loading && (
+                    <div className="flex items-center justify-center py-20">
+                       <Loader2 className="size-8 animate-spin text-primary" />
+                    </div>
+                )}
                 
                 {!loading && filteredJobs.length === 0 && (
-                    <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-                        <Filter className="mx-auto text-slate-400 mb-3" size={32} />
-                        <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">No jobs found</h3>
-                        <p className="text-slate-500">Try adjusting your filters or running a new pipeline.</p>
+                    <div className="cinematic-panel group relative flex h-64 flex-col items-center justify-center rounded-[2.5rem] border-2 border-dashed border-border/40 text-center transition-all duration-500 hover:border-primary/40 hover:bg-primary/5">
+                        <div className="mb-5 flex size-16 items-center justify-center rounded-2xl border border-border/40 bg-card/40 text-muted-foreground shadow-sm backdrop-blur-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 group-hover:border-primary/30 group-hover:text-primary group-hover:shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+                            <Filter className="size-7 transition-colors duration-500 group-hover:text-primary" />
+                        </div>
+                        <h3 className="text-xl font-medium tracking-tight text-foreground">No jobs found</h3>
+                        <p className="mt-2 max-w-sm text-sm font-light leading-relaxed text-muted-foreground">
+                            Try adjusting your filters or run a new pipeline to scrape and score more jobs.
+                        </p>
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {!loading && filteredJobs.map((item, idx) => {
-                        // Normalize data depending on if it's a Match object or raw Job object
                         const isMatchTab = activeTab === 'matched';
                         const jobData = isMatchTab ? item.job : item;
                         
                         return (
-                            <div key={idx} className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow flex flex-col">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div className="bg-slate-100 dark:bg-slate-700 text-xs font-semibold px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-300 uppercase tracking-wider">
-                                        {jobData.platform_name}
+                            <div key={idx} className="cinematic-panel cinematic-panel-hover flex flex-col justify-between rounded-[2rem] p-6 sm:p-7">
+                                <div>
+                                    <div className="mb-4 flex items-start justify-between">
+                                        <div className="inline-flex rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-primary">
+                                            {jobData.platform_name}
+                                        </div>
+                                        
+                                        {isMatchTab && (
+                                            <div className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${
+                                                item.match_score >= 80 ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 
+                                                item.match_score >= 50 ? 'border-amber-500/20 bg-amber-500/10 text-amber-500' : 
+                                                'border-border/50 bg-card/50 text-muted-foreground'
+                                            }`}>
+                                                <Star className={`size-3.5 ${item.match_score >= 80 ? 'fill-current' : ''}`} /> 
+                                                {item.match_score}%
+                                            </div>
+                                        )}
                                     </div>
                                     
-                                    {isMatchTab && (
-                                        <div className={`font-bold px-2.5 py-1 rounded-md text-sm flex items-center gap-1 ${
-                                            item.match_score >= 80 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 
-                                            item.match_score >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 
-                                            'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
-                                        }`}>
-                                            <Star size={14} className={item.match_score >= 80 ? 'fill-current' : ''} /> 
-                                            {item.match_score}%
-                                        </div>
-                                    )}
+                                    <h3 className="mb-2 line-clamp-2 text-lg font-medium leading-snug tracking-tight text-foreground">
+                                        {jobData.title}
+                                    </h3>
+                                    <p className="mb-5 text-sm font-light text-muted-foreground">
+                                        {jobData.company} <span className="mx-1.5 opacity-50">•</span> {jobData.location || 'Remote'}
+                                    </p>
                                 </div>
                                 
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight mb-1">
-                                    {jobData.title}
-                                </h3>
-                                <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                                    {jobData.company} • {jobData.location || 'Remote/Unspecified'}
-                                </p>
-                                
-                                {isMatchTab && item.tags && item.tags.length > 0 && (
-                                    <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-700">
-                                        <div className="flex flex-wrap gap-2">
+                                <div>
+                                    {isMatchTab && item.tags && item.tags.length > 0 && (
+                                        <div className="mb-5 flex flex-wrap gap-2 border-t border-border/30 pt-4">
                                             {item.tags.slice(0, 4).map((tag, i) => (
-                                                <span key={i} className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-xs px-2 py-1 rounded-md border border-indigo-100 dark:border-indigo-800">
+                                                <span key={i} className="rounded-md border border-border/50 bg-card/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
                                                     {tag}
                                                 </span>
                                             ))}
                                             {item.tags.length > 4 && (
-                                                <span className="text-xs text-slate-400 px-1 py-1">+{item.tags.length - 4} more</span>
+                                                <span className="px-1 py-1 text-[11px] font-medium text-muted-foreground/60">
+                                                    +{item.tags.length - 4} more
+                                                </span>
                                             )}
                                         </div>
-                                    </div>
-                                )}
-                                
-                                <div className="mt-5 pt-3">
+                                    )}
+                                    
                                     <a 
                                         href={jobData.url} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-1"
+                                        className="group inline-flex items-center gap-2 text-sm font-medium tracking-wide text-primary transition-colors hover:text-primary/80"
                                     >
-                                        View Original Post <ExternalLink size={14} />
+                                        View Original Post 
+                                        <ExternalLink className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                                     </a>
                                 </div>
                             </div>
@@ -311,23 +345,27 @@ const Jobby = () => {
                 </div>
 
                 {/* Pagination Controls */}
-                <div className="flex justify-center gap-4 mt-8 pt-4">
-                    <button 
-                        disabled={!pagination.prev || loading}
-                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                        className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-50 text-sm font-medium"
-                    >
-                        Previous
-                    </button>
-                    <span className="flex items-center text-sm text-slate-500">Page {pagination.page}</span>
-                    <button 
-                        disabled={!pagination.next || loading}
-                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                        className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg disabled:opacity-50 text-sm font-medium"
-                    >
-                        Next
-                    </button>
-                </div>
+                {filteredJobs.length > 0 && (
+                    <div className="mt-8 flex items-center justify-center gap-4">
+                        <button 
+                            disabled={!pagination.prev || loading}
+                            onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                            className="cinematic-panel inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-card/60 hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                        >
+                            Previous
+                        </button>
+                        <span className="text-sm font-medium tracking-wide text-muted-foreground">
+                            Page {pagination.page}
+                        </span>
+                        <button 
+                            disabled={!pagination.next || loading}
+                            onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                            className="cinematic-panel inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-card/60 hover:text-foreground disabled:pointer-events-none disabled:opacity-40"
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
