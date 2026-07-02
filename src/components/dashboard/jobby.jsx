@@ -64,10 +64,16 @@ const Jobby = () => {
             }
             
             setJobs(data.results || []);
+            
+            // Calculate total pages based on DRF count (assuming 20 items per page as set in backend)
+            const PAGE_SIZE = 20;
+            const calculatedTotalPages = data.count ? Math.ceil(data.count / PAGE_SIZE) : 1;
+
             setPagination(prev => ({
                 ...prev,
                 next: data.next,
                 prev: data.previous,
+                totalPages: calculatedTotalPages
             }));
         } catch (error) {
             console.error("Failed to load jobs", error);
@@ -355,7 +361,7 @@ const Jobby = () => {
                             Previous
                         </button>
                         <span className="text-sm font-medium tracking-wide text-muted-foreground">
-                            Page {pagination.page}
+                            Page {pagination.page} of {pagination.totalPages}
                         </span>
                         <button 
                             disabled={!pagination.next || loading}
