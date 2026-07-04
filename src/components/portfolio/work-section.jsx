@@ -1,5 +1,5 @@
 import { useState, createElement } from 'react'
-import { ArrowUpRight, ChevronRight } from 'lucide-react'
+import { ArrowUpRight, ChevronRight, Github } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/portfolio/section-header'
@@ -12,6 +12,7 @@ const portfolioBuilderProject = {
     'This portfolio is powered by the builder behind it, with a dashboard for editing projects, experience, links, themes, and public portfolio variations.',
   stack: ['React', 'Vite', 'Dashboard CMS'],
   stat: 'Live builder',
+  github: 'https://github.com/sohadutt/portfolio_backend',
   href: '/home',
   ctaLabel: 'Make yours now',
   icon: 'Blocks'
@@ -107,6 +108,25 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                   </span>
                 ))}
               </div>
+
+              {/* Conditionally rendered GitHub Link - Placed above the CTA Button */}
+              {project.github && (
+                <div className="mt-6 flex">
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`group/github inline-flex items-center gap-1.5 text-xs font-medium transition-colors duration-300 ${
+                      isActive || isFeatured
+                        ? 'text-foreground/80 hover:text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <Github className="size-4 transition-transform group-hover/github:scale-110" />
+                    <span>Show on GitHub</span>
+                  </a>
+                </div>
+              )}
 
               <div className="mt-8 flex items-center justify-between border-t border-border/30 pt-6">
                 <Button
