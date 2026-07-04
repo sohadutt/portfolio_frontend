@@ -1,5 +1,6 @@
 import { useState, createElement } from 'react'
-import { ArrowUpRight, ChevronRight, Github } from 'lucide-react'
+import { ArrowUpRight, ChevronRight } from 'lucide-react'
+import { FaGithub } from "react-icons/fa";
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/portfolio/section-header'
@@ -109,7 +110,6 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                 ))}
               </div>
 
-              {/* Conditionally rendered GitHub Link - Placed above the CTA Button */}
               {project.github && (
                 <div className="mt-6 flex">
                   <a
@@ -122,7 +122,7 @@ export function WorkSection({ data = {}, isScrolling, isDefaultPortfolio = false
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <Github className="size-4 transition-transform group-hover/github:scale-110" />
+                    <FaGithub className="size-4 transition-transform group-hover/github:scale-110" />
                     <span>Show on GitHub</span>
                   </a>
                 </div>
