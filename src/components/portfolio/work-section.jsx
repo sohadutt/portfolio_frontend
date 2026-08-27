@@ -8,7 +8,7 @@ import { resolveIcon } from '@/helper/functions'
 
 const portfolioBuilderProject = {
   title: 'Portfolio Builder',
-  eyebrow: 'Launch your own',
+  eyebrow: 'Web App',
   description:
     'This portfolio is powered by the builder behind it, with a dashboard for editing projects, experience, links, themes, and public portfolio variations.',
   stack: ['React', 'Vite', 'Dashboard CMS'],
